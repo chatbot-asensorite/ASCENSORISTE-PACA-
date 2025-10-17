@@ -1,38 +1,43 @@
-// Test de votre nouvelle clé Groq
-async function testNewKey() {
-    console.log("🧪 Test de la clé 'plateforme-ascenseurs'...");
-    
-    try {
-        const response = await fetch('/api/groq', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                messages: [{
-                    role: "user", 
-                    content: "Dis bonjour en français"
-                }],
-                model: "mixtral-8x7b-32768",
-                max_tokens: 50
-            }),
-        });
+<!-- Sauvegardez ceci comme test-groq.html et ouvrez-le dans votre navigateur -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Groq</title>
+</head>
+<body>
+    <h1>Test Groq API</h1>
+    <button onclick="testGroq()">Tester Groq</button>
+    <div id="result"></div>
 
-        const data = await response.json();
+    <script>
+    async function testGroq() {
+        // ⚠️ REMPLACEZ CECI PAR VOTRE NOUVELLE CLÉ COMPLÈTE
+        const API_KEY = "gsk_votre_nouvelle_clé_complète_ici";
         
-        if (response.ok) {
-            console.log("✅ SUCCÈS ! Clé valide 🎉");
-            console.log("Réponse IA:", data.choices[0].message.content);
-            return true;
-        } else {
-            console.log("❌ ERREUR:", data.error);
-            return false;
-        }
-    } catch (error) {
-        console.log("❌ ERREUR RESEAU:", error.message);
-        return false;
-    }
-}
+        try {
+            const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${API_KEY}`,
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    messages: [{role: "user", content: "Dis bonjour en français"}],
+                    model: "mixtral-8x7b-32768",
+                    max_tokens: 50
+                }),
+            });
 
-// Lancez le test
-testNewKey();
+            const data = await response.json();
+            document.getElementById('result').innerHTML = 
+                response.ok ? 
+                `<div style="color:green;">✅ SUCCÈS: ${data.choices[0].message.content}</div>` :
+                `<div style="color:red;">❌ ERREUR: ${data.error?.message}</div>`;
+                
+        } catch (error) {
+            document.getElementById('result').innerHTML = `<div style="color:red;">❌ ERREUR: ${error.message}</div>`;
+        }
+    }
+    </script>
+</body>
+</html>
