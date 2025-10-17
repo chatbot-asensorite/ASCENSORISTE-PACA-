@@ -6,6 +6,10 @@
       "use": "@vercel/node"
     },
     {
+      "src": "api/test.js",
+      "use": "@vercel/node"
+    },
+    {
       "src": "index.html",
       "use": "@vercel/static"
     }
@@ -15,6 +19,11 @@
       "src": "/api/groq",
       "methods": ["POST", "OPTIONS"],
       "dest": "/api/groq.js"
+    },
+    {
+      "src": "/api/test",
+      "methods": ["GET"],
+      "dest": "/api/test.js"
     },
     {
       "src": "/(.*)",
