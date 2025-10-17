@@ -1,43 +1,63 @@
-<!-- Sauvegardez ceci comme test-groq.html et ouvrez-le dans votre navigateur -->
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Test Groq</title>
+    <title>Test Sécurisé API</title>
 </head>
 <body>
-    <h1>Test Groq API</h1>
-    <button onclick="testGroq()">Tester Groq</button>
-    <div id="result"></div>
+    <h1>🧪 Test Sécurisé de votre API</h1>
+    <p>Ce test utilise VOTRE site, pas d'appel direct.</p>
+    
+    <button onclick="testerVotreAPI()">Tester Votre API Groq</button>
+    <div id="resultat" style="margin-top: 20px; padding: 15px;"></div>
 
     <script>
-    async function testGroq() {
-        // ⚠️ REMPLACEZ CECI PAR VOTRE NOUVELLE CLÉ COMPLÈTE
-        const API_KEY = "gsk_votre_nouvelle_clé_complète_ici";
-        
-        try {
-            const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-                method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${API_KEY}`,
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    messages: [{role: "user", content: "Dis bonjour en français"}],
-                    model: "mixtral-8x7b-32768",
-                    max_tokens: 50
-                }),
-            });
+        async function testerVotreAPI() {
+            const resultat = document.getElementById('resultat');
+            resultat.innerHTML = '<div style="color: blue;">🔄 Test en cours...</div>';
+            
+            try {
+                // Utilise VOTRE propre API sur Vercel
+                const response = await fetch('https://ascensoriste-paca-g31s9u6ay-hakim-s-projects-06acb1f8.vercel.app/api/groq', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        messages: [{
+                            role: "user", 
+                            content: "Réponds juste 'OK' pour confirmer que tu fonctionnes"
+                        }],
+                        model: "mixtral-8x7b-32768",
+                        max_tokens: 10
+                    }),
+                });
 
-            const data = await response.json();
-            document.getElementById('result').innerHTML = 
-                response.ok ? 
-                `<div style="color:green;">✅ SUCCÈS: ${data.choices[0].message.content}</div>` :
-                `<div style="color:red;">❌ ERREUR: ${data.error?.message}</div>`;
+                const data = await response.json();
                 
-        } catch (error) {
-            document.getElementById('result').innerHTML = `<div style="color:red;">❌ ERREUR: ${error.message}</div>`;
+                if (response.ok) {
+                    resultat.innerHTML = `
+                        <div style="color: green; background: #d4edda; padding: 15px; border-radius: 5px;">
+                            <strong>✅ VOTRE API FONCTIONNE !</strong><br>
+                            Réponse: "${data.choices[0].message.content}"
+                        </div>
+                    `;
+                } else {
+                    resultat.innerHTML = `
+                        <div style="color: red; background: #f8d7da; padding: 15px; border-radius: 5px;">
+                            <strong>❌ ERREUR API</strong><br>
+                            ${data.error?.message || 'Erreur inconnue'}
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                resultat.innerHTML = `
+                    <div style="color: red; background: #f8d7da; padding: 15px; border-radius: 5px;">
+                        <strong>❌ ERREUR DE CONNEXION</strong><br>
+                        ${error.message}
+                    </div>
+                `;
+            }
         }
-    }
     </script>
 </body>
 </html>
