@@ -1,14 +1,19 @@
-// api/groq.js - VERSION TEMPORAIRE avec clé en dur
+// api/groq.js - VERSION CORRIGÉE
 export default async function handler(req, res) {
+  // CORS
   res.setHeader('Access-Control-Allow-Origin', '*');
-  
-  if (req.method === 'OPTIONS') return res.status(200).end();
-  if (req.method !== 'POST') return res.status(405).json({ error: 'POST seulement' });
+  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
-  // ⚠️ METTEZ VOTRE CLÉ ICI TEMPORAIREMENT
-  const GROQ_API_KEY = "gsk_votre_clé_api_complète_ici";
-  
+  if (req.method === 'OPTIONS') return res.status(200).end();
+  if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
+
+  // Votre NOUVELLE clé Groq (remplacez par la nouvelle clé)
+  const GROQ_API_KEY = process.env.GROQ_API_KEY || "gsk_votre_nouvelle_clé_complète_ici";
+
   try {
+    console.log('🔧 Calling Groq API...');
+    
     const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -19,9 +24,17 @@ export default async function handler(req, res) {
     });
 
     const data = await response.json();
-    res.status(response.status).json(data);
     
+    if (!response.ok) {
+      console.error('❌ Groq API error:', data);
+      return res.status(response.status).json(data);
+    }
+
+    console.log('✅ Groq API success');
+    res.status(200).json(data);
+
   } catch (error) {
+    console.error('❌ Server error:', error);
     res.status(500).json({ error: error.message });
   }
 }
