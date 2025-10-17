@@ -1,4 +1,4 @@
-// api/groq.js - AVEC MODÈLE CORRECT
+// api/groq.js - VERSION CORRIGÉE
 export default async function handler(req, res) {
   // CORS
   res.setHeader('Access-Control-Allow-Origin', '*');
