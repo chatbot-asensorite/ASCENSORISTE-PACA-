@@ -1,4 +1,4 @@
-// api/groq.js - Version corrigée automatiquement
+// api/groq.js - AVEC NOUVEAU MODÈLE
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
@@ -22,7 +22,7 @@ export default async function handler(req, res) {
       },
       body: JSON.stringify({
         ...req.body,
-        model: "llama-3.1-70b-versatile" // Modèle garanti fonctionnel
+        model: "llama-3.2-1b-preview" // NOUVEAU MODÈLE FONCTIONNEL
       }),
     });
 
@@ -33,4 +33,3 @@ export default async function handler(req, res) {
     res.status(500).json({ error: error.message });
   }
 }
-            
