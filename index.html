@@ -106,6 +106,8 @@
             border-radius: 5px;
             border-left: 4px solid #667eea;
             line-height: 1.5;
+            max-height: 400px;
+            overflow-y: auto;
         }
         .mega-link {
             display: block;
@@ -129,6 +131,15 @@
             align-items: center;
             gap: 8px;
             margin: 10px 0;
+            padding: 8px;
+            border-radius: 5px;
+            transition: background 0.3s;
+        }
+        .checkbox-item:hover {
+            background: #e9ecef;
+        }
+        .checkbox-item input[type="radio"] {
+            margin-right: 10px;
         }
         .loading {
             text-align: center;
@@ -150,81 +161,41 @@
             border-radius: 5px;
             margin: 10px 0;
         }
-        
-        /* NOUVEAUX STYLES POUR LE CHATBOT */
-        .chat-container {
-            max-height: 400px;
-            overflow-y: auto;
-            border: 2px solid #e9ecef;
-            border-radius: 10px;
+        .config-section {
+            background: #e8f4fd;
             padding: 15px;
-            background: white;
-            margin-bottom: 15px;
-        }
-        .message {
+            border-radius: 8px;
             margin: 10px 0;
-            padding: 12px;
-            border-radius: 10px;
-            max-width: 80%;
+            border: 2px solid #b8daff;
+        }
+        .options-section {
+            background: #fff3cd;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            border: 2px solid #ffeaa7;
+        }
+        .feedback-section {
+            background: #d4edda;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            border: 2px solid #c3e6cb;
+        }
+        .chat-message {
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 8px;
         }
         .user-message {
             background: #007bff;
             color: white;
-            margin-left: auto;
-            text-align: right;
+            margin-left: 20%;
         }
-        .ai-message {
+        .ia-message {
             background: #f8f9fa;
-            color: #333;
             border: 1px solid #dee2e6;
-        }
-        .message-time {
-            font-size: 0.8em;
-            opacity: 0.7;
-            margin-top: 5px;
-        }
-        .chat-input-container {
-            display: flex;
-            gap: 10px;
-            margin-top: 15px;
-        }
-        .chat-input {
-            flex: 1;
-            padding: 12px;
-            border: 2px solid #ddd;
-            border-radius: 8px;
-            font-size: 16px;
-        }
-        .send-button {
-            background: #28a745;
-            color: white;
-            border: none;
-            padding: 12px 20px;
-            border-radius: 8px;
-            cursor: pointer;
-        }
-        .controls-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-            margin: 15px 0;
-        }
-        .control-group {
-            background: #f8f9fa;
-            padding: 15px;
-            border-radius: 8px;
-            border: 1px solid #dee2e6;
-        }
-        .typing-indicator {
-            display: none;
-            padding: 10px;
-            font-style: italic;
-            color: #666;
-            text-align: center;
-        }
-        .clear-chat {
-            background: #6c757d;
-            margin-top: 10px;
+            margin-right: 20%;
         }
     </style>
 </head>
@@ -275,91 +246,100 @@
             <button class="logout" onclick="showLogin()">🔓 Déconnexion</button>
         </div>
 
-        <!-- Assistant IA - VERSION CHATBOT AMÉLIORÉE -->
+        <!-- CONFIGURATION -->
+        <div class="config-section">
+            <h3>⚙️ CONFIGURATION</h3>
+            
+            <div class="checkbox-item">
+                <input type="checkbox" id="marqueConnue" onchange="toggleMarque()">
+                <label for="marqueConnue"><strong>✅ Marque connue</strong></label>
+            </div>
+
+            <div class="checkbox-item">
+                <input type="checkbox" id="marqueInconnue" onchange="toggleMarqueInconnue()">
+                <label for="marqueInconnue"><strong>❌ Marque inconnue</strong></label>
+            </div>
+
+            <div id="selectionMarque" style="display: none; margin-top: 10px;">
+                <select id="marque">
+                    <option value="">Sélectionnez une marque</option>
+                    <option value="Otis">Otis</option>
+                    <option value="KONE">KONE</option>
+                    <option value="Schindler">Schindler</option>
+                    <option value="ThyssenKrupp">ThyssenKrupp</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- OPTIONS -->
+        <div class="options-section">
+            <h3>🎯 OPTIONS</h3>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 10px 0;">
+                <div class="checkbox-item">
+                    <input type="radio" id="panne" name="typeDemande" value="panne" checked>
+                    <label for="panne"><strong>🔧 Panne</strong></label>
+                </div>
+                <div class="checkbox-item">
+                    <input type="radio" id="programmation" name="typeDemande" value="programmation">
+                    <label for="programmation"><strong>⚙️ Programmation</strong></label>
+                </div>
+            </div>
+
+            <div class="checkbox-item">
+                <input type="checkbox" id="rechercheMega">
+                <label for="rechercheMega"><strong>🔍 Rechercher dans Mega.io</strong></label>
+            </div>
+
+            <div class="checkbox-item">
+                <input type="checkbox" id="rechercheInternet">
+                <label for="rechercheInternet"><strong>🌐 Recherche Internet</strong></label>
+            </div>
+        </div>
+
+        <!-- Assistant IA -->
         <div class="card">
             <h2>🧠 Assistant IA Groq - Spécialisé Ascenseurs</h2>
-            
-            <!-- Contrôles bien organisés -->
-            <div class="controls-grid">
-                <div class="control-group">
-                    <h4>🏷️ Configuration</h4>
+
+            <textarea id="questionIa" placeholder="Décrivez votre problème technique, symptômes, codes erreur..." rows="4"></textarea>
+            <button id="askIaBtn" onclick="demanderIA()" style="width: 100%; background: #28a745;">🧠 Demander à l'IA Groq</button>
+
+            <div id="chatHistorique" class="ia-response">
+                <div class="ia-message chat-message">
+                    <strong>🤖 Assistant IA:</strong><br>
+                    Bonjour ! Je suis votre assistant spécialisé en ascenseurs. Décrivez-moi votre problème et je vous aiderai à le résoudre.
+                </div>
+            </div>
+
+            <!-- Feedback IA -->
+            <div id="feedbackSection" style="display: none; margin-top: 15px;">
+                <div class="feedback-section">
+                    <h4>📊 Feedback - Amélioration IA</h4>
                     <div class="checkbox-item">
-                        <input type="checkbox" id="marqueConnue" onchange="toggleMarque()">
-                        <label for="marqueConnue">Marque connue</label>
+                        <input type="checkbox" id="problemeResolu">
+                        <label for="problemeResolu"><strong>✅ Cette solution a résolu mon problème</strong></label>
                     </div>
                     
-                    <div id="selectionMarque" style="display: none; margin-top: 10px;">
-                        <select id="marque" style="width: 100%;">
-                            <option value="">Sélectionnez une marque</option>
-                            <option value="Otis">Otis</option>
-                            <option value="KONE">KONE</option>
-                            <option value="Schindler">Schindler</option>
-                            <option value="ThyssenKrupp">ThyssenKrupp</option>
-                        </select>
-                    </div>
-                </div>
-                
-                <div class="control-group">
-                    <h4>⚙️ Options</h4>
-                    <div style="margin: 10px 0;">
-                        <label>Type de demande :</label>
-                        <div class="checkbox-item">
-                            <input type="radio" id="panne" name="typeDemande" value="panne" checked>
-                            <label for="panne">🔧 Panne</label>
-                        </div>
-                        <div class="checkbox-item">
-                            <input type="radio" id="programmation" name="typeDemande" value="programmation">
-                            <label for="programmation">⚙️ Programmation</label>
-                        </div>
-                    </div>
-                    
-                    <div class="checkbox-item">
-                        <input type="checkbox" id="autoriserInternet">
-                        <label for="autoriserInternet">🔍 Recherche Internet</label>
+                    <div id="correctionSection" style="display: none; margin-top: 10px;">
+                        <textarea id="correctionText" placeholder="Si la solution n'a pas fonctionné, donnez la solution correcte..." rows="3"></textarea>
+                        <button onclick="corrigerIA()" style="background: #17a2b8;">✅ Envoyer la correction</button>
                     </div>
                 </div>
             </div>
+        </div>
 
-            <!-- Historique du chat -->
-            <div class="chat-container" id="chatHistory">
-                <div class="message ai-message">
-                    <strong>🤖 Assistant IA :</strong><br>
-                    Bonjour ! Je suis votre assistant spécialisé en ascenseurs. 
-                    Comment puis-je vous aider avec votre problème technique aujourd'hui ?
-                    <div class="message-time" id="initialTime"></div>
-                </div>
-            </div>
-
-            <!-- Indicateur de frappe -->
-            <div class="typing-indicator" id="typingIndicator">
-                🤖 L'IA analyse votre problème...
-            </div>
-
-            <!-- Zone de saisie -->
-            <div class="chat-input-container">
-                <input type="text" id="questionIa" class="chat-input" 
-                       placeholder="Posez votre question sur les ascenseurs..." 
-                       onkeypress="handleKeyPress(event)">
-                <button class="send-button" onclick="envoyerMessage()">📤 Envoyer</button>
-            </div>
-
-            <button class="clear-chat" onclick="effacerHistorique()" style="width: 100%;">🗑️ Effacer l'historique</button>
-
-            <!-- Documents Mega.io -->
-            <div style="margin-top: 20px; padding-top: 15px; border-top: 2px solid #dee2e6;">
-                <h4>📁 Documents Techniques disponibles :</h4>
-                <div style="display: grid; grid-template-columns: 1fr; gap: 10px; margin-top: 10px;">
-                    <a href="https://mega.nz/folder/iFVGVKQa#neDd4RKjQUq_fZ-70Qg5xQ" target="_blank" class="mega-link">
-                        📂 Documents Otis
-                    </a>
-                    <a href="https://mega.nz/folder/vB8kHQ5I#TRNu01UmsjrqeqGKHz7gKQ" target="_blank" class="mega-link">
-                        📂 Documents KONE
-                    </a>
-                    <a href="https://mega.nz/folder/OJM3jAIQ#uFG2EBO1NUUG5gfn9hGCzg" target="_blank" class="mega-link">
-                        📂 Documents Schindler
-                    </a>
-                </div>
-            </div>
+        <!-- Documents -->
+        <div class="card">
+            <h2>📁 Documents Techniques</h2>
+            <a href="https://mega.nz/folder/iFVGVKQa#neDd4RKjQUq_fZ-70Qg5xQ" target="_blank" class="mega-link">
+                📂 Ouvrir les documents Otis sur Mega.io
+            </a>
+            <a href="https://mega.nz/folder/vB8kHQ5I#TRNu01UmsjrqeqGKHz7gKQ" target="_blank" class="mega-link">
+                📂 Ouvrir les documents KONE sur Mega.io
+            </a>
+            <a href="https://mega.nz/folder/OJM3jAIQ#uFG2EBO1NUUG5gfn9hGCzg" target="_blank" class="mega-link">
+                📂 Ouvrir les documents Schindler sur Mega.io
+            </a>
         </div>
     </div>
 
@@ -409,7 +389,8 @@
         ];
 
         let connaissances = JSON.parse(localStorage.getItem('connaissancesIA')) || [];
-        let historiqueChat = JSON.parse(localStorage.getItem('historiqueChat')) || [];
+        let historique = JSON.parse(localStorage.getItem('historiqueIA')) || [];
+        let conversation = JSON.parse(localStorage.getItem('conversationIA')) || [];
 
         // Authentification
         const comptesValides = [
@@ -432,7 +413,7 @@
             document.getElementById('adminContainer').style.display = 'none';
             document.getElementById('techEmail').textContent = email;
             afficherMarques();
-            afficherHistoriqueChat();
+            chargerConversation();
         }
 
         function showAdmin() {
@@ -464,6 +445,31 @@
                 errorMessage.textContent = 'Email ou mot de passe incorrect';
             }
         });
+
+        // Configuration Marque
+        function toggleMarque() {
+            const marqueConnue = document.getElementById('marqueConnue');
+            const marqueInconnue = document.getElementById('marqueInconnue');
+            const selectionDiv = document.getElementById('selectionMarque');
+            
+            if (marqueConnue.checked) {
+                selectionDiv.style.display = 'block';
+                marqueInconnue.checked = false;
+            } else {
+                selectionDiv.style.display = 'none';
+            }
+        }
+
+        function toggleMarqueInconnue() {
+            const marqueConnue = document.getElementById('marqueConnue');
+            const marqueInconnue = document.getElementById('marqueInconnue');
+            const selectionDiv = document.getElementById('selectionMarque');
+            
+            if (marqueInconnue.checked) {
+                selectionDiv.style.display = 'none';
+                marqueConnue.checked = false;
+            }
+        }
 
         // Test de l'API Groq via proxy Vercel
         async function testerAPI() {
@@ -501,10 +507,7 @@
                     apiStatus.style.color = 'green';
                 }
                 
-                console.log('✅ Test API réussi:', data);
-                
             } catch (error) {
-                console.error('❌ Test API échoué:', error);
                 if (testResult) testResult.innerHTML = `<div class="error">❌ Erreur: ${error.message}</div>`;
                 if (apiStatus) {
                     apiStatus.innerHTML = '<span style="color: red;">❌ Erreur de connexion</span>';
@@ -513,130 +516,95 @@
             }
         }
 
-        // FONCTIONS CHATBOT AMÉLIORÉES
-        function toggleMarque() {
-            const selectionDiv = document.getElementById('selectionMarque');
-            selectionDiv.style.display = document.getElementById('marqueConnue').checked ? 'block' : 'none';
+        // Système de conversation
+        function ajouterMessageConversation(role, message) {
+            const messageObj = {
+                id: Date.now(),
+                role: role,
+                message: message,
+                timestamp: new Date().toLocaleTimeString()
+            };
+            
+            conversation.push(messageObj);
+            localStorage.setItem('conversationIA', JSON.stringify(conversation));
+            afficherConversation();
         }
 
-        function handleKeyPress(event) {
-            if (event.key === 'Enter') {
-                envoyerMessage();
-            }
-        }
-
-        function ajouterMessageChat(contenu, estUtilisateur) {
-            const chatHistory = document.getElementById('chatHistory');
-            const messageDiv = document.createElement('div');
-            messageDiv.className = `message ${estUtilisateur ? 'user-message' : 'ai-message'}`;
+        function afficherConversation() {
+            const chatHistorique = document.getElementById('chatHistorique');
+            chatHistorique.innerHTML = '';
             
-            const timestamp = new Date().toLocaleTimeString();
-            
-            messageDiv.innerHTML = `
-                <strong>${estUtilisateur ? '👤 Vous' : '🤖 Assistant IA'}:</strong><br>
-                ${contenu.replace(/\n/g, '<br>')}
-                <div class="message-time">${timestamp}</div>
-            `;
-            
-            chatHistory.appendChild(messageDiv);
-            chatHistory.scrollTop = chatHistory.scrollHeight;
-            
-            // Sauvegarder dans l'historique
-            historiqueChat.push({
-                contenu,
-                estUtilisateur,
-                timestamp,
-                marque: document.getElementById('marqueConnue').checked ? document.getElementById('marque').value : 'Non spécifiée',
-                typeDemande: document.querySelector('input[name="typeDemande"]:checked').value
-            });
-            
-            localStorage.setItem('historiqueChat', JSON.stringify(historiqueChat));
-        }
-
-        function afficherHistoriqueChat() {
-            const chatHistory = document.getElementById('chatHistory');
-            chatHistory.innerHTML = '';
-            
-            // Message de bienvenue
-            const welcomeDiv = document.createElement('div');
-            welcomeDiv.className = 'message ai-message';
-            welcomeDiv.innerHTML = `
-                <strong>🤖 Assistant IA :</strong><br>
-                Bonjour ! Je suis votre assistant spécialisé en ascenseurs. 
-                Comment puis-je vous aider avec votre problème technique aujourd'hui ?
-                <div class="message-time">${new Date().toLocaleTimeString()}</div>
-            `;
-            chatHistory.appendChild(welcomeDiv);
-            
-            // Afficher l'historique sauvegardé
-            historiqueChat.forEach(msg => {
+            conversation.forEach(msg => {
                 const messageDiv = document.createElement('div');
-                messageDiv.className = `message ${msg.estUtilisateur ? 'user-message' : 'ai-message'}`;
-                messageDiv.innerHTML = `
-                    <strong>${msg.estUtilisateur ? '👤 Vous' : '🤖 Assistant IA'}:</strong><br>
-                    ${msg.contenu.replace(/\n/g, '<br>')}
-                    <div class="message-time">${msg.timestamp}</div>
-                `;
-                chatHistory.appendChild(messageDiv);
+                messageDiv.className = msg.role === 'user' ? 'user-message chat-message' : 'ia-message chat-message';
+                
+                let prefix = msg.role === 'user' ? '👤 Vous:' : '🤖 Assistant IA:';
+                messageDiv.innerHTML = `<strong>${prefix}</strong><br>${msg.message}`;
+                
+                chatHistorique.appendChild(messageDiv);
             });
             
-            chatHistory.scrollTop = chatHistory.scrollHeight;
+            chatHistorique.scrollTop = chatHistorique.scrollHeight;
         }
 
-        function effacerHistorique() {
-            if (confirm('Voulez-vous vraiment effacer tout l\'historique de conversation ?')) {
-                historiqueChat = [];
-                localStorage.setItem('historiqueChat', JSON.stringify(historiqueChat));
-                afficherHistoriqueChat();
+        function chargerConversation() {
+            if (conversation.length === 0) {
+                conversation = [{
+                    id: 1,
+                    role: 'ia',
+                    message: 'Bonjour ! Je suis votre assistant spécialisé en ascenseurs. Décrivez-moi votre problème et je vous aiderai à le résoudre.',
+                    timestamp: new Date().toLocaleTimeString()
+                }];
+                localStorage.setItem('conversationIA', JSON.stringify(conversation));
             }
+            afficherConversation();
         }
 
-        async function envoyerMessage() {
+        // Fonction IA principale
+        async function demanderIA() {
             const question = document.getElementById('questionIa').value.trim();
+            const askBtn = document.getElementById('askIaBtn');
             const marqueConnue = document.getElementById('marqueConnue').checked;
+            const marqueInconnue = document.getElementById('marqueInconnue').checked;
             const marque = marqueConnue ? document.getElementById('marque').value : 'Non spécifiée';
             const typeDemande = document.querySelector('input[name="typeDemande"]:checked').value;
-            const autoriserInternet = document.getElementById('autoriserInternet').checked;
+            const rechercheMega = document.getElementById('rechercheMega').checked;
+            const rechercheInternet = document.getElementById('rechercheInternet').checked;
 
             if (!question) {
-                alert('Veuillez entrer une question');
+                alert('❌ Veuillez décrire votre problème');
                 return;
             }
 
-            // Ajouter le message de l'utilisateur
-            ajouterMessageChat(question, true);
-            document.getElementById('questionIa').value = '';
-            
-            // Afficher l'indicateur de frappe
-            document.getElementById('typingIndicator').style.display = 'block';
+            // Ajouter la question à la conversation
+            ajouterMessageConversation('user', question);
+
+            // Désactiver le bouton pendant la requête
+            askBtn.disabled = true;
+            askBtn.textContent = '🧠 Analyse en cours...';
 
             try {
-                // Prompt spécialisé pour les ascenseurs - VERSION HONNÊTE
+                // Prompt spécialisé pour les ascenseurs - VERSION AMÉLIORÉE
                 const promptSpecialise = `
 Tu es un expert technique spécialisé EXCLUSIVEMENT dans les ascenseurs.
 
-RÈGLES STRICTES :
-1. Réponds UNIQUEMENT sur les ascenseurs
-2. Sois technique mais compréhensible
-3. Propose des diagnostics étape par étape
-4. Mentionne les normes de sécurité EN 81-20
-5. Si tu ne sais pas, indique où chercher l'information
-
-INFORMATIONS FOURNIES :
-- Marque: ${marque}
+CONFIGURATION UTILISATEUR:
+- Marque: ${marqueConnue ? marque : 'Inconnue'}
 - Type de demande: ${typeDemande}
-- Recherche Internet: ${autoriserInternet ? 'Autorisée si nécessaire' : 'Non autorisée'}
+- Recherche Mega.io: ${rechercheMega ? 'Activée' : 'Désactivée'}
+- Recherche Internet: ${rechercheInternet ? 'Activée' : 'Désactivée'}
 
-QUESTION DU TECHNICIEN :
-${question}
+DIRECTIVES STRICTES:
+1. Sois DIRECT et CONCIS
+2. Pose les questions ESSENTIELLES immédiatement
+3. Si recherche Mega.io activée mais docs non trouvés, dis-le clairement
+4. Ne invente pas de procédures
+5. Concentre-toi sur les solutions pratiques
+6. Si besoin de plus d'infos, demande-les directement
 
-DOCUMENTS DISPONIBLES (Mega.io) :
-L'utilisateur a accès à des documents techniques sur Mega.io, mais tu ne peux pas les analyser directement.
-Si nécessaire, suggère-lui de consulter les documents spécifiques à la marque.
+QUESTION: ${question}
 
-Si tu n'as pas assez d'informations, demande des détails supplémentaires.
-
-Réponds en français de façon professionnelle.
+Réponds en français de façon professionnelle mais directe.
 `;
 
                 // Appel via proxy Vercel
@@ -658,7 +626,7 @@ Réponds en français de façon professionnelle.
                         ],
                         model: "llama-3.1-8b-instant",
                         temperature: 0.3,
-                        max_tokens: 2000
+                        max_tokens: 1000
                     })
                 });
 
@@ -667,24 +635,90 @@ Réponds en français de façon professionnelle.
                 }
 
                 const data = await response.json();
+                const reponseIA = data.choices[0].message.content;
                 
-                // Formater et ajouter la réponse
-                let reponseFormatee = data.choices[0].message.content
-                    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+                // Ajouter la réponse à la conversation
+                ajouterMessageConversation('ia', reponseIA);
 
-                ajouterMessageChat(reponseFormatee, false);
+                // Sauvegarder dans l'historique
+                const interaction = {
+                    id: Date.now(),
+                    question,
+                    reponse: reponseIA,
+                    marque,
+                    typeDemande,
+                    date: new Date().toLocaleString()
+                };
+                historique.unshift(interaction);
+                localStorage.setItem('historiqueIA', JSON.stringify(historique));
+
+                // Afficher section feedback
+                document.getElementById('feedbackSection').style.display = 'block';
+                document.getElementById('correctionSection').style.display = 'none';
+                document.getElementById('problemeResolu').checked = false;
+
+                // Vider le champ de question
+                document.getElementById('questionIa').value = '';
 
             } catch (error) {
-                console.error('Erreur IA:', error);
-                ajouterMessageChat(
-                    `❌ Désolé, une erreur s'est produite : ${error.message}\n\n` +
-                    `💡 Conseil : Vérifiez votre connexion ou consultez directement les documents Mega.io.`,
-                    false
-                );
+                ajouterMessageConversation('ia', `❌ Erreur de connexion: ${error.message}`);
             } finally {
-                // Masquer l'indicateur de frappe
-                document.getElementById('typingIndicator').style.display = 'none';
+                // Réactiver le bouton
+                askBtn.disabled = false;
+                askBtn.textContent = '🧠 Demander à l\'IA Groq';
             }
+        }
+
+        // Système de feedback
+        document.getElementById('problemeResolu').addEventListener('change', function() {
+            const correctionSection = document.getElementById('correctionSection');
+            if (this.checked) {
+                correctionSection.style.display = 'none';
+                // L'IA apprend que la solution était bonne
+                const derniereInteraction = historique[0];
+                if (derniereInteraction) {
+                    derniereInteraction.solutionValide = true;
+                    localStorage.setItem('historiqueIA', JSON.stringify(historique));
+                }
+            } else {
+                correctionSection.style.display = 'block';
+            }
+        });
+
+        function corrigerIA() {
+            const correction = document.getElementById('correctionText').value.trim();
+            const derniereInteraction = historique[0];
+            
+            if (!correction) {
+                alert('Veuillez entrer la solution correcte');
+                return;
+            }
+
+            // Ajouter aux connaissances
+            const nouvelleConnaissance = {
+                id: Date.now(),
+                panne: derniereInteraction.question.substring(0, 100),
+                solution: correction,
+                date: new Date().toLocaleString()
+            };
+            
+            connaissances.push(nouvelleConnaissance);
+            localStorage.setItem('connaissancesIA', JSON.stringify(connaissances));
+
+            // Marquer comme corrigé
+            derniereInteraction.correction = correction;
+            derniereInteraction.solutionValide = false;
+            localStorage.setItem('historiqueIA', JSON.stringify(historique));
+
+            // Afficher confirmation
+            document.getElementById('feedbackSection').innerHTML = `
+                <div class="success">
+                    ✅ Correction enregistrée ! L'IA apprendra de cette information.
+                </div>
+            `;
+
+            // Ajouter un message de confirmation à la conversation
+            ajouterMessageConversation('ia', '✅ Merci pour votre feedback ! J\'ai appris de cette correction.');
         }
 
         // Fonctions Admin
@@ -718,13 +752,9 @@ Réponds en français de façon professionnelle.
 
         // Initialisation
         document.addEventListener('DOMContentLoaded', function() {
-            console.log('🚀 Plateforme Ascenseurs - IA Groq via Proxy Vercel');
             // Pré-remplir pour test
             document.getElementById('email').value = 'technicien1@ascenseurs.fr';
             document.getElementById('password').value = '123456';
-            
-            // Initialiser l'heure du message de bienvenue
-            document.getElementById('initialTime').textContent = new Date().toLocaleTimeString();
             
             // Tester l'API au chargement
             setTimeout(testerAPI, 1000);
