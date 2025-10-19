@@ -71,6 +71,12 @@
         .logout:hover {
             background: #c0392b;
         }
+        .reset-chat {
+            background: #f39c12;
+        }
+        .reset-chat:hover {
+            background: #e67e22;
+        }
         .error {
             color: #e74c3c;
             margin-top: 10px;
@@ -197,6 +203,16 @@
             border: 1px solid #dee2e6;
             margin-right: 20%;
         }
+        .chat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        .chat-controls {
+            display: flex;
+            gap: 10px;
+        }
     </style>
 </head>
 <body>
@@ -243,7 +259,9 @@
                 <span class="security-badge">🧠 IA Groq Réelle</span>
                 <span class="security-badge">🔒 API Protégée</span>
             </div>
-            <button class="logout" onclick="showLogin()">🔓 Déconnexion</button>
+            <div>
+                <button class="logout" onclick="deconnecter()">🔓 Déconnexion</button>
+            </div>
         </div>
 
         <!-- CONFIGURATION -->
@@ -299,7 +317,12 @@
 
         <!-- Assistant IA -->
         <div class="card">
-            <h2>🧠 Assistant IA Groq - Spécialisé Ascenseurs</h2>
+            <div class="chat-header">
+                <h2>🧠 Assistant IA Groq - Spécialisé Ascenseurs</h2>
+                <div class="chat-controls">
+                    <button class="reset-chat" onclick="resetConversation()">🔄 Reset Chat</button>
+                </div>
+            </div>
 
             <textarea id="questionIa" placeholder="Décrivez votre problème technique, symptômes, codes erreur..." rows="4"></textarea>
             <button id="askIaBtn" onclick="demanderIA()" style="width: 100%; background: #28a745;">🧠 Demander à l'IA Groq</button>
@@ -351,7 +374,7 @@
                 <p>Connecté en tant que : <strong>admin@ascenseurs.fr</strong></p>
                 <span class="security-badge">🔧 Gestion Complète</span>
             </div>
-            <button class="logout" onclick="showLogin()">🔓 Déconnexion</button>
+            <button class="logout" onclick="deconnecter()">🔓 Déconnexion</button>
         </div>
 
         <div class="card">
@@ -405,6 +428,10 @@
             document.getElementById('loginContainer').style.display = 'block';
             document.getElementById('technicienContainer').style.display = 'none';
             document.getElementById('adminContainer').style.display = 'none';
+            
+            // Reset du formulaire de connexion
+            document.getElementById('loginForm').reset();
+            document.getElementById('errorMessage').textContent = '';
         }
 
         function showTechnicien(email) {
@@ -421,6 +448,45 @@
             document.getElementById('technicienContainer').style.display = 'none';
             document.getElementById('adminContainer').style.display = 'block';
             afficherMarques();
+        }
+
+        // NOUVELLE FONCTION : Déconnexion avec reset
+        function deconnecter() {
+            // Reset de la conversation
+            resetConversation();
+            
+            // Retour à la page de connexion
+            showLogin();
+        }
+
+        // NOUVELLE FONCTION : Reset de la conversation
+        function resetConversation() {
+            // Réinitialiser la conversation avec le message initial
+            conversation = [{
+                id: 1,
+                role: 'ia',
+                message: 'Bonjour ! Je suis votre assistant spécialisé en ascenseurs. Décrivez-moi votre problème et je vous aiderai à le résoudre.',
+                timestamp: new Date().toLocaleTimeString()
+            }];
+            
+            // Sauvegarder dans le localStorage
+            localStorage.setItem('conversationIA', JSON.stringify(conversation));
+            
+            // Réafficher la conversation
+            afficherConversation();
+            
+            // Cacher la section feedback
+            document.getElementById('feedbackSection').style.display = 'none';
+            
+            // Vider le champ de question
+            document.getElementById('questionIa').value = '';
+            
+            // Réactiver le bouton si désactivé
+            const askBtn = document.getElementById('askIaBtn');
+            askBtn.disabled = false;
+            askBtn.textContent = '🧠 Demander à l\'IA Groq';
+            
+            console.log('✅ Conversation resetée');
         }
 
         // Connexion
@@ -549,15 +615,10 @@
 
         function chargerConversation() {
             if (conversation.length === 0) {
-                conversation = [{
-                    id: 1,
-                    role: 'ia',
-                    message: 'Bonjour ! Je suis votre assistant spécialisé en ascenseurs. Décrivez-moi votre problème et je vous aiderai à le résoudre.',
-                    timestamp: new Date().toLocaleTimeString()
-                }];
-                localStorage.setItem('conversationIA', JSON.stringify(conversation));
+                resetConversation(); // Utiliser la fonction reset pour initialiser
+            } else {
+                afficherConversation();
             }
-            afficherConversation();
         }
 
         // Fonction IA principale
