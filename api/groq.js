@@ -1,4 +1,4 @@
-// api/groq.js - AVEC MODÈLE CORRECT
+// api/groq.js - VERSION FONCTIONNELLE
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
@@ -14,19 +14,13 @@ export default async function handler(req, res) {
   }
 
   try {
-    // FORCER l'utilisation d'un modèle fonctionnel
-    const requestBody = {
-      ...req.body,
-      model: "llama-3.1-8b-instant" // MODÈLE QUI FONCTIONNE
-    };
-
     const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${GROQ_API_KEY}`,
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(requestBody),
+      body: JSON.stringify(req.body),
     });
 
     const data = await response.json();
