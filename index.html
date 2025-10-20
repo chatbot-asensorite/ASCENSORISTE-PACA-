@@ -213,28 +213,28 @@
             display: flex;
             gap: 10px;
         }
-        .config-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-            margin-top: 15px;
-        }
         .options-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 15px;
-            margin-top: 10px;
+            margin: 15px 0;
         }
-        .option-column {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
+        .option-card {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            border: 2px solid #dee2e6;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
         }
-        @media (max-width: 768px) {
-            .config-grid,
-            .options-grid {
-                grid-template-columns: 1fr;
-            }
+        .option-card:hover {
+            border-color: #667eea;
+            transform: translateY(-2px);
+        }
+        .option-card.selected {
+            border-color: #28a745;
+            background: #f8fff9;
         }
     </style>
 </head>
@@ -287,68 +287,59 @@
             </div>
         </div>
 
-        <!-- CONFIGURATION ET OPTIONS CÔTE À CÔTE -->
-        <div class="config-grid">
-            <!-- CONFIGURATION -->
-            <div class="config-section">
-                <h3>⚙️ CONFIGURATION</h3>
-                
-                <div class="checkbox-item">
-                    <input type="checkbox" id="marqueConnue" onchange="toggleMarque()">
-                    <label for="marqueConnue"><strong>✅ Marque connue</strong></label>
-                </div>
+        <!-- CONFIGURATION -->
+        <div class="config-section">
+            <h3>⚙️ CONFIGURATION</h3>
+            
+            <div class="checkbox-item">
+                <input type="checkbox" id="marqueConnue" onchange="toggleMarque()">
+                <label for="marqueConnue"><strong>✅ Marque connue</strong></label>
+            </div>
 
-                <div class="checkbox-item">
-                    <input type="checkbox" id="marqueInconnue" onchange="toggleMarqueInconnue()">
-                    <label for="marqueInconnue"><strong>❌ Marque inconnue</strong></label>
-                </div>
+            <div class="checkbox-item">
+                <input type="checkbox" id="marqueInconnue" onchange="toggleMarqueInconnue()">
+                <label for="marqueInconnue"><strong>❌ Marque inconnue</strong></label>
+            </div>
 
-                <div id="selectionMarque" style="display: none; margin-top: 10px;">
-                    <select id="marque" onchange="toggleModele()">
-                        <option value="">Sélectionnez une marque</option>
-                        <option value="Otis">Otis</option>
-                        <option value="KONE">KONE</option>
-                        <option value="Schindler">Schindler</option>
-                        <option value="ThyssenKrupp">ThyssenKrupp</option>
-                    </select>
-                </div>
+            <div id="selectionMarque" style="display: none; margin-top: 10px;">
+                <select id="marque" onchange="chargerModeles()">
+                    <option value="">Sélectionnez une marque</option>
+                    <option value="Otis">Otis</option>
+                    <option value="KONE">KONE</option>
+                    <option value="Schindler">Schindler</option>
+                </select>
+            </div>
 
-                <div id="selectionModele" style="display: none; margin-top: 10px;">
-                    <select id="modele">
-                        <option value="">Sélectionnez le modèle</option>
-                        <!-- Les options seront chargées dynamiquement -->
-                    </select>
+            <div id="selectionModele" style="display: none; margin-top: 10px;">
+                <select id="modele">
+                    <option value="">Sélectionnez un modèle</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- OPTIONS -->
+        <div class="options-section">
+            <h3>🎯 OPTIONS</h3>
+            
+            <div class="options-grid">
+                <div class="option-card" onclick="selectOption('panne')">
+                    <input type="radio" id="panne" name="typeDemande" value="panne" checked>
+                    <label for="panne"><strong>🔧 Panne</strong></label>
+                </div>
+                <div class="option-card" onclick="selectOption('programmation')">
+                    <input type="radio" id="programmation" name="typeDemande" value="programmation">
+                    <label for="programmation"><strong>⚙️ Programmation</strong></label>
                 </div>
             </div>
 
-            <!-- OPTIONS -->
-            <div class="options-section">
-                <h3>🎯 OPTIONS</h3>
-                
-                <div class="options-grid">
-                    <div class="option-column">
-                        <div class="checkbox-item">
-                            <input type="radio" id="panne" name="typeDemande" value="panne" checked>
-                            <label for="panne"><strong>🔧 Panne</strong></label>
-                        </div>
-                        <div class="checkbox-item">
-                            <input type="radio" id="programmation" name="typeDemande" value="programmation">
-                            <label for="programmation"><strong>⚙️ Programmation</strong></label>
-                        </div>
-                    </div>
-                    
-                    <div class="option-column">
-                        <div class="checkbox-item">
-                            <input type="checkbox" id="rechercheMega" checked>
-                            <label for="rechercheMega"><strong>🔍 Rechercher dans Mega.io</strong></label>
-                        </div>
+            <div class="checkbox-item">
+                <input type="checkbox" id="rechercheMega">
+                <label for="rechercheMega"><strong>🔍 Rechercher dans Mega.io</strong></label>
+            </div>
 
-                        <div class="checkbox-item">
-                            <input type="checkbox" id="rechercheInternet">
-                            <label for="rechercheInternet"><strong>🌐 Recherche Internet</strong></label>
-                        </div>
-                    </div>
-                </div>
+            <div class="checkbox-item">
+                <input type="checkbox" id="rechercheInternet">
+                <label for="rechercheInternet"><strong>🌐 Recherche Internet</strong></label>
             </div>
         </div>
 
@@ -448,19 +439,11 @@
             { nom: "Schindler", lienMega: "https://mega.nz/folder/OJM3jAIQ#uFG2EBO1NUUG5gfn9hGCzg" }
         ];
 
-        // CORRECTION DES LIENS MEGA (inversés)
-        const liensMegaCorriges = {
-            "Otis": "https://mega.nz/folder/iFVGVKQa#neDd4RKjQUq_fZ-70Qg5xQ",
-            "KONE": "https://mega.nz/folder/vB8kHQ5I#TRNu01UmsjrqeqGKHz7gKQ", 
-            "Schindler": "https://mega.nz/folder/OJM3jAIQ#uFG2EBO1NUUG5gfn9hGCzg"
-        };
-
-        // Modèles d'ascenseurs par marque
-        const modelesAscenseurs = {
-            "Otis": ["Gen2", "Gen3", "Elevonic 401", "SkyRise", "Companion", "Select", "Otis 2000"],
-            "KONE": ["MonoSpace", "MiniSpace", "EcoSpace", "TravelMaster", "People Flow", "DX"],
-            "Schindler": ["3300", "5500", "7000", "Port", "Miconic 10", "Miconic TX"],
-            "ThyssenKrupp": ["Evolution", "Synergy", "IHF", "TWIN", "MAX"]
+        // Structure des modèles (PRÊTE POUR GOOGLE DRIVE)
+        const modelesParMarque = {
+            "Otis": ["Gen2", "Gen3", "Elevonic", "5000"],
+            "KONE": ["MonoSpace", "MiniSpace", "EcoSpace", "TravelMaster"],
+            "Schindler": ["3300", "5500", "7000", "Portfolio"]
         };
 
         let connaissances = JSON.parse(localStorage.getItem('connaissancesIA')) || [];
@@ -493,9 +476,6 @@
             document.getElementById('techEmail').textContent = email;
             afficherMarques();
             chargerConversation();
-            
-            // Par défaut, recherche Mega.io cochée
-            document.getElementById('rechercheMega').checked = true;
         }
 
         function showAdmin() {
@@ -544,28 +524,16 @@
             console.log('✅ Conversation resetée');
         }
 
-        // Connexion
-        document.getElementById('loginForm').addEventListener('submit', function(e) {
-            e.preventDefault();
+        // NOUVELLE FONCTION : Sélection des options avec style
+        function selectOption(optionId) {
+            document.getElementById(optionId).checked = true;
             
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-            const errorMessage = document.getElementById('errorMessage');
-
-            const compte = comptesValides.find(acc => 
-                acc.email === email && acc.password === password
-            );
-
-            if (compte) {
-                if (compte.type === 'admin') {
-                    showAdmin();
-                } else {
-                    showTechnicien(email);
-                }
-            } else {
-                errorMessage.textContent = 'Email ou mot de passe incorrect';
-            }
-        });
+            // Mettre à jour les styles des cartes
+            document.querySelectorAll('.option-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            event.currentTarget.classList.add('selected');
+        }
 
         // Configuration Marque
         function toggleMarque() {
@@ -594,46 +562,52 @@
             }
         }
 
-        // NOUVELLE FONCTION : Gérer la sélection du modèle
-        function toggleModele() {
+        // NOUVELLE FONCTION : Charger les modèles selon la marque
+        function chargerModeles() {
             const marqueSelect = document.getElementById('marque');
-            const modeleSelect = document.getElementById('selectionModele');
-            const modeleOptions = document.getElementById('modele');
+            const modeleSelect = document.getElementById('modele');
+            const selectionModele = document.getElementById('selectionModele');
             
-            const marqueSelectionnee = marqueSelect.value;
+            const marque = marqueSelect.value;
             
-            if (marqueSelectionnee && modelesAscenseurs[marqueSelectionnee]) {
-                // Vider les options existantes
-                modeleOptions.innerHTML = '<option value="">Sélectionnez le modèle</option>';
+            if (marque && modelesParMarque[marque]) {
+                modeleSelect.innerHTML = '<option value="">Sélectionnez un modèle</option>';
                 
-                // Ajouter les modèles pour la marque sélectionnée
-                modelesAscenseurs[marqueSelectionnee].forEach(modele => {
+                modelesParMarque[marque].forEach(modele => {
                     const option = document.createElement('option');
                     option.value = modele;
                     option.textContent = modele;
-                    modeleOptions.appendChild(option);
+                    modeleSelect.appendChild(option);
                 });
                 
-                modeleSelect.style.display = 'block';
+                selectionModele.style.display = 'block';
             } else {
-                modeleSelect.style.display = 'none';
+                selectionModele.style.display = 'none';
             }
         }
 
-        // Mettre à jour les liens Mega avec les liens corrigés
-        function mettreAJourLiensMega() {
-            const liens = document.querySelectorAll('.mega-link');
-            liens.forEach(lien => {
-                const texte = lien.textContent;
-                if (texte.includes('Otis') && liensMegaCorriges.Otis) {
-                    lien.href = liensMegaCorriges.Otis;
-                } else if (texte.includes('KONE') && liensMegaCorriges.KONE) {
-                    lien.href = liensMegaCorriges.KONE;
-                } else if (texte.includes('Schindler') && liensMegaCorriges.Schindler) {
-                    lien.href = liensMegaCorriges.Schindler;
+        // Connexion
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const errorMessage = document.getElementById('errorMessage');
+
+            const compte = comptesValides.find(acc => 
+                acc.email === email && acc.password === password
+            );
+
+            if (compte) {
+                if (compte.type === 'admin') {
+                    showAdmin();
+                } else {
+                    showTechnicien(email);
                 }
-            });
-        }
+            } else {
+                errorMessage.textContent = 'Email ou mot de passe incorrect';
+            }
+        });
 
         // Test de l'API Groq via proxy Vercel
         async function testerAPI() {
@@ -744,13 +718,13 @@
             askBtn.textContent = '🧠 Analyse en cours...';
 
             try {
-                // Prompt spécialisé pour les ascenseurs - VERSION AMÉLIORÉE
+                // Prompt spécialisé pour les ascenseurs
                 const promptSpecialise = `
 Tu es un expert technique spécialisé EXCLUSIVEMENT dans les ascenseurs.
 
 CONFIGURATION UTILISATEUR:
 - Marque: ${marqueConnue ? marque : 'Inconnue'}
-- Modèle: ${marqueConnue && modele ? modele : 'Non spécifié'}
+- Modèle: ${marqueConnue ? modele : 'Non spécifié'}
 - Type de demande: ${typeDemande}
 - Recherche Mega.io: ${rechercheMega ? 'Activée' : 'Désactivée'}
 - Recherche Internet: ${rechercheInternet ? 'Activée' : 'Désactivée'}
@@ -762,7 +736,6 @@ DIRECTIVES STRICTES:
 4. Ne invente pas de procédures
 5. Concentre-toi sur les solutions pratiques
 6. Si besoin de plus d'infos, demande-les directement
-7. Si la marque et le modèle sont spécifiés, adapte tes conseils en conséquence
 
 QUESTION: ${question}
 
@@ -919,8 +892,10 @@ Réponds en français de façon professionnelle mais directe.
             document.getElementById('email').value = 'technicien1@ascenseurs.fr';
             document.getElementById('password').value = '123456';
             
-            // Corriger les liens Mega
-            mettreAJourLiensMega();
+            // Initialiser les styles des options
+            document.querySelectorAll('.option-card').forEach((card, index) => {
+                if (index === 0) card.classList.add('selected');
+            });
             
             // Tester l'API au chargement
             setTimeout(testerAPI, 1000);
