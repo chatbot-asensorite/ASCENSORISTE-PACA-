@@ -1,13 +1,13 @@
 {
   "name": "ascensoriste-paca",
   "version": "1.0.0",
-  "type": "commonjs",
+  "type": "module",
   "scripts": {
     "dev": "vercel dev",
     "build": "vercel build"
   },
   "dependencies": {
-    "@vercel/node": "^4.0.0"
+    "node-fetch": "^3.3.2"
   },
   "engines": {
     "node": ">=18"
