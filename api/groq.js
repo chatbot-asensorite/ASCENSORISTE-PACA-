@@ -1,6 +1,5 @@
-// api/groq.js
-module.exports = async function handler(req, res) {
-  // Le même code mais avec module.exports
+// api/groq.js - VERSION FONCTIONNELLE
+export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
@@ -9,7 +8,10 @@ module.exports = async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
   const GROQ_API_KEY = process.env.GROQ_API_KEY;
-  if (!GROQ_API_KEY) return res.status(500).json({ error: 'GROQ_API_KEY manquante' });
+
+  if (!GROQ_API_KEY) {
+    return res.status(500).json({ error: 'GROQ_API_KEY manquante' });
+  }
 
   try {
     const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
@@ -23,7 +25,8 @@ module.exports = async function handler(req, res) {
 
     const data = await response.json();
     res.status(response.status).json(data);
+    
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
-};
+}
