@@ -1,19 +1,29 @@
-// api/groq.js - VERSION FONCTIONNELLE
-export default async function handler(req, res) {
+// api/groq.js - VERSION COMMONJS POUR VERCEL
+const handler = async (req, res) => {
+  // Headers CORS
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
-  if (req.method === 'OPTIONS') return res.status(200).end();
-  if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
+  // Gestion des préflight OPTIONS
+  if (req.method === 'OPTIONS') {
+    return res.status(200).end();
+  }
+
+  // Vérification de la méthode
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Method not allowed' });
+  }
 
   const GROQ_API_KEY = process.env.GROQ_API_KEY;
 
+  // Vérification de la clé API
   if (!GROQ_API_KEY) {
     return res.status(500).json({ error: 'GROQ_API_KEY manquante' });
   }
 
   try {
+    // Appel à l'API Groq
     const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -27,6 +37,9 @@ export default async function handler(req, res) {
     res.status(response.status).json(data);
     
   } catch (error) {
+    console.error('Erreur API Groq:', error);
     res.status(500).json({ error: error.message });
   }
-}
+};
+
+module.exports = handler;
