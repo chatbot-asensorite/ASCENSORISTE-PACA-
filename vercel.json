@@ -3,7 +3,10 @@
   "builds": [
     {
       "src": "api/groq.js",
-      "use": "@vercel/node"
+      "use": "@vercel/node",
+      "config": { 
+        "includeFiles": ["api/**"] 
+      }
     },
     {
       "src": "index.html",
