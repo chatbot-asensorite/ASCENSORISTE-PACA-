@@ -1,5 +1,7 @@
-// api/groq.js - VERSION COMMONJS POUR VERCEL
-const handler = async (req, res) => {
+// api/groq.js - VERSION ESM PUR
+import fetch from 'node-fetch';
+
+export default async function handler(req, res) {
   // Headers CORS
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
@@ -40,6 +42,4 @@ const handler = async (req, res) => {
     console.error('Erreur API Groq:', error);
     res.status(500).json({ error: error.message });
   }
-};
-
-module.exports = handler;
+}
