@@ -1,621 +1,74 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Plateforme Ascenseurs - IA Groq Sécurisée</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        body {
-            font-family: Arial, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            padding: 20px;
-        }
-        .container {
-            display: none;
-            background: white;
-            padding: 2rem;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-            max-width: 1000px;
-            margin: 0 auto;
-        }
-        #loginContainer {
-            display: block;
-            max-width: 500px;
-        }
-        h1 {
-            margin-bottom: 0.5rem;
-            color: #333;
-            text-align: center;
-        }
-        .subtitle {
-            color: #666;
-            margin-bottom: 1.5rem;
-            text-align: center;
-        }
-        input, textarea, select {
-            width: 100%;
-            padding: 12px;
-            margin: 10px 0;
-            border: 2px solid #ddd;
-            border-radius: 8px;
-            font-size: 16px;
-        }
-        button {
-            background: #667eea;
-            color: white;
-            border: none;
-            padding: 12px 20px;
-            border-radius: 8px;
-            font-size: 16px;
-            cursor: pointer;
-            margin: 5px;
-            transition: background 0.3s;
-        }
-        button:hover {
-            background: #5a6fd8;
-        }
-        button:disabled {
-            background: #ccc;
-            cursor: not-allowed;
-        }
-        .logout {
-            background: #e74c3c;
-        }
-        .logout:hover {
-            background: #c0392b;
-        }
-        .error {
-            color: #e74c3c;
-            margin-top: 10px;
-            padding: 10px;
-            background: #ffeaea;
-            border-radius: 5px;
-        }
-        .success {
-            color: #28a745;
-            margin-top: 10px;
-            padding: 10px;
-            background: #d4edda;
-            border-radius: 5px;
-        }
-        .card {
-            background: #f8f9fa;
-            padding: 20px;
-            border-radius: 10px;
-            margin: 15px 0;
-            border-left: 4px solid #667eea;
-        }
-        .admin-section {
-            background: #2c3e50;
-            color: white;
-            padding: 15px;
-            border-radius: 10px;
-            margin: 10px 0;
-        }
-        .ia-response {
-            margin-top: 15px;
-            padding: 15px;
-            background: #f8f9fa;
-            border-radius: 5px;
-            border-left: 4px solid #667eea;
-            line-height: 1.5;
-        }
-        .mega-link {
-            display: block;
-            padding: 15px;
-            margin: 15px 0;
-            background: #e3f2fd;
-            border-radius: 10px;
-            text-decoration: none;
-            color: #1976d2;
-            border: 2px solid #bbdefb;
-            text-align: center;
-            font-weight: bold;
-            transition: all 0.3s;
-        }
-        .mega-link:hover {
-            background: #bbdefb;
-            transform: translateY(-2px);
-        }
-        .checkbox-item {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            margin: 10px 0;
-        }
-        .loading {
-            text-align: center;
-            color: #666;
-            font-style: italic;
-        }
-        .security-badge {
-            background: #d4edda;
-            color: #155724;
-            padding: 8px 12px;
-            border-radius: 20px;
-            font-size: 12px;
-            display: inline-block;
-            margin: 5px;
-        }
-        .api-test {
-            background: #fff3cd;
-            padding: 10px;
-            border-radius: 5px;
-            margin: 10px 0;
-        }
-    </style>
+    <title>Test Groq + Supabase</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
-    <!-- CONTAINER DE CONNEXION -->
-    <div id="loginContainer" class="container">
-        <h1>🔧 Plateforme Ascenseurs</h1>
-        <p class="subtitle">IA Groq Sécurisée - Proxy Vercel</p>
-        
-        <div class="card">
-            <h3>🔒 Clé API Protégée</h3>
-            <p><strong>Sécurité maximale</strong> - Clé API sur serveur Vercel</p>
-            <span class="security-badge">🔐 API Sécurisée</span>
-            <span class="security-badge">🚀 Proxy Vercel</span>
-            
-            <div class="api-test">
-                <strong>Test API :</strong> 
-                <button onclick="testerAPI()" style="background: #17a2b8;">🧪 Tester la connexion</button>
-                <div id="testResult"></div>
-            </div>
-        </div>
-
-        <form id="loginForm">
-            <input type="email" id="email" placeholder="Email professionnel" required>
-            <input type="password" id="password" placeholder="Mot de passe" required>
-            <button type="submit" style="width: 100%;">Se connecter</button>
-        </form>
-        
-        <div id="errorMessage" class="error"></div>
-        
-        <div class="card">
-            <p><strong>Comptes disponibles :</strong></p>
-            <p>👨‍🔧 Technicien : technicien1@ascenseurs.fr</p>
-            <p>⚙️ Admin : admin@ascenseurs.fr</p>
-            <p>🔑 Mot de passe : 123456</p>
-        </div>
+    <h1>Test Groq avec vos PDF</h1>
+    
+    <div>
+        <h3>Configuration Supabase :</h3>
+        <input type="text" id="supabaseUrl" placeholder="URL Supabase" style="width: 400px; margin: 5px;"><br>
+        <input type="text" id="supabaseKey" placeholder="Clé API publique Supabase" style="width: 400px; margin: 5px;">
     </div>
 
-    <!-- CONTAINER TECHNICIEN -->
-    <div id="technicienContainer" class="container">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-            <div>
-                <h1>🔧 Interface Technicien</h1>
-                <p>Connecté en tant que : <strong id="techEmail">technicien@ascenseurs.fr</strong></p>
-                <span class="security-badge">🧠 IA Groq Réelle</span>
-                <span class="security-badge">🔒 API Protégée</span>
-            </div>
-            <button class="logout" onclick="showLogin()">🔓 Déconnexion</button>
-        </div>
-
-        <!-- Assistant IA -->
-        <div class="card">
-            <h2>🧠 Assistant IA Groq - Spécialisé Ascenseurs</h2>
-            
-            <div class="checkbox-item">
-                <input type="checkbox" id="marqueConnue" onchange="toggleMarque()">
-                <label for="marqueConnue">Je connais la marque de l'ascenseur</label>
-            </div>
-
-            <div id="selectionMarque" style="display: none;">
-                <select id="marque">
-                    <option value="">Sélectionnez une marque</option>
-                    <option value="Otis">Otis</option>
-                    <option value="KONE">KONE</option>
-                    <option value="Schindler">Schindler</option>
-                    <option value="ThyssenKrupp">ThyssenKrupp</option>
-                </select>
-            </div>
-
-            <div style="margin: 15px 0;">
-                <label>Type de demande :</label>
-                <div class="checkbox-item">
-                    <input type="radio" id="panne" name="typeDemande" value="panne" checked>
-                    <label for="panne">🔧 Panne</label>
-                </div>
-                <div class="checkbox-item">
-                    <input type="radio" id="programmation" name="typeDemande" value="programmation">
-                    <label for="programmation">⚙️ Programmation</label>
-                </div>
-            </div>
-
-            <div class="checkbox-item">
-                <input type="checkbox" id="autoriserInternet">
-                <label for="autoriserInternet">🔍 Autoriser la recherche Internet si nécessaire</label>
-            </div>
-
-            <textarea id="questionIa" placeholder="Décrivez en détail la panne, les symptômes, les codes erreur, le comportement anormal..." rows="5"></textarea>
-            <button id="askIaBtn" onclick="demanderIA()" style="width: 100%; background: #28a745;">🧠 Demander à l'IA Groq</button>
-
-            <div id="reponseIA" class="ia-response">
-                💡 Décrivez votre problème technique et l'IA spécialisée vous aidera.
-            </div>
-
-            <!-- Correction IA -->
-            <div id="correctionSection" style="display: none; margin-top: 15px;">
-                <div class="card" style="background: #e3f2fd;">
-                    <h4>✏️ Améliorer la réponse de l'IA</h4>
-                    <p>Si la réponse n'est pas correcte, aidez l'IA à apprendre :</p>
-                    <textarea id="correctionText" placeholder="Donnez la solution correcte ou des informations supplémentaires..." rows="3"></textarea>
-                    <button onclick="corrigerIA()" style="background: #17a2b8;">✅ Envoyer la correction</button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Documents -->
-        <div class="card">
-            <h2>📁 Documents Techniques</h2>
-            <a href="https://mega.nz/folder/iFVGVKQa#neDd4RKjQUq_fZ-70Qg5xQ" target="_blank" class="mega-link">
-                📂 Ouvrir les documents Otis sur Mega.io
-            </a>
-            <a href="https://mega.nz/folder/vB8kHQ5I#TRNu01UmsjrqeqGKHz7gKQ" target="_blank" class="mega-link">
-                📂 Ouvrir les documents KONE sur Mega.io
-            </a>
-            <a href="https://mega.nz/folder/OJM3jAIQ#uFG2EBO1NUUG5gfn9hGCzg" target="_blank" class="mega-link">
-                📂 Ouvrir les documents Schindler sur Mega.io
-            </a>
-        </div>
+    <div>
+        <h3>Question technique :</h3>
+        <textarea id="question" placeholder="Posez une question sur vos ascenseurs..." rows="4" cols="50"></textarea><br>
+        <button onclick="demanderGroq()">Tester Groq</button>
     </div>
 
-    <!-- CONTAINER ADMIN -->
-    <div id="adminContainer" class="container">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-            <div>
-                <h1>⚙️ Panel Administrateur</h1>
-                <p>Connecté en tant que : <strong>admin@ascenseurs.fr</strong></p>
-                <span class="security-badge">🔧 Gestion Complète</span>
-            </div>
-            <button class="logout" onclick="showLogin()">🔓 Déconnexion</button>
-        </div>
-
-        <div class="card">
-            <h2>🔐 Configuration IA Groq</h2>
-            <p><strong>Statut :</strong> <span id="apiStatus">En attente de test...</span></p>
-            <p><strong>Méthode :</strong> Proxy Vercel sécurisé</p>
-            <button onclick="testerAPI()" style="background: #17a2b8;">🧪 Tester la connexion API</button>
-            <div id="adminTestResult"></div>
-        </div>
-
-        <div class="card">
-            <h2>🏷️ Gestion des Marques</h2>
-            <input type="text" id="nouvelleMarque" placeholder="Nom de la marque">
-            <input type="text" id="lienMega" placeholder="Lien Mega.io">
-            <button onclick="ajouterMarque()">✅ Ajouter la marque</button>
-
-            <div style="margin-top: 15px;">
-                <h3>Marques configurées :</h3>
-                <div id="listeMarques">
-                    <!-- Les marques s'afficheront ici -->
-                </div>
-            </div>
-        </div>
-    </div>
+    <div id="resultat" style="margin-top: 20px; padding: 10px; border: 1px solid #ccc;"></div>
 
     <script>
-        // PROXY VERCEL - Pas de clé API dans le code
-        const VERCEL_PROXY_URL = "/api/groq";
-        
-        // Données
-        let marques = JSON.parse(localStorage.getItem('marquesAscenseurs')) || [
-            { nom: "Otis", lienMega: "https://mega.nz/folder/iFVGVKQa#neDd4RKjQUq_fZ-70Qg5xQ" },
-            { nom: "KONE", lienMega: "https://mega.nz/folder/vB8kHQ5I#TRNu01UmsjrqeqGKHz7gKQ" },
-            { nom: "Schindler", lienMega: "https://mega.nz/folder/OJM3jAIQ#uFG2EBO1NUUG5gfn9hGCzg" }
-        ];
+        async function demanderGroq() {
+            const supabaseUrl = document.getElementById('supabaseUrl').value;
+            const supabaseKey = document.getElementById('supabaseKey').value;
+            const question = document.getElementById('question').value;
 
-        let connaissances = JSON.parse(localStorage.getItem('connaissancesIA')) || [];
-        let historique = JSON.parse(localStorage.getItem('historiqueIA')) || [];
-
-        // Authentification
-        const comptesValides = [
-            { email: 'technicien1@ascenseurs.fr', password: '123456', type: 'technicien' },
-            { email: 'technicien2@ascenseurs.fr', password: '123456', type: 'technicien' },
-            { email: 'technicien3@ascenseurs.fr', password: '123456', type: 'technicien' },
-            { email: 'admin@ascenseurs.fr', password: '123456', type: 'admin' }
-        ];
-
-        // Navigation
-        function showLogin() {
-            document.getElementById('loginContainer').style.display = 'block';
-            document.getElementById('technicienContainer').style.display = 'none';
-            document.getElementById('adminContainer').style.display = 'none';
-        }
-
-        function showTechnicien(email) {
-            document.getElementById('loginContainer').style.display = 'none';
-            document.getElementById('technicienContainer').style.display = 'block';
-            document.getElementById('adminContainer').style.display = 'none';
-            document.getElementById('techEmail').textContent = email;
-            afficherMarques();
-        }
-
-        function showAdmin() {
-            document.getElementById('loginContainer').style.display = 'none';
-            document.getElementById('technicienContainer').style.display = 'none';
-            document.getElementById('adminContainer').style.display = 'block';
-            afficherMarques();
-        }
-
-        // Connexion
-        document.getElementById('loginForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-            const errorMessage = document.getElementById('errorMessage');
-
-            const compte = comptesValides.find(acc => 
-                acc.email === email && acc.password === password
-            );
-
-            if (compte) {
-                if (compte.type === 'admin') {
-                    showAdmin();
-                } else {
-                    showTechnicien(email);
-                }
-            } else {
-                errorMessage.textContent = 'Email ou mot de passe incorrect';
+            if (!supabaseUrl || !supabaseKey || !question) {
+                alert('Remplissez tous les champs !');
+                return;
             }
-        });
 
-        // Test de l'API Groq via proxy Vercel
-        async function testerAPI() {
-            const testResult = document.getElementById('testResult') || document.getElementById('adminTestResult');
-            const apiStatus = document.getElementById('apiStatus');
+            // Initialisation Supabase
+            const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
             
-            if (testResult) testResult.innerHTML = '<div class="loading">🧪 Test de connexion en cours...</div>';
-            if (apiStatus) apiStatus.innerHTML = 'Test en cours...';
+            document.getElementById('resultat').innerHTML = '🔍 Recherche dans vos PDF...';
 
             try {
-                const response = await fetch(VERCEL_PROXY_URL, {
+                // 1. Récupérer la liste des PDF
+                const { data: fichiers, error } = await supabase.storage
+                    .from('documents-techniques')
+                    .list('', { limit: 50 });
+
+                if (error) throw error;
+
+                document.getElementById('resultat').innerHTML = `📁 ${fichiers.length} fichiers trouvés<br>Analyse avec Groq...`;
+
+                // 2. Envoyer à Groq (version simplifiée)
+                const reponse = await fetch('/api/groq', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         messages: [{
                             role: "user",
-                            content: "Réponds juste par 'OK' si tu fonctionnes"
+                            content: `J'ai ces documents techniques: ${fichiers.map(f => f.name).join(', ')}. Question: ${question}`
                         }],
                         model: "llama-3.1-8b-instant",
-                        max_tokens: 10
+                        max_tokens: 500
                     })
                 });
 
-                if (!response.ok) {
-                    throw new Error(`Erreur API: ${response.status}`);
-                }
-
-                const data = await response.json();
-                
-                if (testResult) testResult.innerHTML = '<div class="success">✅ Connexion API Groq réussie !</div>';
-                if (apiStatus) {
-                    apiStatus.innerHTML = '<span style="color: green;">✅ Connecté via Proxy Vercel</span>';
-                    apiStatus.style.color = 'green';
-                }
-                
-                console.log('✅ Test API réussi:', data);
-                
-            } catch (error) {
-                console.error('❌ Test API échoué:', error);
-                if (testResult) testResult.innerHTML = `<div class="error">❌ Erreur: ${error.message}</div>`;
-                if (apiStatus) {
-                    apiStatus.innerHTML = '<span style="color: red;">❌ Erreur de connexion</span>';
-                    apiStatus.style.color = 'red';
-                }
-            }
-        }
-
-        // Fonctions IA avec appel via proxy Vercel
-        function toggleMarque() {
-            const selectionDiv = document.getElementById('selectionMarque');
-            selectionDiv.style.display = document.getElementById('marqueConnue').checked ? 'block' : 'none';
-        }
-
-        async function demanderIA() {
-            const question = document.getElementById('questionIa').value;
-            const reponseDiv = document.getElementById('reponseIA');
-            const askBtn = document.getElementById('askIaBtn');
-            const marqueConnue = document.getElementById('marqueConnue').checked;
-            const marque = marqueConnue ? document.getElementById('marque').value : 'Non spécifiée';
-            const typeDemande = document.querySelector('input[name="typeDemande"]:checked').value;
-            const autoriserInternet = document.getElementById('autoriserInternet').checked;
-
-            if (!question) {
-                reponseDiv.innerHTML = '<div class="error">❌ Veuillez décrire votre problème</div>';
-                return;
-            }
-
-            // Désactiver le bouton pendant la requête
-            askBtn.disabled = true;
-            askBtn.textContent = '🧠 Analyse en cours...';
-            reponseDiv.innerHTML = '<div class="loading">🧠 L\'IA Groq analyse votre problème...</div>';
-
-            try {
-                // Prompt spécialisé pour les ascenseurs
-                const promptSpecialise = `
-Tu es un expert technique spécialisé EXCLUSIVEMENT dans les ascenseurs.
-
-RÈGLES STRICTES :
-1. Réponds UNIQUEMENT sur les ascenseurs
-2. Sois technique mais compréhensible
-3. Propose des diagnostics étape par étape
-4. Mentionne les normes de sécurité EN 81-20
-5. Si tu ne sais pas, indique où chercher l'information
-
-INFORMATIONS FOURNIES :
-- Marque: ${marque}
-- Type de demande: ${typeDemande}
-- Recherche Internet: ${autoriserInternet ? 'Autorisée' : 'Non autorisée'}
-
-QUESTION DU TECHNICIEN :
-${question}
-
-DOCUMENTS DISPONIBLES (Mega.io) :
-- Schémas électriques
-- Procédures de dépannage  
-- Documentation de programmation
-- Manuels techniques
-
-Réponds en français de façon professionnelle.
-`;
-
-                // Appel via proxy Vercel
-                const response = await fetch(VERCEL_PROXY_URL, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        messages: [
-                            {
-                                role: "system",
-                                content: promptSpecialise
-                            },
-                            {
-                                role: "user", 
-                                content: question
-                            }
-                        ],
-                        model: "llama-3.1-8b-instant",
-                        temperature: 0.3,
-                        max_tokens: 2000
-                    })
-                });
-
-                if (!response.ok) {
-                    throw new Error(`Erreur API: ${response.status}`);
-                }
-
-                const data = await response.json();
-                
-                // Formater la réponse
-                let reponseFormatee = data.choices[0].message.content
-                    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-                    .replace(/\n/g, '<br>');
-
-                reponseDiv.innerHTML = `
-                    <strong>🧠 IA Groq - Expert Ascenseurs :</strong><br><br>
-                    ${reponseFormatee}
-                    <br><br>
-                    <small style="color: #666;">💡 Réponse générée par l'IA Groq via proxy sécurisé</small>
-                `;
-
-                // Sauvegarder dans l'historique
-                const interaction = {
-                    id: Date.now(),
-                    question,
-                    reponse: data.choices[0].message.content,
-                    marque,
-                    typeDemande,
-                    date: new Date().toLocaleString()
-                };
-                historique.unshift(interaction);
-                localStorage.setItem('historiqueIA', JSON.stringify(historique));
-
-                // Afficher section correction
-                document.getElementById('correctionSection').style.display = 'block';
+                const data = await reponse.json();
+                document.getElementById('resultat').innerHTML = 
+                    `<strong>Réponse Groq :</strong><br>${data.choices[0].message.content}`;
 
             } catch (error) {
-                console.error('Erreur IA:', error);
-                reponseDiv.innerHTML = `
-                    <div class="error">
-                        <strong>❌ Erreur de connexion à l'IA</strong><br>
-                        <small>${error.message}</small>
-                        <br><br>
-                        <strong>Conseil immédiat :</strong><br>
-                        Consultez les documents Mega.io correspondant à la marque "${marque}" pour trouver la solution.
-                    </div>
-                `;
-            } finally {
-                // Réactiver le bouton
-                askBtn.disabled = false;
-                askBtn.textContent = '🧠 Demander à l\'IA Groq';
+                document.getElementById('resultat').innerHTML = `❌ Erreur: ${error.message}`;
             }
         }
-
-        function corrigerIA() {
-            const correction = document.getElementById('correctionText').value;
-            const derniereInteraction = historique[0];
-            
-            if (!correction) {
-                alert('Veuillez entrer une correction');
-                return;
-            }
-
-            // Ajouter aux connaissances
-            const nouvelleConnaissance = {
-                id: Date.now(),
-                panne: derniereInteraction.question.substring(0, 100),
-                solution: correction,
-                date: new Date().toLocaleString()
-            };
-            
-            connaissances.push(nouvelleConnaissance);
-            localStorage.setItem('connaissancesIA', JSON.stringify(connaissances));
-
-            // Marquer comme corrigé
-            derniereInteraction.correction = correction;
-            localStorage.setItem('historiqueIA', JSON.stringify(historique));
-
-            // Afficher confirmation
-            document.getElementById('correctionSection').innerHTML = `
-                <div class="success">
-                    ✅ Correction enregistrée ! L'IA apprendra de cette information.
-                </div>
-            `;
-        }
-
-        // Fonctions Admin
-        function afficherMarques() {
-            const liste = document.getElementById('listeMarques');
-            if (liste) {
-                liste.innerHTML = marques.map(marque => `
-                    <div style="padding: 10px; margin: 5px 0; background: white; border-radius: 5px;">
-                        <strong>${marque.nom}</strong><br>
-                        <small>${marque.lienMega}</small>
-                    </div>
-                `).join('');
-            }
-        }
-
-        function ajouterMarque() {
-            const nom = document.getElementById('nouvelleMarque').value.trim();
-            const lien = document.getElementById('lienMega').value.trim();
-
-            if (nom && lien) {
-                marques.push({ nom, lienMega: lien });
-                localStorage.setItem('marquesAscenseurs', JSON.stringify(marques));
-                afficherMarques();
-                document.getElementById('nouvelleMarque').value = '';
-                document.getElementById('lienMega').value = '';
-                alert('✅ Marque ajoutée !');
-            } else {
-                alert('❌ Veuillez remplir tous les champs');
-            }
-        }
-
-        // Initialisation
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('🚀 Plateforme Ascenseurs - IA Groq via Proxy Vercel');
-            // Pré-remplir pour test
-            document.getElementById('email').value = 'technicien1@ascenseurs.fr';
-            document.getElementById('password').value = '123456';
-            
-            // Tester l'API au chargement
-            setTimeout(testerAPI, 1000);
-        });
     </script>
 </body>
 </html>
