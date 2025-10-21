@@ -1,72 +1,75 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Test Groq + Supabase</title>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <title>Test IA Ascenseurs</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 40px auto; padding: 20px; }
+        .container { border: 2px solid #007bff; border-radius: 10px; padding: 20px; }
+        textarea { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ddd; border-radius: 5px; }
+        button { background: #007bff; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; }
+        button:hover { background: #0056b3; }
+        .resultat { margin-top: 20px; padding: 15px; border-radius: 5px; background: #f8f9fa; }
+        .success { border-left: 4px solid #28a745; }
+        .error { border-left: 4px solid #dc3545; }
+    </style>
 </head>
 <body>
-    <h1>Test Groq avec vos PDF</h1>
-    
-    <div>
-        <h3>Configuration Supabase :</h3>
-        <input type="text" id="supabaseUrl" placeholder="URL Supabase" style="width: 400px; margin: 5px;"><br>
-        <input type="text" id="supabaseKey" placeholder="Clé API publique Supabase" style="width: 400px; margin: 5px;">
-    </div>
+    <div class="container">
+        <h1>🧰 TEST IA ASCENSEURS</h1>
+        <p><strong>URL Fonction:</strong> https://xhwoskhlseowoyzynsmk.supabase.co/functions/v1/ascensoriste-ask</p>
+        
+        <div>
+            <h3>Posez une question technique :</h3>
+            <textarea id="question" rows="4" placeholder="Ex: Bonjour, tu es un expert en ascenseurs ? Quelles marques connais-tu ?..."></textarea><br>
+            <button onclick="testerIA()">🔧 Tester l'IA Ascenseurs</button>
+        </div>
 
-    <div>
-        <h3>Question technique :</h3>
-        <textarea id="question" placeholder="Posez une question sur vos ascenseurs..." rows="4" cols="50"></textarea><br>
-        <button onclick="demanderGroq()">Tester Groq</button>
+        <div id="resultat" class="resultat">
+            👆 Cliquez sur le bouton pour tester
+        </div>
     </div>
-
-    <div id="resultat" style="margin-top: 20px; padding: 10px; border: 1px solid #ccc;"></div>
 
     <script>
-        async function demanderGroq() {
-            const supabaseUrl = document.getElementById('supabaseUrl').value;
-            const supabaseKey = document.getElementById('supabaseKey').value;
+        async function testerIA() {
             const question = document.getElementById('question').value;
+            const resultat = document.getElementById('resultat');
 
-            if (!supabaseUrl || !supabaseKey || !question) {
-                alert('Remplissez tous les champs !');
+            if (!question) {
+                alert('Écrivez une question !');
                 return;
             }
 
-            // Initialisation Supabase
-            const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
-            
-            document.getElementById('resultat').innerHTML = '🔍 Recherche dans vos PDF...';
+            resultat.innerHTML = '🔄 Connexion à votre expert ascenseurs...';
+            resultat.className = 'resultat';
 
             try {
-                // 1. Récupérer la liste des PDF
-                const { data: fichiers, error } = await supabase.storage
-                    .from('documents-techniques')
-                    .list('', { limit: 50 });
-
-                if (error) throw error;
-
-                document.getElementById('resultat').innerHTML = `📁 ${fichiers.length} fichiers trouvés<br>Analyse avec Groq...`;
-
-                // 2. Envoyer à Groq (version simplifiée)
-                const reponse = await fetch('/api/groq', {
+                const response = await fetch('https://xhwoskhlseowoyzynsmk.supabase.co/functions/v1/ascensoriste-ask', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
                     body: JSON.stringify({
-                        messages: [{
-                            role: "user",
-                            content: `J'ai ces documents techniques: ${fichiers.map(f => f.name).join(', ')}. Question: ${question}`
-                        }],
-                        model: "llama-3.1-8b-instant",
-                        max_tokens: 500
+                        question: question
                     })
                 });
 
-                const data = await reponse.json();
-                document.getElementById('resultat').innerHTML = 
-                    `<strong>Réponse Groq :</strong><br>${data.choices[0].message.content}`;
+                const data = await response.json();
+                
+                if (data.error) {
+                    resultat.innerHTML = `❌ Erreur: ${data.error}`;
+                    resultat.className = 'resultat error';
+                } else {
+                    resultat.innerHTML = `
+                        <strong>📝 Votre question:</strong> ${data.question}<br><br>
+                        <strong>🤖 Expert Ascenseurs:</strong><br>${data.reponse}
+                    `;
+                    resultat.className = 'resultat success';
+                }
 
             } catch (error) {
-                document.getElementById('resultat').innerHTML = `❌ Erreur: ${error.message}`;
+                resultat.innerHTML = `❌ Erreur de connexion: ${error.message}<br>
+                                     Vérifiez que la fonction est déployée et que CORS est configuré.`;
+                resultat.className = 'resultat error';
             }
         }
     </script>
