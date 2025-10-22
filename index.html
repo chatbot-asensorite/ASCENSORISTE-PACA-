@@ -27,7 +27,7 @@
   <script type="module">
     import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
 
-    // === VALEURS DU PROJET (déjà remplies) ===
+    // === VALEURS DU PROJET (à vérifier dans Supabase → Settings → API) ===
     const SUPABASE_URL = 'https://prrzsosrbrskmeozmmmu.supabase.co';
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBycnpzb3NyYnJza21lb3ptbW11Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjExNDMyNTIsImV4cCI6MjA3NjcxOTI1Mn0.Hovju6M2k3temb1xbTYfBFXwUrZw54lxvVIMsfwSL_s';
 
@@ -46,7 +46,7 @@
         const { data, error } = await supabase.storage.from(BUCKET_NAME).list('', { limit: 100 });
         if (error) {
           console.error('Erreur list:', error);
-          fileListEl.textContent = 'Erreur lors de la lecture du bucket: ' + error.message;
+          fileListEl.textContent = 'Erreur lors de la lecture du bucket: ' + (error.message || JSON.stringify(error));
           statusEl.textContent = 'Statut: erreur';
           return;
         }
