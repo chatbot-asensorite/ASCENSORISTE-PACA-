@@ -1,47 +1,22 @@
 <!DOCTYPE html>
-<html>
+<html lang="fr">
 <head>
-    <title>Assistant Ascenseurs - Paca</title>
-    <style>
-        body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
-        .chat-container { border: 1px solid #ccc; padding: 20px; border-radius: 10px; }
-        .question-input { width: 100%; padding: 10px; margin-bottom: 10px; }
-        .btn { background: #007bff; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; }
-    </style>
+  <meta charset="UTF-8">
+  <title>Bonjour, je suis le technicien</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding-top: 100px;
+      background-color: #f4f4f4;
+    }
+    h1 {
+      color: #333;
+    }
+  </style>
 </head>
 <body>
-    <h1>🔧 Assistant Technique Ascenseurs</h1>
-    
-    <div class="chat-container">
-        <h3>Posez votre question technique :</h3>
-        <textarea class="question-input" rows="4" placeholder="Ex: Panne Otis GN2 - code E35"></textarea>
-        <button class="btn" onclick="poserQuestion()">🔍 Demander à l'expert</button>
-        
-        <div id="reponse" style="margin-top: 20px; padding: 15px; background: #f8f9fa; border-radius: 5px;"></div>
-    </div>
-
-    <script>
-        async function poserQuestion() {
-            const question = document.querySelector('.question-input').value;
-            const reponseDiv = document.getElementById('reponse');
-            
-            reponseDiv.innerHTML = '🔄 Analyse en cours...';
-            
-            try {
-                // Remplacez par l'URL de votre Edge Function
-                const response = await fetch('https://VOTRE-URL-SUPABASE.supabase.co/functions/v1/ask-ascenseurs', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ question })
-                });
-                
-                const data = await response.json();
-                reponseDiv.innerHTML = `<strong>🤖 Réponse :</strong><br>${data.réponse}`;
-                
-            } catch (error) {
-                reponseDiv.innerHTML = `❌ Erreur: ${error.message}`;
-            }
-        }
-    </script>
+  <h1>Bonjour, je suis le technicien</h1>
+  <p>Bienvenue sur ma page d’accueil IA</p>
 </body>
 </html>
