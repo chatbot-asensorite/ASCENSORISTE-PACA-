@@ -1,75 +1,45 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Test IA Ascenseurs</title>
+    <title>Assistant Ascenseurs - Paca</title>
     <style>
-        body { font-family: Arial, sans-serif; max-width: 800px; margin: 40px auto; padding: 20px; }
-        .container { border: 2px solid #007bff; border-radius: 10px; padding: 20px; }
-        textarea { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ddd; border-radius: 5px; }
-        button { background: #007bff; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; }
-        button:hover { background: #0056b3; }
-        .resultat { margin-top: 20px; padding: 15px; border-radius: 5px; background: #f8f9fa; }
-        .success { border-left: 4px solid #28a745; }
-        .error { border-left: 4px solid #dc3545; }
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
+        .chat-container { border: 1px solid #ccc; padding: 20px; border-radius: 10px; }
+        .question-input { width: 100%; padding: 10px; margin-bottom: 10px; }
+        .btn { background: #007bff; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>🧰 TEST IA ASCENSEURS</h1>
-        <p><strong>URL Fonction:</strong> https://xhwoskhlseowoyzynsmk.supabase.co/functions/v1/ascensoriste-ask</p>
+    <h1>🔧 Assistant Technique Ascenseurs</h1>
+    
+    <div class="chat-container">
+        <h3>Posez votre question technique :</h3>
+        <textarea class="question-input" rows="4" placeholder="Ex: Panne Otis GN2 - code E35"></textarea>
+        <button class="btn" onclick="poserQuestion()">🔍 Demander à l'expert</button>
         
-        <div>
-            <h3>Posez une question technique :</h3>
-            <textarea id="question" rows="4" placeholder="Ex: Bonjour, tu es un expert en ascenseurs ? Quelles marques connais-tu ?..."></textarea><br>
-            <button onclick="testerIA()">🔧 Tester l'IA Ascenseurs</button>
-        </div>
-
-        <div id="resultat" class="resultat">
-            👆 Cliquez sur le bouton pour tester
-        </div>
+        <div id="reponse" style="margin-top: 20px; padding: 15px; background: #f8f9fa; border-radius: 5px;"></div>
     </div>
 
     <script>
-        async function testerIA() {
-            const question = document.getElementById('question').value;
-            const resultat = document.getElementById('resultat');
-
-            if (!question) {
-                alert('Écrivez une question !');
-                return;
-            }
-
-            resultat.innerHTML = '🔄 Connexion à votre expert ascenseurs...';
-            resultat.className = 'resultat';
-
+        async function poserQuestion() {
+            const question = document.querySelector('.question-input').value;
+            const reponseDiv = document.getElementById('reponse');
+            
+            reponseDiv.innerHTML = '🔄 Analyse en cours...';
+            
             try {
-                const response = await fetch('https://xhwoskhlseowoyzynsmk.supabase.co/functions/v1/ascensoriste-ask', {
+                // Remplacez par l'URL de votre Edge Function
+                const response = await fetch('https://VOTRE-URL-SUPABASE.supabase.co/functions/v1/ask-ascenseurs', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        question: question
-                    })
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ question })
                 });
-
-                const data = await response.json();
                 
-                if (data.error) {
-                    resultat.innerHTML = `❌ Erreur: ${data.error}`;
-                    resultat.className = 'resultat error';
-                } else {
-                    resultat.innerHTML = `
-                        <strong>📝 Votre question:</strong> ${data.question}<br><br>
-                        <strong>🤖 Expert Ascenseurs:</strong><br>${data.reponse}
-                    `;
-                    resultat.className = 'resultat success';
-                }
-
+                const data = await response.json();
+                reponseDiv.innerHTML = `<strong>🤖 Réponse :</strong><br>${data.réponse}`;
+                
             } catch (error) {
-                resultat.innerHTML = `❌ Erreur de connexion: ${error.message}<br>
-                                     Vérifiez que la fonction est déployée et que CORS est configuré.`;
-                resultat.className = 'resultat error';
+                reponseDiv.innerHTML = `❌ Erreur: ${error.message}`;
             }
         }
     </script>
