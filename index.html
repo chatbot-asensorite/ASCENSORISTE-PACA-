@@ -1,22 +1,85 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="utf-8" />
   <title>Bonjour, je suis le technicien</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      text-align: center;
-      padding-top: 100px;
-      background-color: #f4f4f4;
-    }
-    h1 {
-      color: #333;
-    }
+    body { font-family: Arial, sans-serif; background:#f4f4f4; color:#222; margin:0; padding:40px; display:flex; flex-direction:column; align-items:center; }
+    .card { background:#fff; padding:24px; border-radius:8px; box-shadow:0 6px 18px rgba(0,0,0,0.06); max-width:760px; width:100%; }
+    h1 { margin:0 0 8px; font-size:22px; color:#111; }
+    p { margin:0 0 16px; color:#444; }
+    #file-list div { padding:8px 0; border-bottom:1px solid #eee; }
+    a.file-link { color:#0066cc; text-decoration:none; }
+    .status { margin-top:12px; color:#888; font-size:14px; }
+    @media (max-width:520px){ body{padding:16px} .card{padding:16px} }
   </style>
 </head>
 <body>
-  <h1>Bonjour, je suis le technicien</h1>
-  <p>Bienvenue sur ma page d’accueil IA</p>
+  <div class="card">
+    <h1>Bonjour, je suis le technicien</h1>
+    <p>Bienvenue — utilisation de Supabase Storage pour lister des fichiers publics.</p>
+
+    <div id="file-list">Chargement des fichiers…</div>
+    <div class="status" id="status">Statut: initialisation</div>
+  </div>
+
+  <script type="module">
+    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
+
+    // === VALEURS DU PROJET (déjà remplies) ===
+    const SUPABASE_URL = 'https://prrzsosrbrskmeozmmmu.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBycnpzb3NyYnJza21lb3ptbW11Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjExNDMyNTIsImV4cCI6MjA3NjcxOTI1Mn0.Hovju6M2k3temb1xbTYfBFXwUrZw54lxvVIMsfwSL_s';
+
+    // === Nom du bucket à utiliser (crée-le dans Supabase Storage → documents) ===
+    const BUCKET_NAME = 'documents';
+
+    const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    const fileListEl = document.getElementById('file-list');
+    const statusEl = document.getElementById('status');
+
+    async function listPublicFiles() {
+      statusEl.textContent = 'Statut: connexion à Supabase…';
+      try {
+        // Liste les objets à la racine du bucket (''), max 100
+        const { data, error } = await supabase.storage.from(BUCKET_NAME).list('', { limit: 100 });
+        if (error) {
+          console.error('Erreur list:', error);
+          fileListEl.textContent = 'Erreur lors de la lecture du bucket: ' + error.message;
+          statusEl.textContent = 'Statut: erreur';
+          return;
+        }
+
+        if (!data || data.length === 0) {
+          fileListEl.textContent = 'Aucun fichier trouvé dans le bucket ' + BUCKET_NAME + '.';
+          statusEl.textContent = 'Statut: ok (aucun fichier)';
+          return;
+        }
+
+        fileListEl.innerHTML = '';
+        data.forEach(item => {
+          const row = document.createElement('div');
+          const a = document.createElement('a');
+          a.className = 'file-link';
+          a.textContent = item.name;
+          // Lien public direct pour bucket public
+          a.href = `${SUPABASE_URL}/storage/v1/object/public/${BUCKET_NAME}/${encodeURIComponent(item.name)}`;
+          a.target = '_blank';
+          row.appendChild(a);
+          fileListEl.appendChild(row);
+        });
+
+        statusEl.textContent = 'Statut: ok (fichiers listés)';
+      } catch (err) {
+        console.error(err);
+        fileListEl.textContent = 'Erreur inattendue';
+        statusEl.textContent = 'Statut: erreur inattendue';
+      }
+    }
+
+    // Lancer le test au chargement
+    listPublicFiles();
+  </script>
 </body>
 </html>
