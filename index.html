@@ -3,122 +3,425 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Admin Upload - Test</title>
+<title>Plateforme Ascenseurs - Admin & Technicien</title>
 <style>
-body{font-family:Arial,sans-serif;padding:20px;background:#f3f4f6}
-.container{max-width:720px;margin:0 auto;background:#fff;padding:16px;border-radius:8px}
-input,textarea,select,button{width:100%;padding:10px;margin:8px 0;border:1px solid #ccc;border-radius:6px}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Arial,Helvetica,sans-serif;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);min-height:100vh;padding:20px;color:#222}
+.container{background:#fff;border-radius:12px;max-width:980px;margin:0 auto;padding:18px;box-shadow:0 10px 30px rgba(0,0,0,.18)}
+.hidden{display:none}
+.header{display:flex;justify-content:space-between;align-items:center;gap:12px}
+h1{font-size:20px;margin-bottom:8px}
+.subtitle{color:#555;margin-bottom:12px}
+input,textarea,select,button{width:100%;padding:10px;margin:8px 0;border:1px solid #dcdcdc;border-radius:8px;font-size:15px}
 button{background:#667eea;color:#fff;border:none;cursor:pointer}
-button[disabled]{background:#ccc;cursor:not-allowed}
-.small{font-size:14px;color:#555}
+button.secondary{background:#17a2b8}
+button.danger{background:#e74c3c}
+.badge{display:inline-block;padding:6px 10px;border-radius:20px;background:#d4edda;color:#155724;font-size:13px;margin-right:6px}
+.card{background:#f8f9fa;padding:14px;border-radius:8px;margin:12px 0;border-left:4px solid #667eea}
+.small{font-size:13px;color:#555}
+.inline-row{display:flex;gap:8px}
+.row{display:flex;gap:12px;flex-wrap:wrap}
+.col{flex:1;min-width:180px}
+.ia-response{margin-top:12px;padding:12px;border-radius:8px;background:#fff;border-left:4px solid #667eea;line-height:1.4}
+.loading{font-style:italic;color:#666}
+.error{color:#e74c3c;background:#ffeaea;padding:8px;border-radius:6px;margin-top:8px}
+.success{color:#155724;background:#d4edda;padding:8px;border-radius:6px;margin-top:8px}
+.logout{background:#e74c3c;color:#fff;border:none;padding:8px 12px;border-radius:8px;cursor:pointer}
+.form-inline{display:flex;gap:8px;align-items:center}
+.file-small{font-size:13px;color:#444}
+footer{margin-top:12px;text-align:center;color:#fff;opacity:.9}
+@media(max-width:700px){.header{flex-direction:column;align-items:stretch}}
 </style>
 </head>
 <body>
-<div class="container">
-  <h2>Admin - Upload document</h2>
-  <form id="uploadForm">
-    <label class="small">Fabricant</label>
-    <input name="manufacturer" id="manufacturer" required placeholder="ex: Schindler" />
-    <label class="small">Modèle</label>
-    <input name="model" id="model" required placeholder="ex: 3300-5300" />
-    <label class="small">Fichier (pdf/png/jpg)</label>
-    <input type="file" id="fileInput" accept=".pdf,image/png,image/jpeg" required />
-    <label class="small">Tags (virgule séparés)</label>
-    <input id="tags" placeholder="erreurs,diagnostic" />
-    <label class="small">Description</label>
-    <textarea id="description" rows="3" placeholder="Courte description"></textarea>
-    <button id="uploadBtn">Uploader</button>
-    <div id="status" class="small"></div>
-  </form>
+
+<div id="loginContainer" class="container">
+  <div class="header">
+    <div>
+      <h1>Plateforme Ascenseurs</h1>
+      <div class="subtitle">Admin & Technicien — IA Groq (proxy) — Supabase storage</div>
+    </div>
+    <div>
+      <span class="badge">Sécurité : clé serveur côté fonctions</span>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Connexion</h3>
+    <p class="small">Se connecter avec Supabase Auth. Si tu n'as pas configuré Auth, tu peux utiliser les comptes de test fournis localement.</p>
+    <div id="authMsg" class="small"></div>
+    <input id="email" type="email" placeholder="Email professionnel" />
+    <input id="password" type="password" placeholder="Mot de passe (si password auth)" />
+    <div class="row">
+      <div class="col"><button id="btnSignIn">Se connecter</button></div>
+      <div class="col"><button id="btnMagic" class="secondary">Envoyer magic link</button></div>
+    </div>
+    <div style="margin-top:8px" class="small">Comptes test (si pas Supabase) : technicien1@ascenseurs.fr / 123456  — admin@ascenseurs.fr / 123456</div>
+    <div id="errorLogin" class="error hidden"></div>
+  </div>
 </div>
 
-<!-- Inclure supabase-js depuis CDN si tu veux utiliser Auth côté client -->
+<div id="technicienContainer" class="container hidden">
+  <div class="header">
+    <div>
+      <h1>Interface Technicien</h1>
+      <div class="small">Connecté en tant <strong id="techEmail">-</strong></div>
+      <div style="margin-top:6px">
+        <span class="badge">IA Groq</span>
+        <span class="badge">Docs Supabase</span>
+      </div>
+    </div>
+    <div>
+      <button class="logout" id="btnLogoutTech">Déconnexion</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Assistant IA Groq - Spécialisé Ascenseurs</h2>
+
+    <div class="checkbox-item">
+      <input type="checkbox" id="marqueConnue" onchange="toggleMarque()" />
+      <label for="marqueConnue" class="small">Je connais la marque</label>
+    </div>
+
+    <div id="selectionMarque" class="hidden">
+      <select id="marque">
+        <option value="">Sélectionnez une marque</option>
+        <option value="Otis">Otis</option>
+        <option value="KONE">KONE</option>
+        <option value="Schindler">Schindler</option>
+        <option value="Thyssenkrupp">Thyssenkrupp</option>
+      </select>
+    </div>
+
+    <div style="margin:10px 0;">
+      <label class="small">Type de demande</label>
+      <div class="row">
+        <label class="form-inline"><input type="radio" name="typeDemande" value="panne" checked /> Panne</label>
+        <label class="form-inline"><input type="radio" name="typeDemande" value="programmation" /> Programmation</label>
+      </div>
+    </div>
+
+    <div class="checkbox-item">
+      <input id="autoriserInternet" type="checkbox" />
+      <label for="autoriserInternet" class="small">Autoriser la recherche Internet si nécessaire</label>
+    </div>
+
+    <textarea id="questionIa" placeholder="Décris la panne, symptômes, codes erreur..." rows="5"></textarea>
+    <div class="row">
+      <div class="col"><button id="askIaBtn" style="background:#28a745">Demander à l'IA Groq</button></div>
+      <div class="col"><button id="openDocsBtn" class="secondary">Ouvrir docs Mega (admin)</button></div>
+    </div>
+
+    <div id="reponseIA" class="ia-response">Pose ta question pour obtenir un diagnostic.</div>
+
+    <div id="correctionSection" class="hidden" style="margin-top:12px">
+      <div class="card" style="background:#e3f2fd">
+        <h4>Améliorer la réponse de l'IA</h4>
+        <textarea id="correctionText" rows="3" placeholder="Solution ou ajout pour améliorer l'IA"></textarea>
+        <button id="sendCorrection" class="secondary">Envoyer la correction</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Historique local (tech)</h3>
+    <div id="historiqueList" class="small"></div>
+  </div>
+</div>
+
+<div id="adminContainer" class="container hidden">
+  <div class="header">
+    <div>
+      <h1>Panel Administrateur</h1>
+      <div class="small">Connecté en tant <strong id="adminEmail">-</strong></div>
+      <div style="margin-top:6px"><span class="badge">Gestion des docs</span><span class="badge">Gestion comptes</span></div>
+    </div>
+    <div>
+      <button class="logout" id="btnLogoutAdmin">Déconnexion</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Upload document vers Supabase</h2>
+    <form id="uploadForm">
+      <label class="small">Fabricant</label>
+      <input id="manufacturer" required placeholder="ex: Schindler" />
+      <label class="small">Modèle</label>
+      <input id="model" required placeholder="ex: 3300-5300" />
+      <label class="small">Fichier (pdf/png/jpg)</label>
+      <input id="fileInput" type="file" accept=".pdf,image/png,image/jpeg" />
+      <label class="small">Tags (virgule séparés)</label>
+      <input id="tags" placeholder="erreurs,diagnostic" />
+      <label class="small">Description</label>
+      <textarea id="description" rows="2"></textarea>
+      <div class="row">
+        <div class="col"><button id="uploadBtn">Uploader</button></div>
+        <div class="col"><button id="listDocs" type="button" class="secondary">Voir documents (table)</button></div>
+      </div>
+      <div id="uploadStatus" class="small"></div>
+    </form>
+  </div>
+
+  <div class="card">
+    <h2>Marques configurées</h2>
+    <input id="nouvelleMarque" placeholder="Nom de la marque" />
+    <input id="lienMega" placeholder="Lien Mega.io" />
+    <div class="row">
+      <div class="col"><button id="ajouterMarqueBtn">Ajouter marque</button></div>
+    </div>
+    <div id="listeMarques" class="small" style="margin-top:10px"></div>
+  </div>
+
+  <div class="card">
+    <h3>Test API GROQ (via proxy)</h3>
+    <button id="testerApiBtn" class="secondary">Tester connexion GROQ</button>
+    <div id="apiTestResult" class="small"></div>
+  </div>
+</div>
+
+<footer>Plateforme Ascenseurs — testé mobile-first</footer>
+
 <script type="module">
-// Remplace par tes valeurs
-const SUPABASE_URL = 'https://<TON_PROJECT>.supabase.co';
-const SUPABASE_ANON_KEY = '<TON_ANON_KEY>';
+/* ---------- CONFIG - REMPLACER AVANT DEPLOIEMENT ---------- */
+const SUPABASE_URL = 'https://<TON_PROJECT>.supabase.co'; // <-- remplace
+const SUPABASE_ANON_KEY = '<TON_ANON_KEY>';              // <-- remplace
 const UPLOAD_REQUEST_FN = `${SUPABASE_URL}/functions/v1/upload-request`;
 const CONFIRM_UPLOAD_FN = `${SUPABASE_URL}/functions/v1/confirm-upload`;
+const GROQ_PROXY_PATH = '/api/groq'; // ton proxy Vercel ou équivalent
+/* ---------------------------------------------------------- */
 
-// Helper: obtenir token de session Supabase (ici on suppose que l'utilisateur est connecté via Supabase Auth)
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-const form = document.getElementById('uploadForm');
-const status = document.getElementById('status');
-const uploadBtn = document.getElementById('uploadBtn');
+/* Local fallback simple accounts (utile si Auth non configuré) */
+const comptesValides = [
+  { email: 'technicien1@ascenseurs.fr', password: '123456', role: 'technicien' },
+  { email: 'admin@ascenseurs.fr', password: '123456', role: 'admin' }
+];
 
-form.addEventListener('submit', async (e) => {
-  e.preventDefault();
-  status.textContent = '';
-  uploadBtn.disabled = true;
+/* ---------- UI refs ---------- */
+const loginContainer = document.getElementById('loginContainer');
+const adminContainer = document.getElementById('adminContainer');
+const technicienContainer = document.getElementById('technicienContainer');
+const authMsg = document.getElementById('authMsg');
+const errorLogin = document.getElementById('errorLogin');
 
-  const file = document.getElementById('fileInput').files[0];
-  if (!file) { status.textContent = 'Sélectionne un fichier'; uploadBtn.disabled = false; return; }
-
-  // Récupérer la session / token Supabase (l'utilisateur doit être connecté)
-  const sessionRes = await supabase.auth.getSession();
-  const token = sessionRes?.data?.session?.access_token;
-  if (!token) {
-    status.textContent = 'Connecte-toi d\'abord (Supabase Auth requis)';
-    uploadBtn.disabled = false;
-    return;
+/* ---------- Auth handlers ---------- */
+async function showViewForUser(userEmail, role) {
+  loginContainer.classList.add('hidden');
+  errorLogin.classList.add('hidden');
+  if (role === 'admin') {
+    adminContainer.classList.remove('hidden');
+    technicienContainer.classList.add('hidden');
+    document.getElementById('adminEmail').textContent = userEmail;
+  } else {
+    technicienContainer.classList.remove('hidden');
+    adminContainer.classList.add('hidden');
+    document.getElementById('techEmail').textContent = userEmail;
   }
+}
 
-  const manufacturer = document.getElementById('manufacturer').value || 'unknown';
-  const model = document.getElementById('model').value || 'generic';
+function showLogin() {
+  loginContainer.classList.remove('hidden');
+  adminContainer.classList.add('hidden');
+  technicienContainer.classList.add('hidden');
+}
 
+document.getElementById('btnSignIn').addEventListener('click', async () => {
+  errorLogin.classList.add('hidden');
+  const email = document.getElementById('email').value.trim();
+  const password = document.getElementById('password').value.trim();
+
+  if (!email || !password) { errorLogin.textContent = 'Email et mot de passe requis'; errorLogin.classList.remove('hidden'); return; }
+
+  // Essayer Supabase Auth first
   try {
-    status.textContent = 'Demande URL d\'upload...';
-
-    // 1) Demander upload-request (renvoie uploadUrl et path)
-    const req1 = await fetch(UPLOAD_REQUEST_FN, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
-      body: JSON.stringify({
-        manufacturer, model, filename: file.name, mimeType: file.type
-      })
-    });
-    if (!req1.ok) throw new Error('upload-request failed: ' + req1.status);
-    const j1 = await req1.json();
-
-    status.textContent = 'Upload vers Supabase Storage...';
-
-    // 2) PUT direct vers l'URL signée renvoyée
-    const put = await fetch(j1.uploadUrl, {
-      method: 'PUT',
-      headers: { 'Content-Type': file.type },
-      body: file
-    });
-    if (!put.ok) throw new Error('Upload HTTP failed: ' + put.status);
-
-    status.textContent = 'Confirmation en base...';
-
-    // 3) Confirm-upload pour insérer metadata en DB
-    const tags = (document.getElementById('tags').value || '').split(',').map(s => s.trim()).filter(Boolean);
-    const confirm = await fetch(CONFIRM_UPLOAD_FN, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
-      body: JSON.stringify({
-        path: j1.path,
-        manufacturer,
-        model,
-        filetype: file.type,
-        description: document.getElementById('description').value || '',
-        tags
-      })
-    });
-    if (!confirm.ok) throw new Error('confirm-upload failed: ' + confirm.status);
-    const j2 = await confirm.json();
-
-    status.textContent = 'Upload OK — fichier ajouté : ' + (j2.doc?.path || j1.path);
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+    if (error && error.message) {
+      // fallback local accounts
+      const compte = comptesValides.find(c => c.email === email && c.password === password);
+      if (compte) { showViewForUser(compte.email, compte.role); return; }
+      errorLogin.textContent = 'Erreur connexion: ' + error.message; errorLogin.classList.remove('hidden'); return;
+    }
+    const role = email.startsWith('admin') ? 'admin' : 'technicien';
+    showViewForUser(email, role);
   } catch (err) {
-    console.error(err);
-    status.textContent = 'Erreur: ' + err.message;
-  } finally {
-    uploadBtn.disabled = false;
+    errorLogin.textContent = err.message || 'Erreur de connexion'; errorLogin.classList.remove('hidden');
   }
 });
+
+document.getElementById('btnMagic').addEventListener('click', async () => {
+  const email = document.getElementById('email').value.trim();
+  if (!email) { errorLogin.textContent = 'Email requis'; errorLogin.classList.remove('hidden'); return; }
+  await supabase.auth.signInWithOtp({ email });
+  authMsg.textContent = 'Magic link envoyé si email existe (vérifie ta boîte).';
+});
+
+/* Logout */
+document.getElementById('btnLogoutAdmin').addEventListener('click', async () => { await supabase.auth.signOut(); showLogin(); });
+document.getElementById('btnLogoutTech').addEventListener('click', async () => { await supabase.auth.signOut(); showLogin(); });
+
+/* Keep local fallback session if using fallback login */
+function toggleMarque(){ document.getElementById('selectionMarque').classList.toggle('hidden'); }
+
+/* ---------- Technician IA flow ---------- */
+document.getElementById('askIaBtn').addEventListener('click', async () => {
+  const question = document.getElementById('questionIa').value.trim();
+  const reponseDiv = document.getElementById('reponseIA');
+  const askBtn = document.getElementById('askIaBtn');
+  if (!question) { reponseDiv.innerHTML = '<div class="error">Décris la panne</div>'; return; }
+  askBtn.disabled = true; askBtn.textContent = 'Analyse en cours...';
+  reponseDiv.innerHTML = '<div class="loading">L\'IA analyse...</div>';
+  try {
+    const marque = document.getElementById('marqueConnue').checked ? document.getElementById('marque').value : 'Non spécifiée';
+    const typeDemande = document.querySelector('input[name="typeDemande"]:checked').value;
+    const autoriserInternet = document.getElementById('autoriserInternet').checked;
+    const prompt = `Expert ascenseurs. Marque:${marque}. Type:${typeDemande}. Internet:${autoriserInternet}. Question:${question}`;
+    const resp = await fetch(GROQ_PROXY_PATH, {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({
+        messages: [{ role: 'system', content: prompt }, { role: 'user', content: question }],
+        model: 'llama-3.1-8b-instant', max_tokens: 800, temperature: 0.2
+      })
+    });
+    if (!resp.ok) throw new Error('Erreur API: ' + resp.status);
+    const data = await resp.json();
+    const text = (data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content) || data.result || JSON.stringify(data);
+    reponseDiv.innerHTML = `<strong>IA Groq :</strong><br>${text.replace(/\n/g,'<br>')}`;
+    document.getElementById('correctionSection').classList.remove('hidden');
+    const hist = JSON.parse(localStorage.getItem('historiqueIA')||'[]');
+    hist.unshift({ id: Date.now(), question, reponse: text, marque, date: new Date().toLocaleString() });
+    localStorage.setItem('historiqueIA', JSON.stringify(hist));
+    renderHistorique();
+  } catch (err) {
+    reponseDiv.innerHTML = `<div class="error">Erreur IA: ${err.message}</div>`;
+  } finally { askBtn.disabled = false; askBtn.textContent = 'Demander à l\'IA Groq'; }
+});
+
+/* Correction */
+document.getElementById('sendCorrection').addEventListener('click', () => {
+  const c = document.getElementById('correctionText').value.trim();
+  if (!c) { alert('Entrez une correction'); return; }
+  const know = JSON.parse(localStorage.getItem('connaissancesIA')||'[]');
+  know.unshift({ id:Date.now(), correction:c, date:new Date().toLocaleString() });
+  localStorage.setItem('connaissancesIA', JSON.stringify(know));
+  document.getElementById('correctionSection').innerHTML = '<div class="success">Correction enregistrée.</div>';
+});
+
+/* Historique render */
+function renderHistorique(){
+  const list = JSON.parse(localStorage.getItem('historiqueIA')||'[]');
+  const el = document.getElementById('historiqueList');
+  if(!el) return;
+  el.innerHTML = list.slice(0,20).map(i=>`<div style="padding:8px;border-bottom:1px solid #eee"><strong>${i.question.substring(0,80)}</strong><div class="small">${i.date}</div></div>`).join('') || '<div class="small">Aucun historique</div>';
+}
+renderHistorique();
+
+/* ---------- Admin upload flow (Supabase signed upload) ---------- */
+document.getElementById('uploadForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const uploadStatus = document.getElementById('uploadStatus');
+  uploadStatus.textContent = '';
+  const file = document.getElementById('fileInput').files[0];
+  if (!file) { uploadStatus.textContent = 'Sélectionne un fichier'; return; }
+  const manufacturer = document.getElementById('manufacturer').value.trim() || 'unknown';
+  const model = document.getElementById('model').value.trim() || 'generic';
+
+  // Récupérer token Supabase (session)
+  const session = await supabase.auth.getSession();
+  const token = session?.data?.session?.access_token;
+  if (!token) { uploadStatus.textContent = 'Connecte-toi via Supabase Auth avant d\'uploader'; return; }
+
+  try {
+    uploadStatus.textContent = 'Demande URL d\'upload...';
+    const r1 = await fetch(UPLOAD_REQUEST_FN, {
+      method:'POST',
+      headers: {'Content-Type':'application/json','Authorization':'Bearer ' + token},
+      body: JSON.stringify({ manufacturer, model, filename: file.name, mimeType: file.type })
+    });
+    if (!r1.ok) throw new Error('upload-request échoué ' + r1.status);
+    const j1 = await r1.json();
+    uploadStatus.textContent = 'Upload vers Supabase Storage...';
+
+    const put = await fetch(j1.uploadUrl, { method:'PUT', headers: { 'Content-Type': file.type }, body: file });
+    if (!put.ok) throw new Error('Upload HTTP échoué ' + put.status);
+
+    uploadStatus.textContent = 'Insertion metadata...';
+    const tags = (document.getElementById('tags').value||'').split(',').map(s=>s.trim()).filter(Boolean);
+    const r2 = await fetch(CONFIRM_UPLOAD_FN, {
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer ' + token},
+      body: JSON.stringify({
+        path: j1.path, manufacturer, model, filetype: file.type,
+        description: document.getElementById('description').value || '', tags
+      })
+    });
+    if (!r2.ok) throw new Error('confirm-upload échoué ' + r2.status);
+    const j2 = await r2.json();
+    uploadStatus.innerHTML = `<span class="success">Upload OK — ${j2.doc?.path || j1.path}</span>`;
+  } catch (err) {
+    uploadStatus.innerHTML = `<div class="error">Erreur upload: ${err.message}</div>`;
+  }
+});
+
+/* Voir documents rapide (lecture simple) */
+document.getElementById('listDocs').addEventListener('click', async () => {
+  const session = await supabase.auth.getSession();
+  const token = session?.data?.session?.access_token;
+  if (!token) { alert('Connecte-toi via Supabase Auth'); return; }
+  // requête directe à la table documents (utilise anon key; si tu as RLS, adapte)
+  const { data, error } = await supabase.from('documents').select('*').order('uploaded_at', { ascending: false }).limit(50);
+  if (error) { alert('Erreur lecture documents: ' + error.message); return; }
+  document.getElementById('uploadStatus').innerText = `Documents trouvés: ${data.length}`;
+  document.getElementById('listeMarques').innerHTML = data.slice(0,10).map(d=>`<div class="small">${d.manufacturer}/${d.model} — ${d.path}</div>`).join('');
+});
+
+/* ---------- Marques admin ---------- */
+const marquesKey = 'marquesAscenseurs';
+function renderMarques(){
+  const m = JSON.parse(localStorage.getItem(marquesKey) || '[]');
+  document.getElementById('listeMarques').innerHTML = m.map(x=>`<div style="padding:8px;background:#fff;margin:6px 0;border-radius:6px"><strong>${x.nom}</strong><br><small>${x.lienMega}</small></div>`).join('') || '<div class="small">Aucune marque</div>';
+}
+document.getElementById('ajouterMarqueBtn').addEventListener('click', () => {
+  const nom = document.getElementById('nouvelleMarque').value.trim();
+  const lien = document.getElementById('lienMega').value.trim();
+  if(!nom || !lien){ alert('Remplis les champs'); return; }
+  const m = JSON.parse(localStorage.getItem(marquesKey)||'[]');
+  m.unshift({ nom, lienMega: lien });
+  localStorage.setItem(marquesKey, JSON.stringify(m));
+  document.getElementById('nouvelleMarque').value=''; document.getElementById('lienMega').value='';
+  renderMarques();
+});
+renderMarques();
+
+/* ---------- Tester GROQ proxy ---------- */
+document.getElementById('testerApiBtn').addEventListener('click', async () => {
+  const el = document.getElementById('apiTestResult');
+  el.textContent = 'Test en cours...';
+  try {
+    const res = await fetch(GROQ_PROXY_PATH, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ messages:[{role:'user',content:"Réponds OK"}], model:'llama-3.1-8b-instant', max_tokens:10 })});
+    if(!res.ok) throw new Error('Status ' + res.status);
+    const d = await res.json();
+    el.innerText = 'Connexion GROQ OK';
+    console.log('GROQ test', d);
+  } catch(e) { el.innerText = 'Erreur GROQ: ' + e.message; }
+});
+
+/* ---------- Init : voir session Supabase et adapter vue ---------- */
+(async function init(){
+  // si Supabase session active, montrer role via email
+  const { data } = await supabase.auth.getSession();
+  const user = data?.session?.user;
+  if (user?.email) {
+    // simple role detection: emails with 'admin' considered admin else tech
+    const role = user.email.startsWith('admin') ? 'admin' : 'technicien';
+    showViewForUser(user.email, role);
+  } else {
+    showLogin();
+  }
+})();
 </script>
 </body>
 </html>
