@@ -1,85 +1,124 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="fr">
 <head>
-  <meta charset="utf-8" />
-  <title>Bonjour, je suis le technicien</title>
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <style>
-    body { font-family: Arial, sans-serif; background:#f4f4f4; color:#222; margin:0; padding:40px; display:flex; flex-direction:column; align-items:center; }
-    .card { background:#fff; padding:24px; border-radius:8px; box-shadow:0 6px 18px rgba(0,0,0,0.06); max-width:760px; width:100%; }
-    h1 { margin:0 0 8px; font-size:22px; color:#111; }
-    p { margin:0 0 16px; color:#444; }
-    #file-list div { padding:8px 0; border-bottom:1px solid #eee; }
-    a.file-link { color:#0066cc; text-decoration:none; }
-    .status { margin-top:12px; color:#888; font-size:14px; }
-    @media (max-width:520px){ body{padding:16px} .card{padding:16px} }
-  </style>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Admin Upload - Test</title>
+<style>
+body{font-family:Arial,sans-serif;padding:20px;background:#f3f4f6}
+.container{max-width:720px;margin:0 auto;background:#fff;padding:16px;border-radius:8px}
+input,textarea,select,button{width:100%;padding:10px;margin:8px 0;border:1px solid #ccc;border-radius:6px}
+button{background:#667eea;color:#fff;border:none;cursor:pointer}
+button[disabled]{background:#ccc;cursor:not-allowed}
+.small{font-size:14px;color:#555}
+</style>
 </head>
 <body>
-  <div class="card">
-    <h1>Bonjour, je suis le technicien</h1>
-    <p>Bienvenue — utilisation de Supabase Storage pour lister des fichiers publics.</p>
+<div class="container">
+  <h2>Admin - Upload document</h2>
+  <form id="uploadForm">
+    <label class="small">Fabricant</label>
+    <input name="manufacturer" id="manufacturer" required placeholder="ex: Schindler" />
+    <label class="small">Modèle</label>
+    <input name="model" id="model" required placeholder="ex: 3300-5300" />
+    <label class="small">Fichier (pdf/png/jpg)</label>
+    <input type="file" id="fileInput" accept=".pdf,image/png,image/jpeg" required />
+    <label class="small">Tags (virgule séparés)</label>
+    <input id="tags" placeholder="erreurs,diagnostic" />
+    <label class="small">Description</label>
+    <textarea id="description" rows="3" placeholder="Courte description"></textarea>
+    <button id="uploadBtn">Uploader</button>
+    <div id="status" class="small"></div>
+  </form>
+</div>
 
-    <div id="file-list">Chargement des fichiers…</div>
-    <div class="status" id="status">Statut: initialisation</div>
-  </div>
+<!-- Inclure supabase-js depuis CDN si tu veux utiliser Auth côté client -->
+<script type="module">
+// Remplace par tes valeurs
+const SUPABASE_URL = 'https://<TON_PROJECT>.supabase.co';
+const SUPABASE_ANON_KEY = '<TON_ANON_KEY>';
+const UPLOAD_REQUEST_FN = `${SUPABASE_URL}/functions/v1/upload-request`;
+const CONFIRM_UPLOAD_FN = `${SUPABASE_URL}/functions/v1/confirm-upload`;
 
-  <script type="module">
-    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
+// Helper: obtenir token de session Supabase (ici on suppose que l'utilisateur est connecté via Supabase Auth)
+import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
+const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    // === VALEURS DU PROJET (à vérifier dans Supabase → Settings → API) ===
-    const SUPABASE_URL = 'https://prrzsosrbrskmeozmmmu.supabase.co';
-    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBycnpzb3NyYnJza21lb3ptbW11Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjExNDMyNTIsImV4cCI6MjA3NjcxOTI1Mn0.Hovju6M2k3temb1xbTYfBFXwUrZw54lxvVIMsfwSL_s';
+const form = document.getElementById('uploadForm');
+const status = document.getElementById('status');
+const uploadBtn = document.getElementById('uploadBtn');
 
-    // === Nom du bucket à utiliser (crée-le dans Supabase Storage → documents) ===
-    const BUCKET_NAME = 'documents';
+form.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  status.textContent = '';
+  uploadBtn.disabled = true;
 
-    const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  const file = document.getElementById('fileInput').files[0];
+  if (!file) { status.textContent = 'Sélectionne un fichier'; uploadBtn.disabled = false; return; }
 
-    const fileListEl = document.getElementById('file-list');
-    const statusEl = document.getElementById('status');
+  // Récupérer la session / token Supabase (l'utilisateur doit être connecté)
+  const sessionRes = await supabase.auth.getSession();
+  const token = sessionRes?.data?.session?.access_token;
+  if (!token) {
+    status.textContent = 'Connecte-toi d\'abord (Supabase Auth requis)';
+    uploadBtn.disabled = false;
+    return;
+  }
 
-    async function listPublicFiles() {
-      statusEl.textContent = 'Statut: connexion à Supabase…';
-      try {
-        // Liste les objets à la racine du bucket (''), max 100
-        const { data, error } = await supabase.storage.from(BUCKET_NAME).list('', { limit: 100 });
-        if (error) {
-          console.error('Erreur list:', error);
-          fileListEl.textContent = 'Erreur lors de la lecture du bucket: ' + (error.message || JSON.stringify(error));
-          statusEl.textContent = 'Statut: erreur';
-          return;
-        }
+  const manufacturer = document.getElementById('manufacturer').value || 'unknown';
+  const model = document.getElementById('model').value || 'generic';
 
-        if (!data || data.length === 0) {
-          fileListEl.textContent = 'Aucun fichier trouvé dans le bucket ' + BUCKET_NAME + '.';
-          statusEl.textContent = 'Statut: ok (aucun fichier)';
-          return;
-        }
+  try {
+    status.textContent = 'Demande URL d\'upload...';
 
-        fileListEl.innerHTML = '';
-        data.forEach(item => {
-          const row = document.createElement('div');
-          const a = document.createElement('a');
-          a.className = 'file-link';
-          a.textContent = item.name;
-          // Lien public direct pour bucket public
-          a.href = `${SUPABASE_URL}/storage/v1/object/public/${BUCKET_NAME}/${encodeURIComponent(item.name)}`;
-          a.target = '_blank';
-          row.appendChild(a);
-          fileListEl.appendChild(row);
-        });
+    // 1) Demander upload-request (renvoie uploadUrl et path)
+    const req1 = await fetch(UPLOAD_REQUEST_FN, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+      body: JSON.stringify({
+        manufacturer, model, filename: file.name, mimeType: file.type
+      })
+    });
+    if (!req1.ok) throw new Error('upload-request failed: ' + req1.status);
+    const j1 = await req1.json();
 
-        statusEl.textContent = 'Statut: ok (fichiers listés)';
-      } catch (err) {
-        console.error(err);
-        fileListEl.textContent = 'Erreur inattendue';
-        statusEl.textContent = 'Statut: erreur inattendue';
-      }
-    }
+    status.textContent = 'Upload vers Supabase Storage...';
 
-    // Lancer le test au chargement
-    listPublicFiles();
-  </script>
+    // 2) PUT direct vers l'URL signée renvoyée
+    const put = await fetch(j1.uploadUrl, {
+      method: 'PUT',
+      headers: { 'Content-Type': file.type },
+      body: file
+    });
+    if (!put.ok) throw new Error('Upload HTTP failed: ' + put.status);
+
+    status.textContent = 'Confirmation en base...';
+
+    // 3) Confirm-upload pour insérer metadata en DB
+    const tags = (document.getElementById('tags').value || '').split(',').map(s => s.trim()).filter(Boolean);
+    const confirm = await fetch(CONFIRM_UPLOAD_FN, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+      body: JSON.stringify({
+        path: j1.path,
+        manufacturer,
+        model,
+        filetype: file.type,
+        description: document.getElementById('description').value || '',
+        tags
+      })
+    });
+    if (!confirm.ok) throw new Error('confirm-upload failed: ' + confirm.status);
+    const j2 = await confirm.json();
+
+    status.textContent = 'Upload OK — fichier ajouté : ' + (j2.doc?.path || j1.path);
+  } catch (err) {
+    console.error(err);
+    status.textContent = 'Erreur: ' + err.message;
+  } finally {
+    uploadBtn.disabled = false;
+  }
+});
+</script>
 </body>
 </html>
