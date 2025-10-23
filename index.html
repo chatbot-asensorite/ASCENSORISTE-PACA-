@@ -183,31 +183,31 @@ footer{margin-top:12px;text-align:center;color:#fff;opacity:.9}
 <footer>Plateforme Ascenseurs — testé mobile-first</footer>
 
 <script type="module">
-/* ---------- CONFIG - REMPLACER AVANT DEPLOIEMENT ---------- */
-const SUPABASE_URL = 'https://<TON_PROJECT>.supabase.co'; // <-- remplace
-const SUPABASE_ANON_KEY = '<TON_ANON_KEY>';              // <-- remplace
+/* ---------- CONFIGURATIONS SUPABASE (déjà insérées) ---------- */
+const SUPABASE_URL = 'https://prrzsosrbrskmeozmmmu.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBycnpzb3NyYnJza21lb3ptbW11Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjExNDMyNTIsImV4cCI6MjA3NjcxOTI1Mn0.Hovju6M2k3temb1xbTYfBFXwUrZw54lxvVIMsfwSL_s';
+
 const UPLOAD_REQUEST_FN = `${SUPABASE_URL}/functions/v1/upload-request`;
 const CONFIRM_UPLOAD_FN = `${SUPABASE_URL}/functions/v1/confirm-upload`;
-const GROQ_PROXY_PATH = '/api/groq'; // ton proxy Vercel ou équivalent
-/* ---------------------------------------------------------- */
+const GROQ_PROXY_PATH = '/api/groq';
 
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-/* Local fallback simple accounts (utile si Auth non configuré) */
+/* Local fallback simple accounts */
 const comptesValides = [
   { email: 'technicien1@ascenseurs.fr', password: '123456', role: 'technicien' },
   { email: 'admin@ascenseurs.fr', password: '123456', role: 'admin' }
 ];
 
-/* ---------- UI refs ---------- */
+/* UI refs */
 const loginContainer = document.getElementById('loginContainer');
 const adminContainer = document.getElementById('adminContainer');
 const technicienContainer = document.getElementById('technicienContainer');
 const authMsg = document.getElementById('authMsg');
 const errorLogin = document.getElementById('errorLogin');
 
-/* ---------- Auth handlers ---------- */
+/* Auth handlers */
 async function showViewForUser(userEmail, role) {
   loginContainer.classList.add('hidden');
   errorLogin.classList.add('hidden');
@@ -228,6 +228,7 @@ function showLogin() {
   technicienContainer.classList.add('hidden');
 }
 
+/* Attach login handlers */
 document.getElementById('btnSignIn').addEventListener('click', async () => {
   errorLogin.classList.add('hidden');
   const email = document.getElementById('email').value.trim();
@@ -235,18 +236,18 @@ document.getElementById('btnSignIn').addEventListener('click', async () => {
 
   if (!email || !password) { errorLogin.textContent = 'Email et mot de passe requis'; errorLogin.classList.remove('hidden'); return; }
 
-  // Essayer Supabase Auth first
   try {
     const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-    if (error && error.message) {
-      // fallback local accounts
+    if (error) {
       const compte = comptesValides.find(c => c.email === email && c.password === password);
       if (compte) { showViewForUser(compte.email, compte.role); return; }
-      errorLogin.textContent = 'Erreur connexion: ' + error.message; errorLogin.classList.remove('hidden'); return;
+      errorLogin.textContent = 'Erreur connexion: ' + (error.message || JSON.stringify(error)); errorLogin.classList.remove('hidden'); return;
     }
     const role = email.startsWith('admin') ? 'admin' : 'technicien';
     showViewForUser(email, role);
   } catch (err) {
+    const compte = comptesValides.find(c => c.email === email && c.password === password);
+    if (compte) { showViewForUser(compte.email, compte.role); return; }
     errorLogin.textContent = err.message || 'Erreur de connexion'; errorLogin.classList.remove('hidden');
   }
 });
@@ -262,10 +263,10 @@ document.getElementById('btnMagic').addEventListener('click', async () => {
 document.getElementById('btnLogoutAdmin').addEventListener('click', async () => { await supabase.auth.signOut(); showLogin(); });
 document.getElementById('btnLogoutTech').addEventListener('click', async () => { await supabase.auth.signOut(); showLogin(); });
 
-/* Keep local fallback session if using fallback login */
+/* UI helpers */
 function toggleMarque(){ document.getElementById('selectionMarque').classList.toggle('hidden'); }
 
-/* ---------- Technician IA flow ---------- */
+/* Technician IA flow */
 document.getElementById('askIaBtn').addEventListener('click', async () => {
   const question = document.getElementById('questionIa').value.trim();
   const reponseDiv = document.getElementById('reponseIA');
@@ -319,7 +320,7 @@ function renderHistorique(){
 }
 renderHistorique();
 
-/* ---------- Admin upload flow (Supabase signed upload) ---------- */
+/* Admin upload flow (Supabase signed upload) */
 document.getElementById('uploadForm').addEventListener('submit', async (e) => {
   e.preventDefault();
   const uploadStatus = document.getElementById('uploadStatus');
@@ -329,7 +330,6 @@ document.getElementById('uploadForm').addEventListener('submit', async (e) => {
   const manufacturer = document.getElementById('manufacturer').value.trim() || 'unknown';
   const model = document.getElementById('model').value.trim() || 'generic';
 
-  // Récupérer token Supabase (session)
   const session = await supabase.auth.getSession();
   const token = session?.data?.session?.access_token;
   if (!token) { uploadStatus.textContent = 'Connecte-toi via Supabase Auth avant d\'uploader'; return; }
@@ -371,14 +371,13 @@ document.getElementById('listDocs').addEventListener('click', async () => {
   const session = await supabase.auth.getSession();
   const token = session?.data?.session?.access_token;
   if (!token) { alert('Connecte-toi via Supabase Auth'); return; }
-  // requête directe à la table documents (utilise anon key; si tu as RLS, adapte)
   const { data, error } = await supabase.from('documents').select('*').order('uploaded_at', { ascending: false }).limit(50);
   if (error) { alert('Erreur lecture documents: ' + error.message); return; }
   document.getElementById('uploadStatus').innerText = `Documents trouvés: ${data.length}`;
   document.getElementById('listeMarques').innerHTML = data.slice(0,10).map(d=>`<div class="small">${d.manufacturer}/${d.model} — ${d.path}</div>`).join('');
 });
 
-/* ---------- Marques admin ---------- */
+/* Marques admin */
 const marquesKey = 'marquesAscenseurs';
 function renderMarques(){
   const m = JSON.parse(localStorage.getItem(marquesKey) || '[]');
@@ -396,7 +395,7 @@ document.getElementById('ajouterMarqueBtn').addEventListener('click', () => {
 });
 renderMarques();
 
-/* ---------- Tester GROQ proxy ---------- */
+/* Tester GROQ proxy */
 document.getElementById('testerApiBtn').addEventListener('click', async () => {
   const el = document.getElementById('apiTestResult');
   el.textContent = 'Test en cours...';
@@ -409,16 +408,18 @@ document.getElementById('testerApiBtn').addEventListener('click', async () => {
   } catch(e) { el.innerText = 'Erreur GROQ: ' + e.message; }
 });
 
-/* ---------- Init : voir session Supabase et adapter vue ---------- */
+/* Init : session Supabase */
 (async function init(){
-  // si Supabase session active, montrer role via email
-  const { data } = await supabase.auth.getSession();
-  const user = data?.session?.user;
-  if (user?.email) {
-    // simple role detection: emails with 'admin' considered admin else tech
-    const role = user.email.startsWith('admin') ? 'admin' : 'technicien';
-    showViewForUser(user.email, role);
-  } else {
+  try {
+    const { data } = await supabase.auth.getSession();
+    const user = data?.session?.user;
+    if (user?.email) {
+      const role = user.email.startsWith('admin') ? 'admin' : 'technicien';
+      showViewForUser(user.email, role);
+    } else {
+      showLogin();
+    }
+  } catch(e) {
     showLogin();
   }
 })();
