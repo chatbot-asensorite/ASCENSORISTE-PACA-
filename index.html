@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>App Upload sécurisé</title>
+  <title>Upload sécurisé</title>
   <style>
     body{font-family:system-ui,Segoe UI,Roboto,Arial;margin:24px auto;max-width:900px;color:#111;padding:0 16px}
     label{display:block;margin-top:12px;font-weight:600}
@@ -42,10 +42,10 @@
     <section style="margin-top:16px">
       <h3>Configuration</h3>
       <pre class="muted" style="background:#fff;padding:8px;border-radius:6px;border:1px solid #eef2ff;">
-const SUPABASE_URL = 'https://prrzsosrbrskmeozmmmu.supabase.co';
+const SUPABASE_URL = 'REPLACE_WITH_SUPABASE_URL';
 const SUPABASE_ANON_KEY = 'REPLACE_WITH_ANON_KEY';
-const FN_UPLOAD_REQUEST = 'https://prrzsosrbrskmeozmmmu.functions.supabase.co/upload-request';
-const FN_CONFIRM_UPLOAD = 'https://prrzsosrbrskmeozmmmu.functions.supabase.co/confirm-upload';
+const FN_UPLOAD_REQUEST = 'REPLACE_WITH_FN_UPLOAD_REQUEST';
+const FN_CONFIRM_UPLOAD = 'REPLACE_WITH_FN_CONFIRM_UPLOAD';
       </pre>
     </section>
   </main>
@@ -55,12 +55,10 @@ const FN_CONFIRM_UPLOAD = 'https://prrzsosrbrskmeozmmmu.functions.supabase.co/co
   </footer>
 
   <script>
-    // PLACEHOLDERS uniquement — remplacer par CI au build
-    const SUPABASE_URL = 'https://prrzsosrbrskmeozmmmu.supabase.co';
+    const SUPABASE_URL = 'REPLACE_WITH_SUPABASE_URL';
     const SUPABASE_ANON_KEY = 'REPLACE_WITH_ANON_KEY';
-
-    const FN_UPLOAD_REQUEST = 'https://prrzsosrbrskmeozmmmu.functions.supabase.co/upload-request';
-    const FN_CONFIRM_UPLOAD = 'https://prrzsosrbrskmeozmmmu.functions.supabase.co/confirm-upload';
+    const FN_UPLOAD_REQUEST = 'REPLACE_WITH_FN_UPLOAD_REQUEST';
+    const FN_CONFIRM_UPLOAD = 'REPLACE_WITH_FN_CONFIRM_UPLOAD';
 
     const logEl = document.getElementById('log');
     const statusEl = document.getElementById('status');
