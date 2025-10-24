@@ -17,10 +17,12 @@ jobs:
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+          FN_UPLOAD_REQUEST: ${{ secrets.FN_UPLOAD_REQUEST }}
+          FN_CONFIRM_UPLOAD: ${{ secrets.FN_CONFIRM_UPLOAD }}
         run: |
           mkdir -p public
           cp index.html public/index.html
-          envsubst '${SUPABASE_URL} ${SUPABASE_ANON_KEY}' < public/index.html > public/index.tmp && mv public/index.tmp public/index.html
+          envsubst '${SUPABASE_URL} ${SUPABASE_ANON_KEY} ${FN_UPLOAD_REQUEST} ${FN_CONFIRM_UPLOAD}' < public/index.html > public/index.tmp && mv public/index.tmp public/index.html
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
