@@ -5,98 +5,63 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>App Upload sécurisé</title>
   <style>
-    :root{--bg:#ffffff;--muted:#6b7280;--accent:#0366d6;--ok:#16a34a;--err:#dc2626}
-    body{font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;margin:24px auto;max-width:980px;color:#0f172a;padding:0 16px}
-    header{margin-bottom:18px}
+    body{font-family:system-ui,Segoe UI,Roboto,Arial;margin:24px auto;max-width:900px;color:#111;padding:0 16px}
     label{display:block;margin-top:12px;font-weight:600}
-    input[type="text"], input[type="file"], textarea, select{width:100%;padding:10px;border:1px solid #d1d5db;border-radius:8px;margin-top:6px;box-sizing:border-box}
-    button{margin-top:12px;padding:10px 14px;border-radius:8px;border:0;background:var(--accent);color:white;font-weight:600;cursor:pointer}
-    .muted{color:var(--muted);font-size:0.95rem}
-    .row{display:flex;gap:12px;align-items:center}
-    .small{font-size:0.9rem}
-    .log{white-space:pre-wrap;background:#f8fafc;padding:12px;border-radius:8px;margin-top:12px;border:1px solid #e6eef8;max-height:260px;overflow:auto}
-    progress{width:100%;height:14px;border-radius:8px}
-    .danger{color:var(--err);font-weight:700}
-    .success{color:var(--ok);font-weight:700}
-    footer{margin-top:20px;color:var(--muted);font-size:0.9rem}
-    .hint{background:#f1f5f9;padding:10px;border-radius:8px;margin-top:12px;border-left:4px solid #c7e0ff}
+    input,textarea,button{width:100%;padding:10px;border:1px solid #d1d5db;border-radius:8px;box-sizing:border-box}
+    button{background:#0366d6;color:#fff;border:0;padding:10px 14px;border-radius:8px;cursor:pointer}
+    .muted{color:#6b7280;font-size:0.95rem}
+    .log{white-space:pre-wrap;background:#f8fafc;padding:12px;border-radius:8px;margin-top:12px;border:1px solid #e6eef8;max-height:240px;overflow:auto}
+    progress{width:100%;height:14px;border-radius:8px;display:none}
   </style>
 </head>
 <body>
   <header>
-    <h1>Upload sécurisé — Frontend</h1>
-    <p class="muted">Ne jamais placer la <strong>service_role</strong> dans ce fichier. Injecter <strong>SUPABASE_ANON_KEY</strong> via CI/CD (GitHub Secrets) au build.</p>
+    <h1>Upload sécurisé</h1>
+    <p class="muted"><strong>Ne jamais</strong> inclure la service_role dans le frontend. Les clés réelles doivent être injectées par CI via GitHub Secrets.</p>
   </header>
 
   <main>
-    <section aria-labelledby="upload-title">
-      <h2 id="upload-title">Formulaire d'upload</h2>
+    <label for="file">Fichier</label>
+    <input id="file" type="file" />
 
-      <label for="file">Fichier</label>
-      <input id="file" type="file" aria-describedby="file-hint" />
+    <label for="manufacturer">Fabricant</label>
+    <input id="manufacturer" type="text" placeholder="ex: Otis" />
 
-      <div class="row">
-        <div style="flex:1">
-          <label for="manufacturer">Fabricant</label>
-          <input id="manufacturer" type="text" placeholder="ex: Otis" />
-        </div>
-        <div style="width:220px">
-          <label for="model">Modèle</label>
-          <input id="model" type="text" placeholder="ex: MX200" />
-        </div>
-      </div>
+    <label for="model">Modèle</label>
+    <input id="model" type="text" placeholder="ex: MX200" />
 
-      <label for="description">Description (optionnel)</label>
-      <textarea id="description" rows="3" placeholder="Court descriptif"></textarea>
+    <label for="description">Description (optionnel)</label>
+    <textarea id="description" rows="3"></textarea>
 
-      <div style="display:flex;gap:8px;align-items:center;margin-top:10px">
-        <button id="start">Démarrer l'upload</button>
-        <div id="status" class="muted small">Prêt</div>
-      </div>
+    <button id="start">Démarrer l'upload</button>
+    <div id="status" class="muted">Prêt</div>
 
-      <div class="hint" id="file-hint">
-        Le frontend n’a pas accès à la clé <strong>service_role</strong>. Les URLs signées et l'insertion en base sont effectuées via des Edge Functions serveur.
-      </div>
+    <progress id="progress" value="0" max="100"></progress>
+    <div class="log" id="log">Journal d'activité</div>
 
-      <div style="margin-top:12px">
-        <progress id="progress" value="0" max="100" style="display:none"></progress>
-      </div>
-
-      <div class="log" id="log">Journal d'activité</div>
-    </section>
-
-    <section style="margin-top:18px">
-      <h3>Configuration (placeholders)</h3>
-      <p class="muted">Ces valeurs doivent être remplacées au build via ton pipeline CI (GitHub Actions) avec les secrets.</p>
-      <pre id="cfg" class="muted" style="background:#fff;padding:8px;border-radius:6px;border:1px solid #eef2ff;">
+    <section style="margin-top:16px">
+      <h3>Configuration</h3>
+      <pre class="muted" style="background:#fff;padding:8px;border-radius:6px;border:1px solid #eef2ff;">
 const SUPABASE_URL = 'https://prrzsosrbrskmeozmmmu.supabase.co';
 const SUPABASE_ANON_KEY = 'REPLACE_WITH_ANON_KEY';
-const FN_UPLOAD_REQUEST = 'https://<PROJECT>.functions.supabase.co/upload-request';
-const FN_CONFIRM_UPLOAD = 'https://<PROJECT>.functions.supabase.co/confirm-upload';
+const FN_UPLOAD_REQUEST = 'https://prrzsosrbrskmeozmmmu.functions.supabase.co/upload-request';
+const FN_CONFIRM_UPLOAD = 'https://prrzsosrbrskmeozmmmu.functions.supabase.co/confirm-upload';
       </pre>
     </section>
   </main>
 
-  <footer>
-    <p class="muted">Après mise en production : ajouter SUPABASE_ANON_KEY et SUPABASE_URL aux GitHub Secrets, déployer via Actions pour injecter ces valeurs au build.</p>
+  <footer style="margin-top:16px" class="muted">
+    Injecter SUPABASE_ANON_KEY et SUPABASE_URL via GitHub Secrets; ne pas stocker de clés dans le repo.
   </footer>
 
   <script>
-    // ----------------------------
-    // Configuration (placeholders)
-    // Ces valeurs doivent être remplacées par la pipeline CI (envsubst / templating)
-    // ----------------------------
+    // PLACEHOLDERS uniquement — remplacer par CI au build
     const SUPABASE_URL = 'https://prrzsosrbrskmeozmmmu.supabase.co';
     const SUPABASE_ANON_KEY = 'REPLACE_WITH_ANON_KEY';
 
-    // Points d'accès des Edge Functions (modifier si vous utilisez un autre domaine)
-    // Exemples : https://<PROJECT>.functions.supabase.co/upload-request
     const FN_UPLOAD_REQUEST = 'https://prrzsosrbrskmeozmmmu.functions.supabase.co/upload-request';
     const FN_CONFIRM_UPLOAD = 'https://prrzsosrbrskmeozmmmu.functions.supabase.co/confirm-upload';
 
-    // ----------------------------
-    // Utilitaires
-    // ----------------------------
     const logEl = document.getElementById('log');
     const statusEl = document.getElementById('status');
     const progressEl = document.getElementById('progress');
@@ -106,136 +71,70 @@ const FN_CONFIRM_UPLOAD = 'https://<PROJECT>.functions.supabase.co/confirm-uploa
       logEl.textContent = `[${ts}] ` + args.join(' ') + '\n' + logEl.textContent;
     }
 
-    function setStatus(text, cls){
-      statusEl.textContent = text;
-      statusEl.className = cls ? cls + ' small' : 'muted small';
-    }
+    function setStatus(t){ statusEl.textContent = t; }
 
-    function showProgress(val){
-      if(val === null){ progressEl.style.display = 'none'; return; }
-      progressEl.style.display = 'block';
-      progressEl.value = Math.max(0, Math.min(100, Math.round(val)));
-    }
-
-    // Vérification basique des placeholders pour éviter fuite accidentelle lors de tests locaux
     function checkPlaceholders(){
       if(SUPABASE_ANON_KEY === 'REPLACE_WITH_ANON_KEY'){
-        log('ATTENTION: SUPABASE_ANON_KEY est un placeholder. Injecter la vraie key via GitHub Secrets au build.');
-        setStatus('Clé non injectée', 'danger');
+        log('ATTENTION: SUPABASE_ANON_KEY est un placeholder. Injecter la vraie clé via GitHub Secrets au build.');
+        setStatus('Clé non injectée');
         return false;
       }
       return true;
     }
 
-    // ----------------------------
-    // Upload workflow
-    // 1) Appeler upload-request (server) pour obtenir uploadUrl signée + path
-    // 2) PUT vers uploadUrl (direct storage)
-    // 3) Appeler confirm-upload (server) pour insérer metadata en base
-    // ----------------------------
     async function startUpload(){
-      log('Démarrage du processus d\'upload');
-      setStatus('Préparation...', null);
-
-      if(!checkPlaceholders()){
-        alert('La clé ANON n\'est pas injectée. Voir le journal pour plus de détails.');
-        return;
-      }
+      log('Démarrage upload');
+      if(!checkPlaceholders()){ alert('La clé ANON n\'est pas injectée. Voir le journal.'); return; }
 
       const fileInput = document.getElementById('file');
-      if(!fileInput.files || fileInput.files.length === 0){
-        alert('Choisis un fichier avant de démarrer');
-        return;
-      }
+      if(!fileInput.files.length){ alert('Choisir un fichier'); return; }
       const file = fileInput.files[0];
-      const manufacturer = document.getElementById('manufacturer').value.trim() || null;
-      const model = document.getElementById('model').value.trim() || null;
-      const description = document.getElementById('description').value.trim() || null;
+      const manufacturer = document.getElementById('manufacturer').value || null;
+      const model = document.getElementById('model').value || null;
+      const description = document.getElementById('description').value || null;
 
       try {
-        setStatus('Demande URL signée...', null);
-        log('Appel de la fonction upload-request pour signer une URL');
-
+        setStatus('Demande URL signée');
         const signRes = await fetch(FN_UPLOAD_REQUEST, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-          body: JSON.stringify({
-            filename: file.name,
-            mimeType: file.type || 'application/octet-stream',
-            manufacturer, model
-          })
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ filename: file.name, mimeType: file.type || 'application/octet-stream', manufacturer, model })
         });
-
-        if(!signRes.ok){
-          const text = await signRes.text();
-          throw new Error('upload-request erreur: ' + signRes.status + ' ' + text);
-        }
+        if(!signRes.ok) throw new Error('upload-request failed ' + signRes.status);
         const signJson = await signRes.json();
         const uploadUrl = signJson.uploadUrl || signJson.signedUrl || signJson.url;
         const storagePath = signJson.path;
         if(!uploadUrl || !storagePath) throw new Error('Réponse upload-request invalide');
 
-        log('URL signée reçue, path=', storagePath);
-        setStatus('Upload direct vers le stockage...', null);
-        showProgress(0);
+        setStatus('Upload vers stockage');
+        progressEl.style.display = 'block';
+        progressEl.value = 30;
 
-        // Upload en chunk (simple PUT ici — adapté selon fournisseur)
-        const putRes = await fetch(uploadUrl, {
-          method: 'PUT',
-          headers: { 'Content-Type': file.type || 'application/octet-stream' },
-          body: file
-        });
+        const putRes = await fetch(uploadUrl, { method: 'PUT', headers: { 'Content-Type': file.type || 'application/octet-stream' }, body: file });
+        if(!(putRes.ok || putRes.status === 200 || putRes.status === 201)) throw new Error('Erreur PUT storage ' + putRes.status);
 
-        if(!(putRes.ok || putRes.status === 200 || putRes.status === 201)){
-          const txt = await putRes.text().catch(()=>'<no-body>');
-          throw new Error('Erreur lors du PUT storage: ' + putRes.status + ' ' + txt);
-        }
-
-        // Mise à jour progress indicatif (ici simulation, adapter si tu utilises XHR avec progress events)
-        showProgress(100);
-        log('Upload vers storage terminé');
-
-        setStatus('Confirmation en base...', null);
+        progressEl.value = 80;
+        setStatus('Confirmation metadata');
         const confirmRes = await fetch(FN_CONFIRM_UPLOAD, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-          body: JSON.stringify({
-            path: storagePath,
-            filename: file.name,
-            filetype: file.type || null,
-            manufacturer, model, description
-          })
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ path: storagePath, filename: file.name, filetype: file.type || null, manufacturer, model, description })
         });
-
-        if(!confirmRes.ok){
-          const txt = await confirmRes.text().catch(()=>'<no-body>');
-          throw new Error('confirm-upload erreur: ' + confirmRes.status + ' ' + txt);
-        }
+        if(!confirmRes.ok) throw new Error('confirm-upload failed ' + confirmRes.status);
         const confirmJson = await confirmRes.json();
-        log('Metadata insérées en base:', JSON.stringify(confirmJson));
-        setStatus('Terminé', 'success');
-      } catch (err){
+
+        progressEl.value = 100;
+        setStatus('Terminé');
+        log('Upload OK, metadata:', JSON.stringify(confirmJson));
+      } catch(err){
         log('Erreur:', err.message || err);
-        setStatus('Erreur', 'danger');
-        showProgress(null);
+        setStatus('Erreur');
       } finally {
-        // reset progress après un court délai
-        setTimeout(()=>showProgress(null), 1200);
+        setTimeout(()=>{ progressEl.style.display = 'none'; progressEl.value = 0; }, 1200);
       }
     }
 
-    // Attacher handler
-    document.getElementById('start').addEventListener('click', () => {
-      startUpload();
-    });
-
-    // Interaction rapide: mettre à jour bloc de config visible
-    document.getElementById('cfg').textContent = `
-const SUPABASE_URL = '${SUPABASE_URL}';
-const SUPABASE_ANON_KEY = '${SUPABASE_ANON_KEY}';
-const FN_UPLOAD_REQUEST = '${FN_UPLOAD_REQUEST}';
-const FN_CONFIRM_UPLOAD = '${FN_CONFIRM_UPLOAD}';
-    `;
+    document.getElementById('start').addEventListener('click', startUpload);
   </script>
 </body>
 </html>
