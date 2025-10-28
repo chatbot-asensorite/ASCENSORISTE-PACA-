@@ -1,138 +1,134 @@
-<!doctype html>
-<html lang="fr">
+<!DOCTYPE html>
+<html>
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Upload sécurisé</title>
+  <meta charset="UTF-8">
+  <title>Uploader un document ascenseur</title>
   <style>
-    body{font-family:system-ui,Segoe UI,Roboto,Arial;margin:24px auto;max-width:900px;color:#111;padding:0 16px}
-    label{display:block;margin-top:12px;font-weight:600}
-    input,textarea,button{width:100%;padding:10px;border:1px solid #d1d5db;border-radius:8px;box-sizing:border-box}
-    button{background:#0366d6;color:#fff;border:0;padding:10px 14px;border-radius:8px;cursor:pointer}
-    .muted{color:#6b7280;font-size:0.95rem}
-    .log{white-space:pre-wrap;background:#f8fafc;padding:12px;border-radius:8px;margin-top:12px;border:1px solid #e6eef8;max-height:240px;overflow:auto}
-    progress{width:100%;height:14px;border-radius:8px;display:none}
+    body { font-family: Arial, sans-serif; padding: 20px; max-width: 800px; }
+    label { display: block; margin-top: 10px; }
+    select, input[type="text"], input[type="file"] { width: 100%; padding: 8px; margin-top: 6px; box-sizing: border-box; }
+    button { margin-top: 12px; padding: 10px 16px; }
+    .note { color: #666; margin-top: 8px; }
+    .error { color: #a00; white-space: pre-wrap; margin-top: 10px; }
   </style>
 </head>
 <body>
-  <header>
-    <h1>Upload sécurisé</h1>
-    <p class="muted"><strong>Ne jamais</strong> inclure la service_role dans le frontend. Les clés réelles doivent être injectées par CI via GitHub Secrets.</p>
-  </header>
+  <h2>Uploader un document ascenseur</h2>
 
-  <main>
-    <label for="file">Fichier</label>
-    <input id="file" type="file" />
+  <label>Marque existante :
+    <select id="manufacturer"><option>Chargement...</option></select>
+  </label>
 
-    <label for="manufacturer">Fabricant</label>
-    <input id="manufacturer" type="text" placeholder="ex: Otis" />
+  <label>Nouvelle marque (facultatif) :
+    <input type="text" id="newManufacturer" placeholder="Ex: thyssenkrupp">
+  </label>
 
-    <label for="model">Modèle</label>
-    <input id="model" type="text" placeholder="ex: MX200" />
+  <label>Modèle existant :
+    <select id="model"><option>Chargement...</option></select>
+  </label>
 
-    <label for="description">Description (optionnel)</label>
-    <textarea id="description" rows="3"></textarea>
+  <label>Nouveau modèle (facultatif) :
+    <input type="text" id="newModel" placeholder="Ex: LVA 2">
+  </label>
 
-    <button id="start">Démarrer l'upload</button>
-    <div id="status" class="muted">Prêt</div>
+  <label>Choisir un fichier :
+    <input type="file" id="fileInput">
+  </label>
 
-    <progress id="progress" value="0" max="100"></progress>
-    <div class="log" id="log">Journal d'activité</div>
+  <label>Description du document :
+    <input type="text" id="description" placeholder="Ex: schéma électrique, manuel utilisateur">
+  </label>
 
-    <section style="margin-top:16px">
-      <h3>Configuration</h3>
-      <pre class="muted" style="background:#fff;padding:8px;border-radius:6px;border:1px solid #eef2ff;">
-const SUPABASE_URL = 'REPLACE_WITH_SUPABASE_URL';
-const SUPABASE_ANON_KEY = 'REPLACE_WITH_ANON_KEY';
-const FN_UPLOAD_REQUEST = 'REPLACE_WITH_FN_UPLOAD_REQUEST';
-const FN_CONFIRM_UPLOAD = 'REPLACE_WITH_FN_CONFIRM_UPLOAD';
-      </pre>
-    </section>
-  </main>
+  <button id="submitBtn">Envoyer</button>
 
-  <footer style="margin-top:16px" class="muted">
-    Injecter SUPABASE_ANON_KEY et SUPABASE_URL via GitHub Secrets; ne pas stocker de clés dans le repo.
-  </footer>
+  <p class="note">Si les listes restent vides : vérifie que la table <strong>documents</strong> contient des lignes avec marque et modèle, et que RLS est bien configuré.</p>
+  <div id="debug" class="error"></div>
 
   <script>
-    const SUPABASE_URL = 'REPLACE_WITH_SUPABASE_URL';
-    const SUPABASE_ANON_KEY = 'REPLACE_WITH_ANON_KEY';
-    const FN_UPLOAD_REQUEST = 'REPLACE_WITH_FN_UPLOAD_REQUEST';
-    const FN_CONFIRM_UPLOAD = 'REPLACE_WITH_FN_CONFIRM_UPLOAD';
+    const projectUrl = "https://prrzsosrbrskmeozmmmu.supabase.co";
+    const anonKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBycnpzb3NyYnJza21lb3ptbW11Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjEzMTkwMDMsImV4cCI6MjA3Njg5NTAwM30.JuqL6tJC5LRXX3OHXrznm_v9bca-aOJ_vnk_wPsP9Mc";
 
-    const logEl = document.getElementById('log');
-    const statusEl = document.getElementById('status');
-    const progressEl = document.getElementById('progress');
+    const headers = { apikey: anonKey, Authorization: `Bearer ${anonKey}` };
+    const manufacturerSelect = document.getElementById('manufacturer');
+    const modelSelect = document.getElementById('model');
+    const debugEl = document.getElementById('debug');
 
-    function log(...args){
-      const ts = new Date().toISOString().replace('T',' ').split('.')[0];
-      logEl.textContent = `[${ts}] ` + args.join(' ') + '\n' + logEl.textContent;
+    function emptySelect(sel, text) {
+      sel.innerHTML = "";
+      const o = document.createElement('option');
+      o.textContent = text;
+      o.value = "";
+      sel.appendChild(o);
     }
 
-    function setStatus(t){ statusEl.textContent = t; }
+    function detectKeys(sample) {
+      const keys = Object.keys(sample || {});
+      const lower = keys.map(k => k.toLowerCase());
+      const brandKeys = ['manufacturer','marque','brand','fabricant'];
+      const modelKeys = ['model','type','modèle','variant'];
 
-    function checkPlaceholders(){
-      if(SUPABASE_ANON_KEY === 'REPLACE_WITH_ANON_KEY'){
-        log('ATTENTION: SUPABASE_ANON_KEY est un placeholder. Injecter la vraie clé via GitHub Secrets au build.');
-        setStatus('Clé non injectée');
-        return false;
-      }
-      return true;
+      let brandKey = null, modelKey = null;
+      for (const b of brandKeys) if (lower.includes(b)) brandKey = keys[lower.indexOf(b)];
+      for (const m of modelKeys) if (lower.includes(m)) modelKey = keys[lower.indexOf(m)];
+      return { brandKey, modelKey };
     }
 
-    async function startUpload(){
-      log('Démarrage upload');
-      if(!checkPlaceholders()){ alert('La clé ANON n\'est pas injectée. Voir le journal.'); return; }
-
-      const fileInput = document.getElementById('file');
-      if(!fileInput.files.length){ alert('Choisir un fichier'); return; }
-      const file = fileInput.files[0];
-      const manufacturer = document.getElementById('manufacturer').value || null;
-      const model = document.getElementById('model').value || null;
-      const description = document.getElementById('description').value || null;
+    async function loadOptions() {
+      emptySelect(manufacturerSelect, "Chargement...");
+      emptySelect(modelSelect, "Chargement...");
+      debugEl.textContent = "";
 
       try {
-        setStatus('Demande URL signée');
-        const signRes = await fetch(FN_UPLOAD_REQUEST, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ filename: file.name, mimeType: file.type || 'application/octet-stream', manufacturer, model })
+        const res = await fetch(`${projectUrl}/rest/v1/documents?select=*`, { headers });
+        const data = await res.json();
+
+        if (!Array.isArray(data) || data.length === 0) {
+          emptySelect(manufacturerSelect, "Aucune marque trouvée");
+          emptySelect(modelSelect, "Aucun modèle trouvé");
+          debugEl.textContent = "La table documents est vide ou les colonnes marque/modèle sont vides.";
+          return;
+        }
+
+        const { brandKey, modelKey } = detectKeys(data[0]);
+        if (!brandKey || !modelKey) {
+          emptySelect(manufacturerSelect, "Colonne marque introuvable");
+          emptySelect(modelSelect, "Colonne modèle introuvable");
+          debugEl.textContent = "Colonnes détectées : " + Object.keys(data[0]).join(", ");
+          return;
+        }
+
+        const brands = new Set(), models = new Set();
+        data.forEach(row => {
+          if (row[brandKey]) brands.add(row[brandKey]);
+          if (row[modelKey]) models.add(row[modelKey]);
         });
-        if(!signRes.ok) throw new Error('upload-request failed ' + signRes.status);
-        const signJson = await signRes.json();
-        const uploadUrl = signJson.uploadUrl || signJson.signedUrl || signJson.url;
-        const storagePath = signJson.path;
-        if(!uploadUrl || !storagePath) throw new Error('Réponse upload-request invalide');
 
-        setStatus('Upload vers stockage');
-        progressEl.style.display = 'block';
-        progressEl.value = 30;
+        manufacturerSelect.innerHTML = "";
+        modelSelect.innerHTML = "";
 
-        const putRes = await fetch(uploadUrl, { method: 'PUT', headers: { 'Content-Type': file.type || 'application/octet-stream' }, body: file });
-        if(!(putRes.ok || putRes.status === 200 || putRes.status === 201)) throw new Error('Erreur PUT storage ' + putRes.status);
+        if (brands.size === 0) emptySelect(manufacturerSelect, "Aucune marque trouvée");
+        else {
+          const p = document.createElement('option'); p.value=""; p.textContent="-- Choisir une marque --"; manufacturerSelect.appendChild(p);
+          Array.from(brands).sort().forEach(b => {
+            const o = document.createElement('option'); o.value = b; o.textContent = b; manufacturerSelect.appendChild(o);
+          });
+        }
 
-        progressEl.value = 80;
-        setStatus('Confirmation metadata');
-        const confirmRes = await fetch(FN_CONFIRM_UPLOAD, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ path: storagePath, filename: file.name, filetype: file.type || null, manufacturer, model, description })
-        });
-        if(!confirmRes.ok) throw new Error('confirm-upload failed ' + confirmRes.status);
-        const confirmJson = await confirmRes.json();
-
-        progressEl.value = 100;
-        setStatus('Terminé');
-        log('Upload OK, metadata:', JSON.stringify(confirmJson));
-      } catch(err){
-        log('Erreur:', err.message || err);
-        setStatus('Erreur');
-      } finally {
-        setTimeout(()=>{ progressEl.style.display = 'none'; progressEl.value = 0; }, 1200);
+        if (models.size === 0) emptySelect(modelSelect, "Aucun modèle trouvé");
+        else {
+          const p = document.createElement('option'); p.value=""; p.textContent="-- Choisir un modèle --"; modelSelect.appendChild(p);
+          Array.from(models).sort().forEach(m => {
+            const o = document.createElement('option'); o.value = m; o.textContent = m; modelSelect.appendChild(o);
+          });
+        }
+      } catch (err) {
+        debugEl.textContent = "Erreur JS : " + err.message;
+        emptySelect(manufacturerSelect, "Erreur de chargement");
+        emptySelect(modelSelect, "Erreur de chargement");
       }
     }
 
-    document.getElementById('start').addEventListener('click', startUpload);
+    loadOptions();
   </script>
 </body>
 </html>
