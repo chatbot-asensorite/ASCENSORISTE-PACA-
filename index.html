@@ -2,133 +2,97 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>Uploader un document ascenseur</title>
-  <style>
-    body { font-family: Arial, sans-serif; padding: 20px; max-width: 800px; }
-    label { display: block; margin-top: 10px; }
-    select, input[type="text"], input[type="file"] { width: 100%; padding: 8px; margin-top: 6px; box-sizing: border-box; }
-    button { margin-top: 12px; padding: 10px 16px; }
-    .note { color: #666; margin-top: 8px; }
-    .error { color: #a00; white-space: pre-wrap; margin-top: 10px; }
-  </style>
+  <title>Admin - Documents Ascenseur</title>
 </head>
 <body>
-  <h2>Uploader un document ascenseur</h2>
+  <h1>📂 Fichiers techniques ascenseur</h1>
 
-  <label>Marque existante :
-    <select id="manufacturer"><option>Chargement...</option></select>
-  </label>
+  <label for="marque">Marque :</label>
+  <select id="marque"></select>
 
-  <label>Nouvelle marque (facultatif) :
-    <input type="text" id="newManufacturer" placeholder="Ex: thyssenkrupp">
-  </label>
+  <label for="modele">Modèle :</label>
+  <select id="modele"></select>
 
-  <label>Modèle existant :
-    <select id="model"><option>Chargement...</option></select>
-  </label>
+  <label for="type_doc">Type de document :</label>
+  <select id="type_doc">
+    <option value="technique">Technique</option>
+    <option value="schema">Schéma</option>
+  </select>
 
-  <label>Nouveau modèle (facultatif) :
-    <input type="text" id="newModel" placeholder="Ex: LVA 2">
-  </label>
+  <div id="resultat"></div>
 
-  <label>Choisir un fichier :
-    <input type="file" id="fileInput">
-  </label>
+  <script type="module">
+    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
 
-  <label>Description du document :
-    <input type="text" id="description" placeholder="Ex: schéma électrique, manuel utilisateur">
-  </label>
+    const supabaseUrl = 'https://TON_URL_SUPABASE.supabase.co'
+    const supabaseKey = 'TON_ANON_KEY'
+    const supabase = createClient(supabaseUrl, supabaseKey)
 
-  <button id="submitBtn">Envoyer</button>
+    const marqueSelect = document.getElementById('marque')
+    const modeleSelect = document.getElementById('modele')
+    const typeDocSelect = document.getElementById('type_doc')
+    const resultatDiv = document.getElementById('resultat')
 
-  <p class="note">Si les listes restent vides : vérifie que la table <strong>documents</strong> contient des lignes avec marque et modèle, et que RLS est bien configuré.</p>
-  <div id="debug" class="error"></div>
-
-  <script>
-    const projectUrl = "https://prrzsosrbrskmeozmmmu.supabase.co";
-    const anonKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBycnpzb3NyYnJza21lb3ptbW11Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjEzMTkwMDMsImV4cCI6MjA3Njg5NTAwM30.JuqL6tJC5LRXX3OHXrznm_v9bca-aOJ_vnk_wPsP9Mc";
-
-    const headers = { apikey: anonKey, Authorization: `Bearer ${anonKey}` };
-    const manufacturerSelect = document.getElementById('manufacturer');
-    const modelSelect = document.getElementById('model');
-    const debugEl = document.getElementById('debug');
-
-    function emptySelect(sel, text) {
-      sel.innerHTML = "";
-      const o = document.createElement('option');
-      o.textContent = text;
-      o.value = "";
-      sel.appendChild(o);
-    }
-
-    function detectKeys(sample) {
-      const keys = Object.keys(sample || {});
-      const lower = keys.map(k => k.toLowerCase());
-      const brandKeys = ['manufacturer','marque','brand','fabricant'];
-      const modelKeys = ['model','type','modèle','variant'];
-
-      let brandKey = null, modelKey = null;
-      for (const b of brandKeys) if (lower.includes(b)) brandKey = keys[lower.indexOf(b)];
-      for (const m of modelKeys) if (lower.includes(m)) modelKey = keys[lower.indexOf(m)];
-      return { brandKey, modelKey };
-    }
-
-    async function loadOptions() {
-      emptySelect(manufacturerSelect, "Chargement...");
-      emptySelect(modelSelect, "Chargement...");
-      debugEl.textContent = "";
-
-      try {
-        const res = await fetch(`${projectUrl}/rest/v1/documents?select=*`, { headers });
-        const data = await res.json();
-
-        if (!Array.isArray(data) || data.length === 0) {
-          emptySelect(manufacturerSelect, "Aucune marque trouvée");
-          emptySelect(modelSelect, "Aucun modèle trouvé");
-          debugEl.textContent = "La table documents est vide ou les colonnes marque/modèle sont vides.";
-          return;
-        }
-
-        const { brandKey, modelKey } = detectKeys(data[0]);
-        if (!brandKey || !modelKey) {
-          emptySelect(manufacturerSelect, "Colonne marque introuvable");
-          emptySelect(modelSelect, "Colonne modèle introuvable");
-          debugEl.textContent = "Colonnes détectées : " + Object.keys(data[0]).join(", ");
-          return;
-        }
-
-        const brands = new Set(), models = new Set();
-        data.forEach(row => {
-          if (row[brandKey]) brands.add(row[brandKey]);
-          if (row[modelKey]) models.add(row[modelKey]);
-        });
-
-        manufacturerSelect.innerHTML = "";
-        modelSelect.innerHTML = "";
-
-        if (brands.size === 0) emptySelect(manufacturerSelect, "Aucune marque trouvée");
-        else {
-          const p = document.createElement('option'); p.value=""; p.textContent="-- Choisir une marque --"; manufacturerSelect.appendChild(p);
-          Array.from(brands).sort().forEach(b => {
-            const o = document.createElement('option'); o.value = b; o.textContent = b; manufacturerSelect.appendChild(o);
-          });
-        }
-
-        if (models.size === 0) emptySelect(modelSelect, "Aucun modèle trouvé");
-        else {
-          const p = document.createElement('option'); p.value=""; p.textContent="-- Choisir un modèle --"; modelSelect.appendChild(p);
-          Array.from(models).sort().forEach(m => {
-            const o = document.createElement('option'); o.value = m; o.textContent = m; modelSelect.appendChild(o);
-          });
-        }
-      } catch (err) {
-        debugEl.textContent = "Erreur JS : " + err.message;
-        emptySelect(manufacturerSelect, "Erreur de chargement");
-        emptySelect(modelSelect, "Erreur de chargement");
+    async function chargerMarques() {
+      const { data, error } = await supabase
+        .from('documents')
+        .select('marque')
+      if (error) {
+        console.error('Erreur chargement marques', error)
+        return
       }
+      const marques = [...new Set(data.map(item => item.marque).filter(Boolean))]
+      marqueSelect.innerHTML = marques.map(m => `<option value="${m}">${m}</option>`).join('')
+      chargerModeles()
     }
 
-    loadOptions();
+    async function chargerModeles() {
+      const marqueChoisie = marqueSelect.value
+      const { data, error } = await supabase
+        .from('documents')
+        .select('modele')
+        .eq('marque', marqueChoisie)
+      if (error) {
+        console.error('Erreur chargement modèles', error)
+        return
+      }
+      const modeles = [...new Set(data.map(item => item.modele).filter(Boolean))]
+      modeleSelect.innerHTML = modeles.map(m => `<option value="${m}">${m}</option>`).join('')
+      afficherFichiers()
+    }
+
+    async function afficherFichiers() {
+      const marque = marqueSelect.value
+      const modele = modeleSelect.value
+      const type_doc = typeDocSelect.value
+
+      const { data, error } = await supabase
+        .from('documents')
+        .select('filename, path')
+        .eq('marque', marque)
+        .eq('modele', modele)
+        .eq('type_doc', type_doc)
+
+      if (error) {
+        console.error('Erreur chargement fichiers', error)
+        return
+      }
+
+      if (data.length === 0) {
+        resultatDiv.innerHTML = '<p>Aucun fichier trouvé.</p>'
+        return
+      }
+
+      resultatDiv.innerHTML = data.map(doc => `
+        <p><a href="https://TON_URL_SUPABASE.supabase.co/storage/v1/object/public/${doc.path}" target="_blank">${doc.filename}</a></p>
+      `).join('')
+    }
+
+    marqueSelect.addEventListener('change', chargerModeles)
+    modeleSelect.addEventListener('change', afficherFichiers)
+    typeDocSelect.addEventListener('change', afficherFichiers)
+
+    chargerMarques()
   </script>
 </body>
 </html>
