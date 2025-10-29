@@ -9,8 +9,9 @@
   <button onclick="tester()">Tester la lecture des marques</button>
 
   <script>
-    const supabaseUrl = "https://zrsarbork8nseemnu.supabase.co";
-    const supabaseKey = "9a3e3c4f5a9e8e1c1e3f4a6b7c8d9e0f1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d";
+    const supabaseUrl = "https://prrzsosrbrskmeozmmmu.supabase.co";
+    const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBycnpzb3NyYnJza21lb3ptbW11Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjEzMTkwMDMsImV4cCI6MjA3Njg5NTAwM30.JuqL6tJC5LRXX3OHXrznm_v9bca-aOJ_vnk_wPsP9Mc";
+
     const headers = {
       apikey: supabaseKey,
       Authorization: `Bearer ${supabaseKey}`,
@@ -18,7 +19,7 @@
 
     async function tester() {
       try {
-        const res = await fetch(`${supabaseUrl}/rest/v1/documents?select=marque`, { headers });
+        const res = await fetch(`${supabaseUrl}/rest/v1/documents?select=marque,modele`, { headers });
         const data = await res.json();
         console.log("✅ Marques récupérées :", data);
         alert("✅ Connexion réussie ! Regarde la console.");
