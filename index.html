@@ -7,17 +7,11 @@
 <body>
   <h1>📂 Fichiers techniques ascenseur</h1>
 
-  <label for="marque">Marque :</label>
+  <label for="marque">Marque existante :</label>
   <select id="marque"></select>
 
-  <label for="modele">Modèle :</label>
+  <label for="modele">Modèle existant :</label>
   <select id="modele"></select>
-
-  <label for="type_doc">Type de document :</label>
-  <select id="type_doc">
-    <option value="technique">Technique</option>
-    <option value="schema">Schéma</option>
-  </select>
 
   <div id="resultat"></div>
 
@@ -30,7 +24,6 @@
 
     const marqueSelect = document.getElementById('marque')
     const modeleSelect = document.getElementById('modele')
-    const typeDocSelect = document.getElementById('type_doc')
     const resultatDiv = document.getElementById('resultat')
 
     async function chargerMarques() {
@@ -64,14 +57,12 @@
     async function afficherFichiers() {
       const marque = marqueSelect.value
       const modele = modeleSelect.value
-      const type_doc = typeDocSelect.value
 
       const { data, error } = await supabase
         .from('documents')
         .select('filename, path')
         .eq('marque', marque)
         .eq('modele', modele)
-        .eq('type_doc', type_doc)
 
       if (error) {
         console.error('Erreur chargement fichiers', error)
@@ -90,7 +81,6 @@
 
     marqueSelect.addEventListener('change', chargerModeles)
     modeleSelect.addEventListener('change', afficherFichiers)
-    typeDocSelect.addEventListener('change', afficherFichiers)
 
     chargerMarques()
   </script>
