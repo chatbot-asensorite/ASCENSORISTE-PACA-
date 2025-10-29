@@ -2,11 +2,11 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>Test Supabase</title>
+  <title>Test Marques Supabase</title>
 </head>
 <body>
-  <h2>🔍 Test de connexion Supabase</h2>
-  <button onclick="tester()">Tester la lecture des marques</button>
+  <h2>🔍 Test lecture marques/modèles</h2>
+  <button onclick="tester()">Tester la lecture</button>
 
   <script>
     const supabaseUrl = "https://prrzsosrbrskmeozmmmu.supabase.co";
@@ -20,8 +20,9 @@
     async function tester() {
       try {
         const res = await fetch(`${supabaseUrl}/rest/v1/documents?select=marque,modele`, { headers });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const data = await res.json();
-        console.log("✅ Marques récupérées :", data);
+        console.log("✅ Marques et modèles récupérés :", data);
         alert("✅ Connexion réussie ! Regarde la console.");
       } catch (err) {
         console.error("❌ Erreur de connexion :", err);
