@@ -20,7 +20,7 @@
 
     async function charger() {
       try {
-        const res = await fetch(`${supabaseUrl}/rest/v1/documents?select=marque,modele`, { headers });
+        const res = await fetch(`${supabaseUrl}/rest/v1/documents?select=name,model`, { headers });
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const data = await res.json();
         console.log("✅ Marques et modèles :", data);
@@ -29,7 +29,7 @@
         ul.innerHTML = "";
         data.forEach(item => {
           const li = document.createElement("li");
-          li.textContent = `${item.marque} - ${item.modele}`;
+          li.textContent = `${item.name} - ${item.model}`;
           ul.appendChild(li);
         });
 
