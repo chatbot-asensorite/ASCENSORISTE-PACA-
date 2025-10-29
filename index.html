@@ -2,63 +2,11 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>Uploader un document ascenseur</title>
-  <style>
-    body { font-family: Arial, sans-serif; padding: 20px; max-width: 800px; margin: auto; background-color: #f9f9f9; }
-    h2 { color: #333; }
-    label { display: block; margin-top: 15px; font-weight: bold; }
-    select, input[type="text"], input[type="file"] {
-      width: 100%; padding: 8px; margin-top: 6px; box-sizing: border-box;
-      border: 1px solid #ccc; border-radius: 4px;
-    }
-    button {
-      margin-top: 20px; padding: 10px 16px;
-      background-color: #0077cc; color: white; border: none; border-radius: 4px;
-      cursor: pointer;
-    }
-    button:hover { background-color: #005fa3; }
-    .note { color: #666; margin-top: 12px; font-size: 0.9em; }
-    .error { color: #a00; margin-top: 10px; }
-  </style>
+  <title>Test Supabase</title>
 </head>
 <body>
-  <h2>📤 Uploader un document ascenseur</h2>
-
-  <label>Marque existante :
-    <select id="marqueSelect"><option>Chargement...</option></select>
-  </label>
-
-  <label>Nouvelle marque (facultatif) :
-    <input type="text" id="newMarque" placeholder="Ex: thyssenkrupp">
-  </label>
-
-  <label>Modèle existant :
-    <select id="modeleSelect"><option>Chargement...</option></select>
-  </label>
-
-  <label>Nouveau modèle (facultatif) :
-    <input type="text" id="newModele" placeholder="Ex: GEN2">
-  </label>
-
-  <label>Type de document :
-    <select id="typeDoc">
-      <option value="technique">Technique</option>
-      <option value="schema">Schéma</option>
-    </select>
-  </label>
-
-  <label>Description :
-    <input type="text" id="description" placeholder="Ex: schéma électrique, manuel utilisateur">
-  </label>
-
-  <label>Choisir un fichier :
-    <input type="file" id="fileInput">
-  </label>
-
-  <button id="submitBtn">📎 Envoyer le document</button>
-
-  <p class="note">Assure-toi que ta table <strong>documents</strong> contient les colonnes : marque, modele, filename, path, type_doc, description.</p>
-  <p id="debug" class="error"></p>
+  <h2>🔍 Test de connexion Supabase</h2>
+  <button onclick="tester()">Tester la lecture des marques</button>
 
   <script>
     const supabaseUrl = "https://zrsarbork8nseemnu.supabase.co";
@@ -68,88 +16,17 @@
       Authorization: `Bearer ${supabaseKey}`,
     };
 
-    const marqueSelect = document.getElementById('marqueSelect');
-    const modeleSelect = document.getElementById('modeleSelect');
-    const debugEl = document.getElementById('debug');
-
-    function emptySelect(sel, text) {
-      sel.innerHTML = "";
-      const o = document.createElement('option');
-      o.textContent = text;
-      o.value = "";
-      sel.appendChild(o);
-    }
-
-    async function loadOptions() {
-      emptySelect(marqueSelect, "Chargement...");
-      emptySelect(modeleSelect, "Chargement...");
-
+    async function tester() {
       try {
-        const res = await fetch(`${supabaseUrl}/rest/v1/documents?select=marque,modele`, { headers });
+        const res = await fetch(`${supabaseUrl}/rest/v1/documents?select=marque`, { headers });
         const data = await res.json();
-
-        const marques = [...new Set(data.map(row => row.marque).filter(Boolean))];
-        const modeles = [...new Set(data.map(row => row.modele).filter(Boolean))];
-
-        marqueSelect.innerHTML = `<option value="">-- Choisir une marque --</option>` +
-          marques.map(m => `<option value="${m}">${m}</option>`).join('');
-
-        modeleSelect.innerHTML = `<option value="">-- Choisir un modèle --</option>` +
-          modeles.map(m => `<option value="${m}">${m}</option>`).join('');
-
-        debugEl.textContent = "";
+        console.log("✅ Marques récupérées :", data);
+        alert("✅ Connexion réussie ! Regarde la console.");
       } catch (err) {
-        console.error(err);
-        debugEl.textContent = "Erreur chargement marques/modèles : " + err.message;
+        console.error("❌ Erreur de connexion :", err);
+        alert("❌ Échec de la connexion. Regarde la console.");
       }
     }
-
-    loadOptions();
-
-    document.getElementById('submitBtn').addEventListener('click', async () => {
-      const file = document.getElementById('fileInput').files[0];
-      const marque = document.getElementById('newMarque').value.trim() || marqueSelect.value;
-      const modele = document.getElementById('newModele').value.trim() || modeleSelect.value;
-      const type_doc = document.getElementById('typeDoc').value;
-      const description = document.getElementById('description').value.trim();
-
-      if (!marque || !modele || !file) {
-        alert("Remplis tous les champs obligatoires.");
-        return;
-      }
-
-      const path = `documents/${Date.now()}-${file.name}`;
-
-      try {
-        const uploadRes = await fetch(`${supabaseUrl}/storage/v1/object/${path}`, {
-          method: "PUT",
-          headers: { "Content-Type": file.type, ...headers },
-          body: file
-        });
-        if (!uploadRes.ok) throw new Error("Upload échoué");
-
-        const meta = {
-          marque, modele,
-          filename: file.name,
-          path,
-          type_doc,
-          description
-        };
-
-        const insertRes = await fetch(`${supabaseUrl}/rest/v1/documents`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json", ...headers },
-          body: JSON.stringify(meta)
-        });
-        if (!insertRes.ok) throw new Error("Enregistrement échoué");
-
-        alert("✅ Document enregistré avec succès !");
-        loadOptions();
-      } catch (err) {
-        console.error(err);
-        alert("Erreur : " + err.message);
-      }
-    });
   </script>
 </body>
 </html>
