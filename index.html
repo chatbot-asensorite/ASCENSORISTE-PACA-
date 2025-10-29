@@ -2,87 +2,232 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>Fichiers techniques ascenseur</title>
+  <title>Uploader un document ascenseur</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; max-width: 800px; }
+    label { display: block; margin-top: 10px; }
+    select, input[type="text"], input[type="file"] { width: 100%; padding: 8px; margin-top: 6px; box-sizing: border-box; }
+    button { margin-top: 12px; padding: 10px 16px; }
+    .note { color: #666; margin-top: 8px; }
+    .error { color: #a00; }
+  </style>
 </head>
 <body>
-  <h1>📂 Fichiers techniques ascenseur</h1>
+  <h2>Uploader un document ascenseur</h2>
 
-  <label for="marque">Marque existante :</label>
-  <select id="marque"></select>
+  <label>Marque existante :
+    <select id="manufacturer"><option>Chargement...</option></select>
+  </label>
 
-  <label for="modele">Modèle existant :</label>
-  <select id="modele"></select>
+  <label>Nouvelle marque (facultatif) :
+    <input type="text" id="newManufacturer" placeholder="Ex: thyssenkrupp">
+  </label>
 
-  <div id="resultat"></div>
+  <label>Modèle existant :
+    <select id="model"><option>Chargement...</option></select>
+  </label>
 
-  <script type="module">
-    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
+  <label>Nouveau modèle (facultatif) :
+    <input type="text" id="newModel" placeholder="Ex: LVA 2">
+  </label>
 
-    const supabaseUrl = 'https://TON_URL_SUPABASE.supabase.co'
-    const supabaseKey = 'TON_ANON_KEY'
-    const supabase = createClient(supabaseUrl, supabaseKey)
+  <label>Choisir un fichier :
+    <input type="file" id="fileInput">
+  </label>
 
-    const marqueSelect = document.getElementById('marque')
-    const modeleSelect = document.getElementById('modele')
-    const resultatDiv = document.getElementById('resultat')
+  <label>Description du document :
+    <input type="text" id="description" placeholder="Ex: schéma électrique, manuel utilisateur">
+  </label>
 
-    async function chargerMarques() {
-      const { data, error } = await supabase
-        .from('documents')
-        .select('marque')
-      if (error) {
-        console.error('Erreur chargement marques', error)
-        return
-      }
-      const marques = [...new Set(data.map(item => item.marque).filter(Boolean))]
-      marqueSelect.innerHTML = marques.map(m => `<option value="${m}">${m}</option>`).join('')
-      chargerModeles()
+  <button id="submitBtn">Envoyer</button>
+
+  <p class="note">Si les listes restent vides : vérifie dans Supabase que les lignes de la table <strong>documents</strong> ont bien des valeurs pour la marque et le modèle, et que RLS est configuré pour permettre la lecture avec la clé anon.</p>
+  <p id="debug" class="error"></p>
+
+  <script>
+    const projectUrl = "https://zrsarbork8nseemnu.supabase.co";
+    // Remplace par ta clé anon publique si nécessaire
+    const anonKey = "9a3e3c4f5a9e8e1c1e3f4a6b7c8d9e0f1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d";
+
+    const headers = {
+      apikey: anonKey,
+      Authorization: `Bearer ${anonKey}`,
+    };
+
+    const manufacturerSelect = document.getElementById('manufacturer');
+    const modelSelect = document.getElementById('model');
+    const debugEl = document.getElementById('debug');
+
+    function emptySelect(sel, text) {
+      sel.innerHTML = "";
+      const o = document.createElement('option');
+      o.textContent = text;
+      o.value = "";
+      sel.appendChild(o);
     }
 
-    async function chargerModeles() {
-      const marqueChoisie = marqueSelect.value
-      const { data, error } = await supabase
-        .from('documents')
-        .select('modele')
-        .eq('marque', marqueChoisie)
-      if (error) {
-        console.error('Erreur chargement modèles', error)
-        return
-      }
-      const modeles = [...new Set(data.map(item => item.modele).filter(Boolean))]
-      modeleSelect.innerHTML = modeles.map(m => `<option value="${m}">${m}</option>`).join('')
-      afficherFichiers()
+    // Cherche automatiquement les clés de marque/modèle dans la réponse
+    function detectKeys(sampleObj) {
+      const lowerKeys = Object.keys(sampleObj || {}).map(k => k.toLowerCase());
+      const brandCandidates = ['manufacturer','brand','marque','maker','vendor','company','make'];
+      const modelCandidates = ['model','type','type_model','name','model_name','variant'];
+
+      let brandKey = null;
+      let modelKey = null;
+
+      for (const c of brandCandidates) if (lowerKeys.includes(c)) { brandKey = Object.keys(sampleObj).find(k => k.toLowerCase() === c); break; }
+      for (const c of modelCandidates) if (lowerKeys.includes(c)) { modelKey = Object.keys(sampleObj).find(k => k.toLowerCase() === c); break; }
+
+      return { brandKey, modelKey };
     }
 
-    async function afficherFichiers() {
-      const marque = marqueSelect.value
-      const modele = modeleSelect.value
+    async function loadOptions() {
+      emptySelect(manufacturerSelect, "Chargement...");
+      emptySelect(modelSelect, "Chargement...");
 
-      const { data, error } = await supabase
-        .from('documents')
-        .select('filename, path')
-        .eq('marque', marque)
-        .eq('modele', modele)
+      try {
+        const res = await fetch(`${projectUrl}/rest/v1/documents?select=*`, { headers });
+        if (!res.ok) {
+          debugEl.textContent = `Erreur réseau / API: ${res.status} ${res.statusText}`;
+          console.error('Response status', res.status, await res.text());
+          emptySelect(manufacturerSelect, "Erreur de chargement");
+          emptySelect(modelSelect, "Erreur de chargement");
+          return;
+        }
 
-      if (error) {
-        console.error('Erreur chargement fichiers', error)
-        return
+        const data = await res.json();
+        console.log("Réponse brute Supabase documents:", data);
+        if (!Array.isArray(data) || data.length === 0) {
+          emptySelect(manufacturerSelect, "Aucune marque trouvée");
+          emptySelect(modelSelect, "Aucun modèle trouvé");
+          debugEl.textContent = "La table documents est vide ou les lignes n'ont pas de champs marque/modèle remplis.";
+          return;
+        }
+
+        const { brandKey, modelKey } = detectKeys(data[0]);
+        console.log("Clés détectées:", { brandKey, modelKey });
+
+        // Si on n'a pas détecté de clés, on affiche les clés disponibles pour debug
+        if (!brandKey && !modelKey) {
+          emptySelect(manufacturerSelect, "Aucune colonne marque détectée");
+          emptySelect(modelSelect, "Aucune colonne modèle détectée");
+          debugEl.textContent = "Aucune colonne 'manufacturer' ou 'model' détectée. Colonnes trouvées : " + Object.keys(data[0]).join(", ");
+          return;
+        }
+
+        // Extraire valeurs uniques
+        const brands = new Set();
+        const models = new Set();
+
+        data.forEach(row => {
+          if (brandKey) {
+            const val = row[brandKey];
+            if (val) brands.add(String(val));
+          }
+          if (modelKey) {
+            const val = row[modelKey];
+            if (val) models.add(String(val));
+          }
+        });
+
+        // Remplir selects
+        manufacturerSelect.innerHTML = "";
+        modelSelect.innerHTML = "";
+
+        if (brands.size === 0) {
+          emptySelect(manufacturerSelect, "Aucune marque trouvée");
+        } else {
+          const placeholder = document.createElement('option');
+          placeholder.value = "";
+          placeholder.textContent = "-- Choisir une marque --";
+          manufacturerSelect.appendChild(placeholder);
+          Array.from(brands).sort().forEach(b => {
+            const o = document.createElement('option');
+            o.value = b;
+            o.textContent = b;
+            manufacturerSelect.appendChild(o);
+          });
+        }
+
+        if (models.size === 0) {
+          emptySelect(modelSelect, "Aucun modèle trouvé");
+        } else {
+          const placeholder2 = document.createElement('option');
+          placeholder2.value = "";
+          placeholder2.textContent = "-- Choisir un modèle --";
+          modelSelect.appendChild(placeholder2);
+          Array.from(models).sort().forEach(m => {
+            const o = document.createElement('option');
+            o.value = m;
+            o.textContent = m;
+            modelSelect.appendChild(o);
+          });
+        }
+
+        debugEl.textContent = ""; // tout OK, efface le message d'erreur
+      } catch (err) {
+        console.error(err);
+        debugEl.textContent = "Erreur JS lors du fetch: " + (err && err.message ? err.message : String(err));
+        emptySelect(manufacturerSelect, "Erreur de chargement");
+        emptySelect(modelSelect, "Erreur de chargement");
       }
-
-      if (data.length === 0) {
-        resultatDiv.innerHTML = '<p>Aucun fichier trouvé.</p>'
-        return
-      }
-
-      resultatDiv.innerHTML = data.map(doc => `
-        <p><a href="https://TON_URL_SUPABASE.supabase.co/storage/v1/object/public/${doc.path}" target="_blank">${doc.filename}</a></p>
-      `).join('')
     }
 
-    marqueSelect.addEventListener('change', chargerModeles)
-    modeleSelect.addEventListener('change', afficherFichiers)
+    loadOptions();
 
-    chargerMarques()
+    // Upload flow (inchangé) : on suppose que tes Edge Functions upload-request et confirm-upload existent
+    document.getElementById('submitBtn').addEventListener('click', async () => {
+      const file = document.getElementById('fileInput').files[0];
+      const newManufacturer = document.getElementById('newManufacturer').value.trim();
+      const newModel = document.getElementById('newModel').value.trim();
+      const manufacturer = newManufacturer || document.getElementById('manufacturer').value;
+      const model = newModel || document.getElementById('model').value;
+      const description = document.getElementById('description').value;
+
+      if (!manufacturer) return alert("Choisis ou saisis une marque");
+      if (!model) return alert("Choisis ou saisis un modèle");
+      if (!file) return alert("Choisis un fichier");
+
+      try {
+        // 1) demander l'URL de upload
+        const uploadRes = await fetch(`${projectUrl}/functions/v1/upload-request`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ filename: file.name, mimeType: file.type })
+        });
+        if (!uploadRes.ok) throw new Error('Erreur upload-request: ' + uploadRes.status);
+
+        const { uploadUrl, path } = await uploadRes.json();
+
+        // 2) PUT du fichier vers l'URL renvoyée
+        const putRes = await fetch(uploadUrl, {
+          method: "PUT",
+          headers: { "Content-Type": file.type },
+          body: file
+        });
+        if (!putRes.ok) throw new Error('Erreur PUT fichier: ' + putRes.status);
+
+        // 3) confirm-upload pour enregistrer la métadonnée
+        const confirmRes = await fetch(`${projectUrl}/functions/v1/confirm-upload`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            path, filename: file.name, filetype: file.type,
+            manufacturer, model, description
+          })
+        });
+        if (!confirmRes.ok) throw new Error('Erreur confirm-upload: ' + confirmRes.status);
+
+        const result = await confirmRes.json();
+        alert("Document enregistré !");
+        console.log("confirm-upload result:", result);
+        // recharge les listes pour inclure la nouvelle entrée
+        loadOptions();
+      } catch (err) {
+        console.error(err);
+        alert("Erreur pendant l'upload: " + (err.message || err));
+      }
+    });
   </script>
 </body>
 </html>
