@@ -3,64 +3,108 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Interface Dépannage - Structure Réelle</title>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <title>Diagnostic Erreur 401</title>
 </head>
 <body>
-    <h1>🔧 Interface avec Structure Réelle</h1>
+    <h1>🔍 DIAGNOSTIC ERREUR 401</h1>
     
-    <form onsubmit="ajouterDocument(event)">
-        <h3>Ajouter un document :</h3>
-        
-        <label>Marque:</label><br>
-        <input type="text" id="marque" required><br><br>
-        
-        <label>Modèle:</label><br>
-        <input type="text" id="model" required><br><br>
-        
-        <label>Programmation:</label><br>
-        <input type="text" id="programmation"><br><br>
-        
-        <label>Schémas:</label><br>
-        <input type="text" id="schémas"><br><br>
-        
-        <button type="submit">💾 Enregistrer</button>
-    </form>
+    <div id="etapes">
+        <h3>Étapes de diagnostic :</h3>
+        <ol>
+            <li>Test de la clé API...</li>
+            <li>Vérification des permissions...</li>
+            <li>Test de connexion simple...</li>
+        </ol>
+    </div>
 
-    <div id="resultat"></div>
+    <div id="resultat" style="margin: 20px; padding: 15px; border: 1px solid #ccc;"></div>
 
     <script>
-        const supabaseUrl = 'https://prrzsosrbrskmeozmmmu.supabase.co';
-        const supabaseKey = 'sb_publishable_2nwtPyBWSeUNNtx06wROTw_Txpyk2W3';
-        const { createClient } = supabase;
-        const client = createClient(supabaseUrl, supabaseKey);
-
-        async function ajouterDocument(event) {
-            event.preventDefault();
+        async function diagnostic() {
             const resultat = document.getElementById('resultat');
+            const url = 'https://prrzsosrbrskmeozmmmu.supabase.co';
+            const cleApi = 'sb_publishable_2nwtPyBWSeUNNtx06wROTw_Txpyk2W3';
             
-            const documentData = {
-                marque: document.getElementById('marque').value,
-                model: document.getElementById('model').value,
-                programmation: document.getElementById('programmation').value,
-                schémas: document.getElementById('schémas').value
-            };
-
+            // Test 1: Clé API basique
+            resultat.innerHTML += "<h4>1. Test de la clé API...</h4>";
             try {
-                const { data, error } = await client
-                    .from('documents')
-                    .insert([documentData]);
-
-                if (error) throw error;
-
-                resultat.innerHTML = "✅ Document ajouté avec succès!";
+                const response = await fetch(url + '/rest/v1/documents', {
+                    headers: {
+                        'apikey': cleApi,
+                        'Content-Type': 'application/json'
+                    }
+                });
                 
-                // Vider le formulaire
-                document.querySelector('form').reset();
-                
+                if (response.status === 401) {
+                    resultat.innerHTML += `<p style="color:red">❌ ERREUR 401: Clé API INVALIDE ou expirée</p>`;
+                } else if (response.ok) {
+                    resultat.innerHTML += `<p style="color:green">✅ Clé API VALIDE</p>`;
+                } else {
+                    resultat.innerHTML += `<p style="color:orange">⚠️ Statut: ${response.status}</p>`;
+                }
             } catch (error) {
-                resultat.innerHTML = `❌ Erreur: ${error.message}`;
+                resultat.innerHTML += `<p style="color:red">❌ Erreur: ${error.message}</p>`;
             }
+
+            // Test 2: Vérification RLS
+            resultat.innerHTML += "<h4>2. Vérification RLS...</h4>";
+            try {
+                const response = await fetch(url + '/rest/v1/documents?select=*&limit=1', {
+                    headers: {
+                        'apikey': cleApi,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                const data = await response.json();
+                if (response.status === 401) {
+                    resultat.innerHTML += `<p style="color:red">❌ RLS activé - Pas de politique d'accès</p>`;
+                } else {
+                    resultat.innerHTML += `<p style="color:green">✅ Accès autorisé</p>`;
+                }
+            } catch (error) {
+                resultat.innerHTML += `<p style="color:red">❌ Erreur RLS: ${error.message}</p>`;
+            }
+        }
+
+        // Lancer le diagnostic
+        diagnostic();
+    </script>
+
+    <div style="background: #fff3cd; padding: 15px; margin: 20px 0; border-radius: 8px;">
+        <h3>🚨 SOLUTIONS POUR ERREUR 401 :</h3>
+        <ol>
+            <li><strong>Régénérer la clé API :</strong> Allez dans Supabase → Settings → API → Regenerate</li>
+            <li><strong>Activer RLS policies :</strong> Allez dans Authentication → Policies → Créer des politiques</li>
+            <li><strong>Vérifier l'URL :</strong> Confirmez que l'URL est exacte</li>
+        </ol>
+        
+        <h4>Solution rapide - Désactiver RLS :</h4>
+        <p>Dans Supabase, allez dans <strong>Authentication → Policies</strong> et désactivez RLS pour la table "documents"</p>
+        
+        <button onclick="creerPolicies()">Créer automatiquement les politiques</button>
+        <div id="policiesResult"></div>
+    </div>
+
+    <script>
+        async function creerPolicies() {
+            const result = document.getElementById('policiesResult');
+            result.innerHTML = "Création des politiques...";
+            
+            // Ces commandes doivent être exécutées dans Supabase SQL Editor
+            const sqlCommands = [
+                "CREATE POLICY \"Allow all operations\" ON documents FOR ALL USING (true);",
+                "CREATE POLICY \"Allow public select\" ON documents FOR SELECT USING (true);",
+                "CREATE POLICY \"Allow public insert\" ON documents FOR INSERT WITH CHECK (true);"
+            ];
+            
+            result.innerHTML = `
+                <p>Exécutez ces commandes dans <strong>Supabase → SQL Editor</strong> :</p>
+                <textarea style="width:100%; height:150px; font-family: monospace;">
+${sqlCommands.join('\n\n')}
+                </textarea>
+                <p>Ou désactivez simplement RLS dans Authentication → Policies</p>
+            `;
         }
     </script>
 </body>
