@@ -1,27 +1,53 @@
 <!DOCTYPE html>
-<html>
+<html lang="fr">
 <head>
-    <title>Test Simple</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TEST URL CORRECTE</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
+    <h1>🧪 TEST AVEC LA BONNE URL</h1>
+    <div id="resultat"></div>
+
     <script>
-        // Test direct sans Supabase JS
-        fetch('https://prrzsosrbrskmeozmmmu.supabase.co/rest/v1/documents', {
-            headers: {
-                'apikey': 'sb_publishable_2nwtPyBWSeUNNtx06wROTw_Txpyk2W3',
-                'Content-Type': 'application/json'
+        async function testerConnexion() {
+            const resultat = document.getElementById('resultat');
+            resultat.innerHTML = "Test de connexion...";
+            
+            // ✅ BONNE URL avec "sos" au lieu de "scor"
+            const supabaseUrl = 'https://prrzsosrbrskmeozmmmu.supabase.co';
+            const supabaseKey = 'sb_publishable_2nwtPyBWSeUNNtx06wROTw_Txpyk2W3';
+            
+            try {
+                const { createClient } = supabase;
+                const client = createClient(supabaseUrl, supabaseKey);
+                
+                // Test avec la structure exacte de votre table
+                const { data, error } = await client
+                    .from('documents')
+                    .select('marque, model, description, filename, path')
+                    .limit(2);
+                
+                if (error) {
+                    resultat.innerHTML = "❌ Erreur: " + error.message;
+                    
+                    // Si erreur RLS, on peut quand même tester la connexion
+                    if (error.message.includes('row level security')) {
+                        resultat.innerHTML += "<br>⚠️ RLS activé - mais connexion OK!";
+                    }
+                } else {
+                    resultat.innerHTML = "✅ SUCCÈS! Connexion établie<br>" + 
+                                        "Documents trouvés: " + data.length +
+                                        "<pre>" + JSON.stringify(data, null, 2) + "</pre>";
+                }
+            } catch (err) {
+                resultat.innerHTML = "❌ Erreur: " + err.message;
             }
-        })
-        .then(response => {
-            if (response.ok) {
-                document.body.innerHTML = "✅ CONNEXION RÉUSSIE!";
-            } else {
-                document.body.innerHTML = "❌ Erreur: " + response.status;
-            }
-        })
-        .catch(error => {
-            document.body.innerHTML = "❌ Erreur: " + error.message;
-        });
+        }
+        
+        // Test automatique
+        testerConnexion();
     </script>
 </body>
 </html>
