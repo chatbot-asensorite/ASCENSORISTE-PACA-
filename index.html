@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Interface Dépannage Ascenseurs - Auto-détection</title>
+    <title>Interface Dépannage Ascenseurs - Version Stable</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         body { font-family: Arial; margin: 20px; background: #f5f5f5; }
@@ -20,30 +20,39 @@
         .success { color: green; font-weight: bold; }
         .error { color: red; font-weight: bold; }
         .info { background: #e7f3ff; padding: 10px; border-radius: 5px; margin: 10px 0; }
-        .table-info { background: #fff3cd; padding: 15px; border-radius: 5px; margin: 15px 0; }
-        .columns-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 10px; margin: 15px 0; }
-        .column-item { background: #f8f9fa; padding: 10px; border-radius: 5px; border-left: 4px solid #007cba; }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>🔧 Interface Dépannage Ascenseurs - Auto-détection</h1>
+        <h1>🔧 Interface Dépannage Ascenseurs</h1>
         
-        <!-- Section Information Table -->
-        <div class="table-info">
-            <h3>📊 Structure de votre table détectée automatiquement</h3>
-            <div id="tableStructure">
-                <p>Chargement de la structure...</p>
-            </div>
-        </div>
-
         <!-- Section Upload -->
         <div class="section">
             <h2>📤 Ajouter un nouveau document</h2>
             
-            <div id="dynamicForm">
-                <!-- Le formulaire sera généré automatiquement ici -->
-                <p>Chargement du formulaire...</p>
+            <div class="form-group">
+                <label>Marque *</label>
+                <input type="text" id="marque" placeholder="Schindler, Otis, Kone..." required>
+            </div>
+            
+            <div class="form-group">
+                <label>Modèle *</label>
+                <input type="text" id="model" placeholder="3300, Gen2, MonoSpace..." required>
+            </div>
+            
+            <div class="form-group">
+                <label>Programmation</label>
+                <input type="text" id="programmation" placeholder="Documentation programmation...">
+            </div>
+            
+            <div class="form-group">
+                <label>Schémas</label>
+                <input type="text" id="schemas" placeholder="Liens vers les schémas...">
+            </div>
+            
+            <div class="form-group">
+                <label>Description</label>
+                <textarea id="description" placeholder="Description du document..." rows="3"></textarea>
             </div>
 
             <div class="form-group">
@@ -58,8 +67,8 @@
                 </div>
             </div>
             
-            <button onclick="uploadDocument()" id="uploadBtn" disabled>🚀 Uploader le document</button>
-            <button onclick="chargerStructure()">🔄 Actualiser la structure</button>
+            <button onclick="uploadDocument()" id="uploadBtn" disabled>🚀 Enregistrer le document</button>
+            <button onclick="chargerDocuments()">🔄 Actualiser la liste</button>
             
             <div id="uploadResult"></div>
         </div>
@@ -97,77 +106,11 @@
         const client = createClient(supabaseUrl, supabaseKey);
 
         let selectedFile = null;
-        let tableStructure = [];
 
-        // Charger la structure de la table au démarrage
+        // Charger les documents au démarrage
         document.addEventListener('DOMContentLoaded', function() {
-            chargerStructure();
             chargerDocuments();
         });
-
-        // Fonction pour détecter la structure de la table
-        async function chargerStructure() {
-            const structureDiv = document.getElementById('tableStructure');
-            structureDiv.innerHTML = "🔍 Détection de la structure en cours...";
-
-            try {
-                // Récupérer un échantillon pour détecter les colonnes
-                const { data, error } = await client
-                    .from('documents')
-                    .select('*')
-                    .limit(1);
-
-                if (error) throw error;
-
-                if (data && data.length > 0) {
-                    // Détecter les colonnes (exclure id, created_at, etc.)
-                    const sample = data[0];
-                    tableStructure = Object.keys(sample).filter(col => 
-                        !['id', 'created_at', 'updated_at', 'path', 'filename'].includes(col)
-                    );
-
-                    // Afficher la structure détectée
-                    let html = '<div class="columns-list">';
-                    tableStructure.forEach(column => {
-                        html += `<div class="column-item">${column}</div>`;
-                    });
-                    html += '</div>';
-                    structureDiv.innerHTML = html;
-
-                    // Générer le formulaire dynamique
-                    genererFormulaire();
-                } else {
-                    structureDiv.innerHTML = '<p class="info">📭 La table est vide. Les colonnes seront détectées après le premier upload.</p>';
-                    // Structure par défaut basée sur votre description
-                    tableStructure = ['marque', 'model', 'programmation', 'schemas'];
-                    genererFormulaire();
-                }
-            } catch (error) {
-                structureDiv.innerHTML = `<p class="error">❌ Erreur lors de la détection: ${error.message}</p>`;
-            }
-        }
-
-        // Générer le formulaire dynamiquement
-        function genererFormulaire() {
-            const formDiv = document.getElementById('dynamicForm');
-            let html = '';
-
-            tableStructure.forEach(column => {
-                const label = column.charAt(0).toUpperCase() + column.slice(1);
-                const required = ['marque', 'model'].includes(column);
-                
-                html += `
-                    <div class="form-group">
-                        <label>${label} ${required ? '*' : ''}</label>
-                        <input type="text" id="form_${column}" 
-                               placeholder="Entrez ${column}..." 
-                               ${required ? 'required' : ''}>
-                    </div>
-                `;
-            });
-
-            formDiv.innerHTML = html;
-        }
 
         // Gestion de la sélection de fichier
         document.getElementById('fileInput').addEventListener('change', function(e) {
@@ -208,71 +151,70 @@
             });
         });
 
-        // Upload du document
+        // Enregistrer le document
         async function uploadDocument() {
             const uploadBtn = document.getElementById('uploadBtn');
             const resultDiv = document.getElementById('uploadResult');
 
-            // Vérifier les champs requis
-            const marque = document.getElementById('form_marque')?.value;
-            const model = document.getElementById('form_model')?.value;
+            const marque = document.getElementById('marque').value;
+            const model = document.getElementById('model').value;
+            const programmation = document.getElementById('programmation').value;
+            const schemas = document.getElementById('schemas').value;
+            const description = document.getElementById('description').value;
 
-            if (!marque || !model || !selectedFile) {
-                resultDiv.innerHTML = '<div class="error">❌ Veuillez remplir les champs marque, modèle et sélectionner un fichier</div>';
+            if (!marque || !model) {
+                resultDiv.innerHTML = '<div class="error">❌ Veuillez remplir au moins la marque et le modèle</div>';
                 return;
             }
 
             uploadBtn.disabled = true;
-            uploadBtn.textContent = 'Upload en cours...';
+            uploadBtn.textContent = 'Enregistrement en cours...';
             resultDiv.innerHTML = '';
 
             try {
-                // Créer l'objet de données dynamiquement
+                // Préparer les données
                 const documentData = {
+                    marque: marque,
+                    model: model,
+                    filename: selectedFile ? selectedFile.name : null,
                     created_at: new Date().toISOString()
                 };
 
-                // Remplir avec les données du formulaire
-                tableStructure.forEach(column => {
-                    const input = document.getElementById(`form_${column}`);
-                    if (input && input.value) {
-                        documentData[column] = input.value;
-                    }
-                });
-
-                // Ajouter le nom du fichier
-                documentData.filename = selectedFile.name;
+                // Ajouter les champs optionnels s'ils sont remplis
+                if (programmation) documentData.programmation = programmation;
+                if (schemas) documentData.schemas = schemas;
+                if (description) documentData.description = description;
 
                 // Enregistrement dans la base de données
-                const { data: dbData, error: dbError } = await client
+                const { data, error } = await client
                     .from('documents')
                     .insert([documentData]);
 
-                if (dbError) throw dbError;
+                if (error) throw error;
 
-                resultDiv.innerHTML = '<div class="success">✅ Document enregistré avec succès dans la base de données!</div>';
+                resultDiv.innerHTML = '<div class="success">✅ Document enregistré avec succès!</div>';
                 
                 // Réinitialiser le formulaire
-                tableStructure.forEach(column => {
-                    const input = document.getElementById(`form_${column}`);
-                    if (input) input.value = '';
-                });
+                document.getElementById('marque').value = '';
+                document.getElementById('model').value = '';
+                document.getElementById('programmation').value = '';
+                document.getElementById('schemas').value = '';
+                document.getElementById('description').value = '';
                 document.getElementById('fileName').textContent = '';
                 selectedFile = null;
                 document.getElementById('fileInput').value = '';
                 uploadBtn.disabled = true;
-                uploadBtn.textContent = '🚀 Uploader le document';
+                uploadBtn.textContent = '🚀 Enregistrer le document';
 
-                // Recharger les données
+                // Recharger les documents
                 setTimeout(() => {
                     chargerDocuments();
-                    chargerStructure();
                 }, 1000);
 
             } catch (error) {
                 resultDiv.innerHTML = `<div class="error">❌ Erreur: ${error.message}</div>`;
                 uploadBtn.disabled = false;
-                uploadBtn.textContent = '🚀 Uploader le document';
+                uploadBtn.textContent = '🚀 Enregistrer le document';
             }
         }
 
@@ -282,6 +224,7 @@
             listDiv.innerHTML = 'Chargement...';
 
             try {
+                // Requête SIMPLIFIÉE pour éviter les erreurs
                 const { data, error } = await client
                     .from('documents')
                     .select('*')
@@ -302,12 +245,11 @@
                             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; margin: 10px 0;">
                     `;
                     
-                    // Afficher dynamiquement toutes les colonnes
-                    Object.keys(doc).forEach(key => {
-                        if (doc[key] && !['id', 'created_at', 'updated_at'].includes(key)) {
-                            html += `<div><strong>${key}:</strong> ${doc[key]}</div>`;
-                        }
-                    });
+                    // Afficher les champs disponibles
+                    if (doc.programmation) html += `<div><strong>Programmation:</strong> ${doc.programmation}</div>`;
+                    if (doc.schemas) html += `<div><strong>Schémas:</strong> ${doc.schemas}</div>`;
+                    if (doc.description) html += `<div><strong>Description:</strong> ${doc.description}</div>`;
+                    if (doc.filename) html += `<div><strong>Fichier:</strong> ${doc.filename}</div>`;
                     
                     html += `
                             </div>
@@ -318,7 +260,7 @@
 
                 listDiv.innerHTML = html;
             } catch (error) {
-                listDiv.innerHTML = `<div class="error">Erreur: ${error.message}</div>`;
+                listDiv.innerHTML = `<div class="error">Erreur chargement: ${error.message}</div>`;
             }
         }
 
@@ -335,10 +277,11 @@
             resultsDiv.innerHTML = 'Recherche en cours...';
 
             try {
+                // Recherche SIMPLIFIÉE
                 const { data, error } = await client
                     .from('documents')
                     .select('*')
-                    .or(`marque.ilike.%${searchTerm}%,model.ilike.%${searchTerm}%,description.ilike.%${searchTerm}%`)
+                    .or(`marque.ilike.%${searchTerm}%,model.ilike.%${searchTerm}%`)
                     .order('created_at', { ascending: false });
 
                 if (error) throw error;
@@ -356,11 +299,10 @@
                             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; margin: 10px 0;">
                     `;
                     
-                    Object.keys(doc).forEach(key => {
-                        if (doc[key] && !['id', 'created_at', 'updated_at'].includes(key)) {
-                            html += `<div><strong>${key}:</strong> ${doc[key]}</div>`;
-                        }
-                    });
+                    if (doc.programmation) html += `<div><strong>Programmation:</strong> ${doc.programmation}</div>`;
+                    if (doc.schemas) html += `<div><strong>Schémas:</strong> ${doc.schemas}</div>`;
+                    if (doc.description) html += `<div><strong>Description:</strong> ${doc.description}</div>`;
+                    if (doc.filename) html += `<div><strong>Fichier:</strong> ${doc.filename}</div>`;
                     
                     html += `
                             </div>
