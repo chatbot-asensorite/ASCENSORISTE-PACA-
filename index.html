@@ -1,44 +1,849 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <title>Admin Supabase</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Gestion Documentation Ascenseurs</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .tabs {
+            display: flex;
+            background: #f5f5f5;
+            border-bottom: 2px solid #ddd;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            background: #f5f5f5;
+            border: none;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .tab:hover {
+            background: #e0e0e0;
+        }
+
+        .tab.active {
+            background: white;
+            color: #667eea;
+            border-bottom: 3px solid #667eea;
+        }
+
+        .tab-content {
+            display: none;
+            padding: 30px;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        input[type="text"],
+        textarea,
+        select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border 0.3s;
+        }
+
+        input[type="text"]:focus,
+        textarea:focus,
+        select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        input[type="file"] {
+            width: 100%;
+            padding: 10px;
+            border: 2px dashed #667eea;
+            border-radius: 8px;
+            cursor: pointer;
+            background: #f9f9ff;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 10px;
+            padding: 10px;
+            background: #f0f0ff;
+            border-radius: 8px;
+        }
+
+        .checkbox-group.delete-mode {
+            background: #ffe0e0;
+            border: 2px solid #ff4444;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+
+        .checkbox-group label {
+            margin: 0;
+            font-weight: normal;
+            cursor: pointer;
+        }
+
+        .custom-input {
+            margin-top: 10px;
+            display: none;
+        }
+
+        .custom-input.show {
+            display: block;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+            width: 100%;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-delete {
+            background: linear-gradient(135deg, #ff4444 0%, #cc0000 100%);
+            margin-top: 10px;
+        }
+
+        .btn-delete:hover {
+            box-shadow: 0 5px 15px rgba(255, 68, 68, 0.4);
+        }
+
+        .equipment-list {
+            margin-top: 30px;
+        }
+
+        .equipment-card {
+            background: #f9f9f9;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            border-left: 4px solid #667eea;
+            position: relative;
+        }
+
+        .equipment-card h3 {
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .equipment-card p {
+            color: #666;
+            margin: 5px 0;
+        }
+
+        .document-item {
+            background: white;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .document-item a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .delete-btn-card {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: #ff4444;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        .delete-btn-card:hover {
+            background: #cc0000;
+            transform: scale(1.05);
+        }
+
+        .message {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .message.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .message.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .message.warning {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffc107;
+        }
+
+        .message.show {
+            display: block;
+        }
+
+        .success-banner {
+            background: #d4edda;
+            border: 2px solid #28a745;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .success-banner h3 {
+            color: #155724;
+            margin-bottom: 10px;
+        }
+
+        .success-banner p {
+            color: #155724;
+            font-weight: 600;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #667eea;
+        }
+
+        .info-box {
+            background: #e7f3ff;
+            border-left: 4px solid #2196F3;
+            padding: 12px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+        }
+
+        .info-box p {
+            margin: 5px 0;
+            color: #1976D2;
+        }
+
+        .danger-box {
+            background: #ffe0e0;
+            border-left: 4px solid #ff4444;
+            padding: 12px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+        }
+
+        .danger-box p {
+            margin: 5px 0;
+            color: #cc0000;
+            font-weight: 600;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+
+        .modal.show {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+        }
+
+        .modal-content h3 {
+            color: #ff4444;
+            margin-bottom: 15px;
+        }
+
+        .modal-content p {
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .modal-buttons button {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .btn-confirm {
+            background: #ff4444;
+            color: white;
+        }
+
+        .btn-cancel {
+            background: #ddd;
+            color: #333;
+        }
+    </style>
 </head>
 <body>
-  <h2>📋 Marques et modèles</h2>
-  <button onclick="charger()">Charger depuis Supabase</button>
-  <ul id="liste"></ul>
+    <div class="container">
+        <div class="header">
+            <h1>🔧 Interface Admin - Gestion Documentation Ascenseurs</h1>
+            <p>Gérez vos équipements et documents techniques</p>
+        </div>
 
-  <script>
-    const supabaseUrl = "https://prrzsosrbrskmeozmmmu.supabase.co";
-    const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBycnpzb3NyYnJza21lb3ptbW11Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjEzMTkwMDMsImV4cCI6MjA3Njg5NTAwM30.JuqL6tJC5LRXX3OHXrznm_v9bca-aOJ_vnk_wPsP9Mc";
+        <div class="success-banner">
+            <h3>✅ Configuration activée !</h3>
+            <p>Votre interface est prête et connectée à Supabase</p>
+        </div>
 
-    const headers = {
-      apikey: supabaseKey,
-      Authorization: `Bearer ${supabaseKey}`,
-    };
+        <div class="tabs">
+            <button class="tab active" onclick="showTab('equipements')">📦 Ajouter Équipement</button>
+            <button class="tab" onclick="showTab('documents')">📄 Ajouter Document</button>
+            <button class="tab" onclick="showTab('liste')">📋 Liste Complète</button>
+        </div>
 
-    async function charger() {
-      try {
-        const res = await fetch(`${supabaseUrl}/rest/v1/init?select=marque,model`, { headers });
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        const data = await res.json();
-        console.log("✅ Marques et modèles :", data);
+        <!-- TAB 1: Ajouter un équipement -->
+        <div id="equipements" class="tab-content active">
+            <h2>Ajouter un nouvel équipement</h2>
+            
+            <div class="info-box">
+                <p><strong>💡 Logique :</strong></p>
+                <p>• <strong>Marque</strong> : Fabricant de l'ascenseur (Otis, Schindler, Kone...)</p>
+                <p>• <strong>Modèle</strong> : Référence technique précise (LVA, GN2, Gen2, Synergy...)</p>
+            </div>
 
-        const ul = document.getElementById("liste");
-        ul.innerHTML = "";
-        data.forEach(item => {
-          const li = document.createElement("li");
-          li.textContent = `${item.marque} - ${item.model}`;
-          ul.appendChild(li);
+            <div id="messageEquipement" class="message"></div>
+            
+            <form id="formEquipement">
+                <div class="form-group">
+                    <label for="marque">Marque *</label>
+                    <select id="marque" required>
+                        <option value="">-- Sélectionnez une marque --</option>
+                        <option value="Otis">Otis</option>
+                        <option value="Schindler">Schindler</option>
+                        <option value="Kone">Kone</option>
+                        <option value="ThyssenKrupp">ThyssenKrupp</option>
+                        <option value="Mitsubishi">Mitsubishi</option>
+                        <option value="Fujitec">Fujitec</option>
+                        <option value="Canny">Canny</option>
+                        <option value="Sodimas">Sodimas</option>
+                        <option value="Elsyde">Elsyde</option>
+                        <option value="Koné">Koné</option>
+                        <option value="GMT">GMT</option>
+                        <option value="Altra">Altra</option>
+                    </select>
+                    
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="autreMarque" onchange="toggleCustomMarque()">
+                        <label for="autreMarque">➕ Ajouter une nouvelle marque</label>
+                    </div>
+                    
+                    <div id="customMarqueInput" class="custom-input">
+                        <input type="text" id="customMarque" placeholder="Entrez le nom de la nouvelle marque">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="modele">Modèle *</label>
+                    <input type="text" id="modele" required placeholder="Ex: LVA, GN2, Gen2, Synergy, MRL...">
+                    <small style="color: #666; display: block; margin-top: 5px;">La référence technique précise de l'ascenseur</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="description">Description</label>
+                    <textarea id="description" placeholder="Informations complémentaires : année, capacité, spécificités techniques..."></textarea>
+                </div>
+
+                <button type="submit" class="btn">💾 Enregistrer l'équipement</button>
+            </form>
+        </div>
+
+        <!-- TAB 2: Ajouter un document -->
+        <div id="documents" class="tab-content">
+            <h2>Ajouter un document technique</h2>
+            <div id="messageDocument" class="message"></div>
+
+            <form id="formDocument">
+                <div class="form-group">
+                    <label for="equipementSelect">Équipement concerné *</label>
+                    <select id="equipementSelect" required>
+                        <option value="">-- Sélectionnez un équipement --</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="titre">Titre du document *</label>
+                    <input type="text" id="titre" required placeholder="Ex: Schéma électrique complet, Manuel programmation V2.3">
+                </div>
+
+                <div class="form-group">
+                    <label for="typeDocument">Type de document *</label>
+                    <select id="typeDocument" required>
+                        <option value="">-- Sélectionnez --</option>
+                        <option value="schéma">📐 Schéma</option>
+                        <option value="programmation">💻 Documentation de programmation</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="fichier">Fichier PDF *</label>
+                    <input type="file" id="fichier" accept=".pdf" required>
+                </div>
+
+                <button type="submit" class="btn" id="btnUpload">📤 Uploader le document</button>
+            </form>
+        </div>
+
+        <!-- TAB 3: Liste -->
+        <div id="liste" class="tab-content">
+            <h2>Liste de tous les équipements et documents</h2>
+            
+            <div class="danger-box">
+                <p>⚠️ ATTENTION : La suppression est définitive et supprime TOUS les documents associés sur Supabase !</p>
+            </div>
+
+            <div id="messageListe" class="message"></div>
+            <div id="listeEquipements" class="equipment-list">
+                <div class="loading">Chargement...</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de confirmation -->
+    <div id="confirmModal" class="modal">
+        <div class="modal-content">
+            <h3>⚠️ Confirmer la suppression</h3>
+            <p id="modalText"></p>
+            <div class="modal-buttons">
+                <button class="btn-cancel" onclick="closeModal()">Annuler</button>
+                <button class="btn-confirm" onclick="confirmDelete()">Supprimer définitivement</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ========================================
+        // ✅ CONFIGURATION ACTIVÉE
+        // ========================================
+        const SUPABASE_URL = 'https://prrzsosbrskmeozmmu.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBycnpzb3NicnNrbWVvem1tbXUiLCJyb2xlIjoiYW5vbiIsImlhdCI6MTczNzIxMTI2MSwiZXhwIjoyMDUyNzg3MjYxfQ.JuqL6tJC5LRXX3OHXrznm_v9bca-aOJ_vnk_wPsP9Mc';
+        
+        // Initialisation Supabase
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        let equipementToDelete = null;
+
+        // Toggle custom marque input
+        function toggleCustomMarque() {
+            const checkbox = document.getElementById('autreMarque');
+            const customInput = document.getElementById('customMarqueInput');
+            const marqueSelect = document.getElementById('marque');
+            
+            if (checkbox.checked) {
+                customInput.classList.add('show');
+                marqueSelect.disabled = true;
+                marqueSelect.value = '';
+            } else {
+                customInput.classList.remove('show');
+                marqueSelect.disabled = false;
+                document.getElementById('customMarque').value = '';
+            }
+        }
+
+        // Gestion des onglets
+        function showTab(tabName) {
+            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            
+            event.target.classList.add('active');
+            document.getElementById(tabName).classList.add('active');
+
+            if (tabName === 'documents') {
+                chargerEquipementsPourSelect();
+            }
+            if (tabName === 'liste') {
+                chargerListeComplete();
+            }
+        }
+
+        // Afficher un message
+        function showMessage(elementId, message, type) {
+            const msgElement = document.getElementById(elementId);
+            msgElement.textContent = message;
+            msgElement.className = `message ${type} show`;
+            setTimeout(() => {
+                msgElement.classList.remove('show');
+            }, 5000);
+        }
+
+        // Modal
+        function showDeleteModal(equipement) {
+            equipementToDelete = equipement;
+            const modal = document.getElementById('confirmModal');
+            const modalText = document.getElementById('modalText');
+            
+            modalText.innerHTML = `
+                Voulez-vous vraiment supprimer <strong>${equipement.marque} - ${equipement.modele || equipement.type}</strong> ?<br><br>
+                <span style="color: #ff4444;">Cette action supprimera également tous les documents PDF associés dans Supabase Storage.</span>
+            `;
+            
+            modal.classList.add('show');
+        }
+
+        function closeModal() {
+            document.getElementById('confirmModal').classList.remove('show');
+            equipementToDelete = null;
+        }
+
+        async function confirmDelete() {
+            if (!equipementToDelete) return;
+
+            try {
+                // 1. Récupérer tous les documents de cet équipement
+                const { data: docs, error: docsError } = await supabase
+                    .from('documents')
+                    .select('*')
+                    .eq('equipement_id', equipementToDelete.id);
+
+                if (docsError) throw docsError;
+
+                // 2. Supprimer les fichiers PDF du Storage
+                if (docs && docs.length > 0) {
+                    for (const doc of docs) {
+                        // Extraire le nom du fichier de l'URL
+                        const urlParts = doc.fichier_url.split('/');
+                        const fileName = urlParts[urlParts.length - 1];
+                        
+                        const { error: storageError } = await supabase.storage
+                            .from('documents-pdf')
+                            .remove([fileName]);
+                        
+                        if (storageError) console.error('Erreur suppression fichier:', storageError);
+                    }
+
+                    // 3. Supprimer les entrées de la table documents
+                    const { error: deleteDocsError } = await supabase
+                        .from('documents')
+                        .delete()
+                        .eq('equipement_id', equipementToDelete.id);
+
+                    if (deleteDocsError) throw deleteDocsError;
+                }
+
+                // 4. Supprimer l'équipement
+                const { error: deleteEquipError } = await supabase
+                    .from('equipements')
+                    .delete()
+                    .eq('id', equipementToDelete.id);
+
+                if (deleteEquipError) throw deleteEquipError;
+
+                showMessage('messageListe', '✅ Équipement et tous ses documents supprimés avec succès !', 'success');
+                closeModal();
+                chargerListeComplete();
+
+            } catch (error) {
+                showMessage('messageListe', '❌ Erreur lors de la suppression: ' + error.message, 'error');
+                console.error('Erreur:', error);
+                closeModal();
+            }
+        }
+
+        // ========================================
+        // FORMULAIRE ÉQUIPEMENT
+        // ========================================
+        document.getElementById('formEquipement').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            // Déterminer quelle marque utiliser
+            const autreMarqueChecked = document.getElementById('autreMarque').checked;
+            let marque;
+            
+            if (autreMarqueChecked) {
+                marque = document.getElementById('customMarque').value.trim();
+                if (!marque) {
+                    showMessage('messageEquipement', '❌ Veuillez entrer le nom de la nouvelle marque', 'error');
+                    return;
+                }
+            } else {
+                marque = document.getElementById('marque').value;
+            }
+
+            const modele = document.getElementById('modele').value.trim();
+            const description = document.getElementById('description').value.trim();
+
+            try {
+                const { data, error } = await supabase
+                    .from('equipements')
+                    .insert([
+                        { 
+                            marque: marque,
+                            type: modele,
+                            modele: modele,
+                            description: description 
+                        }
+                    ])
+                    .select();
+
+                if (error) throw error;
+
+                showMessage('messageEquipement', '✅ Équipement enregistré avec succès !', 'success');
+                document.getElementById('formEquipement').reset();
+                document.getElementById('autreMarque').checked = false;
+                toggleCustomMarque();
+                
+            } catch (error) {
+                showMessage('messageEquipement', '❌ Erreur: ' + error.message, 'error');
+                console.error('Erreur:', error);
+            }
         });
 
-        alert("✅ Données chargées ! Regarde la liste et la console.");
-      } catch (err) {
-        console.error("❌ Erreur Supabase :", err);
-        alert("❌ Échec de la connexion. Regarde la console.");
-      }
-    }
-  </script>
-</body>
-</html>
+        // ========================================
+        // CHARGER ÉQUIPEMENTS POUR SELECT
+        // ========================================
+        async function chargerEquipementsPourSelect() {
+            try {
+                const { data, error } = await supabase
+                    .from('equipements')
+                    .select('*')
+                    .order('marque', { ascending: true });
+
+                if (error) throw error;
+
+                const select = document.getElementById('equipementSelect');
+                select.innerHTML = '<option value="">-- Sélectionnez un équipement --</option>';
+
+                data.forEach(equip => {
+                    const option = document.createElement('option');
+                    option.value = equip.id;
+                    option.textContent = `${equip.marque} - ${equip.modele || equip.type}`;
+                    select.appendChild(option);
+                });
+
+            } catch (error) {
+                console.error('Erreur chargement équipements:', error);
+            }
+        }
+
+        // ========================================
+        // FORMULAIRE DOCUMENT (UPLOAD PDF)
+        // ========================================
+        document.getElementById('formDocument').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const equipementId = document.getElementById('equipementSelect').value;
+            const titre = document.getElementById('titre').value.trim();
+            const typeDocument = document.getElementById('typeDocument').value;
+            const fichierInput = document.getElementById('fichier');
+            const fichier = fichierInput.files[0];
+
+            if (!fichier) {
+                showMessage('messageDocument', '❌ Veuillez sélectionner un fichier', 'error');
+                return;
+            }
+
+            const btnUpload = document.getElementById('btnUpload');
+            btnUpload.disabled = true;
+            btnUpload.textContent = '⏳ Upload en cours...';
+
+            try {
+                // 1. Upload du fichier dans Supabase Storage
+                const fileName = `${Date.now()}_${fichier.name}`;
+                const { data: uploadData, error: uploadError } = await supabase.storage
+                    .from('documents-pdf')
+                    .upload(fileName, fichier);
+
+                if (uploadError) throw uploadError;
+
+                // 2. Récupérer l'URL publique
+                const { data: urlData } = supabase.storage
+                    .from('documents-pdf')
+                    .getPublicUrl(fileName);
+
+                // 3. Enregistrer dans la table documents
+                const { data, error } = await supabase
+                    .from('documents')
+                    .insert([{
+                        equipement_id: parseInt(equipementId),
+                        titre: titre,
+                        type_document: typeDocument,
+                        fichier_url: urlData.publicUrl,
+                        fichier_nom: fichier.name
+                    }])
+                    .select();
+
+                if (error) throw error;
+
+                showMessage('messageDocument', '✅ Document uploadé avec succès !', 'success');
+                document.getElementById('formDocument').reset();
+
+            } catch (error) {
+                showMessage('messageDocument', '❌ Erreur: ' + error.message, 'error');
+                console.error('Erreur upload:', error);
+            } finally {
+                btnUpload.disabled = false;
+                btnUpload.textContent = '📤 Uploader le document';
+            }
+        });
+
+        // ========================================
+        // CHARGER LISTE COMPLÈTE
+        // ========================================
+        async function chargerListeComplete() {
+            const container = document.getElementById('listeEquipements');
+            container.innerHTML = '<div class="loading">Chargement...</div>';
+
+            try {
+                // Récupérer tous les équipements
+                const { data: equipements, error: errorEquip } = await supabase
+                    .from('equipements')
+                    .select('*')
+                    .order('marque', { ascending: true });
+
+                if (errorEquip) throw errorEquip;
+
+                if (equipements.length === 0) {
+                    container.innerHTML = '<p>Aucun équipement enregistré.</p>';
+                    return;
+                }
+
+                container.innerHTML = '';
+
+                for (const equip of equipements) {
+                    // Récupérer les documents de cet équipement
+                    const { data: docs, error: errorDocs } = await supabase
+                        .from('documents')
+                        .select('*')
+                        .eq('equipement_id', equip.id);
+
+                    if (errorDocs) throw errorDocs;
+
+                    const card = document.createElement('div');
+                    card.className = 'equipment-card';
+                    
+                    let docsHtml = '';
+                    if (docs && docs.length > 0) {
+                        docsHtml = '<strong>Documents :</strong>';
+                        docs.forEach(doc => {
+                            const icon = doc.type_document === 'schéma' ? '📐' : '💻';
+                            docsHtml += `
+                                <div class="document-item">
+                                    <span>${icon} ${doc.titre} (${doc.type_document})</span>
+                                    <a href="${doc.fichier_url}" target="_blank">Voir le PDF</a>
+                                </div>
+                            `;
+                        });
+                    } else {
+                        docsHtml = '<p style="color: #999;">Aucun document</p>';
+                    }
+
+                    card.innerHTML = `
+                        <button class="delete-btn-card" onclick='showDeleteModal(${JSON.stringify(equip)})'>🗑️ Supprimer</button>
+                        <h3>${equip.marque} - ${equip.modele || equip.type}</h3>
+                        <p><strong>Description :</strong> ${equip.description || 'Aucune'}</p>
+                        ${
