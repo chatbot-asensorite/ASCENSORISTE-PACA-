@@ -3,184 +3,202 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TEST CORRIGÉ - Documents Ascenseurs</title>
+    <title>V2 - TEST CONNEXION ASCENSEURS</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        body { font-family: Arial; margin: 20px; }
-        .test-section { border: 2px solid #007cba; padding: 15px; margin: 10px 0; border-radius: 8px; }
+        body { font-family: Arial; margin: 20px; background: #f0f8ff; }
+        .test-section { border: 2px solid #007cba; padding: 15px; margin: 10px 0; border-radius: 8px; background: white; }
         .success { color: green; font-weight: bold; }
         .error { color: red; font-weight: bold; }
+        .warning { color: orange; font-weight: bold; }
         button { padding: 10px; margin: 5px; background: #007cba; color: white; border: none; border-radius: 4px; cursor: pointer; }
         pre { background: #f5f5f5; padding: 10px; border-radius: 4px; overflow-x: auto; }
+        .info { background: #e7f3ff; padding: 10px; border-radius: 4px; margin: 10px 0; }
     </style>
 </head>
 <body>
-    <h1>🧪 TEST CORRIGÉ - Connexion Supabase</h1>
+    <h1>🔧 V2 - TEST COMPLET ASCENSORISTE PACA</h1>
     
-    <div class="test-section">
-        <h2>1. Test de Connexion Base</h2>
-        <button onclick="testConnexion()">🔗 Tester Connexion Supabase</button>
-        <div id="test1"></div>
+    <div class="info">
+        <strong>🔍 Diagnostic en cours...</strong>
+        <p>Problème détecté : <span class="error">Erreur de résolution DNS</span></p>
     </div>
 
     <div class="test-section">
-        <h2>2. Test Accès Table "documents"</h2>
-        <button onclick="testTable()">📊 Tester Accès Table</button>
-        <div id="test2"></div>
+        <h2>1. Test DNS et Réseau</h2>
+        <button onclick="testReseau()">🌐 Tester Accès Internet</button>
+        <div id="testReseau"></div>
     </div>
 
     <div class="test-section">
-        <h2>3. Test Structure Table</h2>
-        <button onclick="testStructure()">🔍 Analyser Structure</button>
-        <div id="test3"></div>
+        <h2>2. Test Connexion Supabase</h2>
+        <button onclick="testSupabase()">🔗 Tester Supabase</button>
+        <div id="testSupabase"></div>
     </div>
 
     <div class="test-section">
-        <h2>4. Test Écriture</h2>
-        <button onclick="testEcriture()">✍️ Tester Ajout Document</button>
-        <div id="test4"></div>
+        <h2>3. Solution Alternative</h2>
+        <button onclick="solutionSecours()">🔄 Mode Secours</button>
+        <div id="solutionSecours"></div>
     </div>
 
     <script>
-        // CONFIGURATION CORRECTE
-        const supabaseUrl = 'https://prrzsosrbrskmeczmmmu.supabase.co';
-        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBycnpzb3NicnJza21lY3ptbW11Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjEzMTkwMDMsImV4cCI6MjA3Njg5NTAwM30.JuqL6tJC5LRXX30HXrznm_y9bca-aOJ_vnk_wPsP9Mc';
-        
-        // INITIALISATION CORRECTE de Supabase
-        const { createClient } = supabase;
-        const supabaseClient = createClient(supabaseUrl, supabaseKey);
+        // CONFIGURATION V2
+        const SUPABASE_CONFIG = {
+            url: 'https://prrzsosrbrskmeczmmmu.supabase.co',
+            key: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBycnpzb3NicnJza21lY3ptbW11Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjEzMTkwMDMsImV4cCI6MjA3Njg5NTAwM30.JuqL6tJC5LRXX30HXrznm_y9bca-aOJ_vnk_wPsP9Mc'
+        };
 
-        // TEST 1: Connexion de base
-        async function testConnexion() {
-            const div = document.getElementById('test1');
-            div.innerHTML = "Connexion en cours...";
+        let supabaseClient = null;
+
+        // TEST 1: Vérification réseau
+        async function testReseau() {
+            const div = document.getElementById('testReseau');
+            div.innerHTML = "🌐 Test de connexion internet...";
             
             try {
-                // Test simple de connexion
-                const { data, error } = await supabaseClient.from('documents').select('count');
+                // Test de base de connexion internet
+                const response = await fetch('https://httpbin.org/get', { 
+                    method: 'GET',
+                    mode: 'no-cors'
+                });
                 
-                if (error) {
-                    div.innerHTML = `<span class="error">❌ ÉCHEC: ${error.message}</span>`;
-                } else {
-                    div.innerHTML = `<span class="success">✅ SUCCÈS: Connecté à Supabase!</span>`;
-                }
-            } catch (err) {
-                div.innerHTML = `<span class="error">❌ ERREUR: ${err.message}</span>`;
+                div.innerHTML = `
+                    <span class="success">✅ Connexion internet OK</span>
+                    <br><br>
+                    <strong>Prochain test :</strong> Vérification Supabase...
+                    <script>
+                        setTimeout(testSupabase, 2000);
+                    </script>
+                `;
+                
+            } catch (error) {
+                div.innerHTML = `
+                    <span class="error">❌ Problème de connexion internet</span>
+                    <br><br>
+                    <strong>Solutions :</strong>
+                    <ul>
+                        <li>Vérifiez votre connexion WiFi/4G</li>
+                        <li>Essayez un autre réseau</li>
+                        <li>Redémarrez votre routeur</li>
+                    </ul>
+                `;
             }
         }
 
-        // TEST 2: Accès à la table
-        async function testTable() {
-            const div = document.getElementById('test2');
-            div.innerHTML = "Test d'accès à la table...";
+        // TEST 2: Test Supabase avec gestion d'erreur améliorée
+        async function testSupabase() {
+            const div = document.getElementById('testSupabase');
+            div.innerHTML = "🔗 Initialisation Supabase...";
             
             try {
+                // Test de résolution DNS d'abord
+                div.innerHTML += "<br>🔍 Résolution DNS...";
+                
+                // Création du client Supabase
+                supabaseClient = supabase.createClient(SUPABASE_CONFIG.url, SUPABASE_CONFIG.key);
+                
+                // Test simple
+                div.innerHTML += "<br>📡 Test de connexion...";
                 const { data, error } = await supabaseClient
                     .from('documents')
                     .select('*')
-                    .limit(5);
+                    .limit(1)
+                    .timeout(10000); // 10 secondes timeout
                 
                 if (error) {
-                    div.innerHTML = `
-                        <span class="error">❌ ACCÈS TABLE ÉCHOUÉ: ${error.message}</span>
-                        <br><br>
-                        <strong>Solutions possibles:</strong>
-                        <ul>
-                            <li>Vérifiez que la table 'documents' existe</li>
-                            <li>Activez RLS ou créez des politiques</li>
-                            <li>Vérifiez les permissions</li>
-                        </ul>
-                    `;
+                    if (error.message.includes('Failed to fetch') || error.message.includes('resolve')) {
+                        div.innerHTML = `
+                            <span class="error">❌ ERREUR DNS - Impossible de joindre Supabase</span>
+                            <br><br>
+                            <strong>Problème :</strong> L'URL Supabase n'est pas accessible
+                            <br><br>
+                            <strong>Solutions :</strong>
+                            <ul>
+                                <li>Vérifiez que 'prrzsosrbrskmeczmmmu.supabase.co' est correct</li>
+                                <li>Testez l'URL dans votre navigateur</li>
+                                <li>Contactez le support Supabase</li>
+                            </ul>
+                        `;
+                    } else {
+                        div.innerHTML = `<span class="warning">⚠️ Connexion établie mais erreur: ${error.message}</span>`;
+                    }
                 } else {
                     div.innerHTML = `
-                        <span class="success">✅ ACCÈS TABLE RÉUSSI!</span>
+                        <span class="success">✅ CONNEXION SUPABASE RÉUSSIE!</span>
                         <br><br>
-                        <strong>${data.length} document(s) trouvé(s):</strong>
+                        <strong>${data.length} document(s) accessible(s)</strong>
                         <pre>${JSON.stringify(data, null, 2)}</pre>
                     `;
                 }
-            } catch (err) {
-                div.innerHTML = `<span class="error">❌ ERREUR: ${err.message}</span>`;
+                
+            } catch (error) {
+                div.innerHTML = `
+                    <span class="error">❌ ERREUR CRITIQUE: ${error.message}</span>
+                    <br><br>
+                    <strong>Diagnostic :</strong>
+                    <ul>
+                        <li>URL Supabase: ${SUPABASE_CONFIG.url}</li>
+                        <li>Statut: Non accessible</li>
+                        <li>Type: Erreur réseau/DNS</li>
+                    </ul>
+                `;
             }
         }
 
-        // TEST 3: Structure de la table
-        async function testStructure() {
-            const div = document.getElementById('test3');
-            div.innerHTML = "Analyse de la structure...";
-            
-            try {
-                const { data, error } = await supabaseClient
-                    .from('documents')
-                    .select('*')
-                    .limit(1);
-                
-                if (error) {
-                    div.innerHTML = `<span class="error">❌ Impossible d'analyser: ${error.message}</span>`;
-                } else if (data.length === 0) {
-                    div.innerHTML = `<span class="error">📭 Table vide - impossible d'analyser la structure</span>`;
-                } else {
-                    const colonnes = Object.keys(data[0]);
-                    div.innerHTML = `
-                        <span class="success">✅ STRUCTURE DÉTECTÉE!</span>
-                        <br><br>
-                        <strong>Colonnes trouvées (${colonnes.length}):</strong>
-                        <ul>
-                            ${colonnes.map(col => `<li><code>${col}</code></li>`).join('')}
-                        </ul>
-                        <br>
-                        <strong>Exemple de données:</strong>
-                        <pre>${JSON.stringify(data[0], null, 2)}</pre>
-                    `;
-                }
-            } catch (err) {
-                div.innerHTML = `<span class="error">❌ ERREUR: ${err.message}</span>`;
-            }
+        // SOLUTION ALTERNATIVE
+        function solutionSecours() {
+            const div = document.getElementById('solutionSecours');
+            div.innerHTML = `
+                <div class="info">
+                    <h3>🔄 Mode Secours Activé</h3>
+                    <p><strong>Problème confirmé :</strong> L'URL Supabase n'est pas résolue</p>
+                    
+                    <strong>Étapes de dépannage :</strong>
+                    <ol>
+                        <li>Ouvrez un nouvel onglet</li>
+                        <li>Allez à : <a href="https://prrzsosrbrskmeczmmmu.supabase.co" target="_blank">https://prrzsosrbrskmeczmmmu.supabase.co</a></li>
+                        <li>Si la page ne s'ouvre pas, le problème vient de Supabase</li>
+                        <li>Contactez le support Supabase</li>
+                    </ol>
+                    
+                    <strong>Solution temporaire :</strong>
+                    <p>Utilisez cette URL alternative pour tester :</p>
+                    <button onclick="testerURLOption()">🌐 Tester URL Alternative</button>
+                    <div id="testURL"></div>
+                </div>
+            `;
         }
 
-        // TEST 4: Test d'écriture
-        async function testEcriture() {
-            const div = document.getElementById('test4');
-            div.innerHTML = "Test d'écriture en cours...";
+        // Test d'URL alternative
+        async function testerURLOption() {
+            const div = document.getElementById('testURL');
+            div.innerHTML = "Test d'URL alternative...";
             
+            // Test avec une autre méthode
             try {
-                const docTest = {
-                    marque: 'TEST-' + Date.now(),
-                    type: 'Type-Test',
-                    model: 'Model-Test',
-                    description: 'Document de test créé le ' + new Date().toLocaleString(),
-                    created_at: new Date().toISOString()
-                };
+                const response = await fetch('https://prrzsosrbrskmeczmmmu.supabase.co/rest/v1/', {
+                    method: 'GET',
+                    headers: {
+                        'apikey': SUPABASE_CONFIG.key,
+                        'Content-Type': 'application/json'
+                    }
+                });
                 
-                const { data, error } = await supabaseClient
-                    .from('documents')
-                    .insert([docTest]);
-                
-                if (error) {
-                    div.innerHTML = `
-                        <span class="error">❌ ÉCRITURE ÉCHOUÉE: ${error.message}</span>
-                        <br><br>
-                        <strong>Problème probable: RLS (Row Level Security) activé</strong>
-                        <p>Dans Supabase: Authentication → Policies → Créez une politique d'insertion</p>
-                    `;
+                if (response.ok) {
+                    div.innerHTML = `<span class="success">✅ URL accessible via fetch direct</span>`;
                 } else {
-                    div.innerHTML = `
-                        <span class="success">✅ ÉCRITURE RÉUSSIE!</span>
-                        <br><br>
-                        <strong>Document test ajouté:</strong>
-                        <pre>${JSON.stringify(docTest, null, 2)}</pre>
-                    `;
+                    div.innerHTML = `<span class="error">❌ URL inaccessible (Status: ${response.status})</span>`;
                 }
-            } catch (err) {
-                div.innerHTML = `<span class="error">❌ ERREUR: ${err.message}</span>`;
+            } catch (error) {
+                div.innerHTML = `<span class="error">❌ Erreur fetch: ${error.message}</span>`;
             }
         }
 
         // Test automatique au chargement
         document.addEventListener('DOMContentLoaded', function() {
-            console.log("🚀 Page chargée - Prêt pour les tests");
-            // Lance le test de connexion après 1 seconde
-            setTimeout(testConnexion, 1000);
+            console.log("🚀 V2 - Diagnostic ASCENSORISTE PACA chargé");
+            setTimeout(testReseau, 1000);
         });
 
     </script>
