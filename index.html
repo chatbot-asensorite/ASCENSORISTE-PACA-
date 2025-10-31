@@ -3,318 +3,117 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Interface Dépannage Ascenseurs - Version Stable</title>
+    <title>Structure Table Documents</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <style>
-        body { font-family: Arial; margin: 20px; background: #f5f5f5; }
-        .container { max-width: 1200px; margin: 0 auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-        .section { margin: 30px 0; padding: 20px; border: 1px solid #ddd; border-radius: 8px; }
-        .form-group { margin: 15px 0; }
-        label { display: block; margin-bottom: 5px; font-weight: bold; }
-        input, select, textarea { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box; }
-        button { background: #007cba; color: white; padding: 10px 15px; border: none; border-radius: 5px; cursor: pointer; margin: 5px; }
-        button:hover { background: #005a87; }
-        button:disabled { background: #ccc; cursor: not-allowed; }
-        .file-drop { border: 2px dashed #007cba; padding: 30px; text-align: center; border-radius: 10px; margin: 15px 0; background: #f0f8ff; }
-        .document-item { border: 1px solid #ddd; padding: 15px; margin: 10px 0; border-radius: 5px; }
-        .success { color: green; font-weight: bold; }
-        .error { color: red; font-weight: bold; }
-        .info { background: #e7f3ff; padding: 10px; border-radius: 5px; margin: 10px 0; }
-    </style>
 </head>
 <body>
-    <div class="container">
-        <h1>🔧 Interface Dépannage Ascenseurs</h1>
-        
-        <!-- Section Upload -->
-        <div class="section">
-            <h2>📤 Ajouter un nouveau document</h2>
-            
-            <div class="form-group">
-                <label>Marque *</label>
-                <input type="text" id="marque" placeholder="Schindler, Otis, Kone..." required>
-            </div>
-            
-            <div class="form-group">
-                <label>Modèle *</label>
-                <input type="text" id="model" placeholder="3300, Gen2, MonoSpace..." required>
-            </div>
-            
-            <div class="form-group">
-                <label>Programmation</label>
-                <input type="text" id="programmation" placeholder="Documentation programmation...">
-            </div>
-            
-            <div class="form-group">
-                <label>Schémas</label>
-                <input type="text" id="schemas" placeholder="Liens vers les schémas...">
-            </div>
-            
-            <div class="form-group">
-                <label>Description</label>
-                <textarea id="description" placeholder="Description du document..." rows="3"></textarea>
-            </div>
-
-            <div class="form-group">
-                <label>Sélectionner le fichier PDF *</label>
-                <div class="file-drop" id="fileDrop">
-                    <p>📎 Glissez-déposez votre fichier PDF ici ou</p>
-                    <input type="file" id="fileInput" accept=".pdf" style="display: none;">
-                    <button type="button" onclick="document.getElementById('fileInput').click()">
-                        Parcourir les fichiers
-                    </button>
-                    <p id="fileName" style="margin-top: 10px; font-style: italic;"></p>
-                </div>
-            </div>
-            
-            <button onclick="uploadDocument()" id="uploadBtn" disabled>🚀 Enregistrer le document</button>
-            <button onclick="chargerDocuments()">🔄 Actualiser la liste</button>
-            
-            <div id="uploadResult"></div>
-        </div>
-
-        <!-- Section Recherche -->
-        <div class="section">
-            <h2>🔍 Rechercher dans les documents</h2>
-            
-            <div class="form-group">
-                <input type="text" id="searchInput" placeholder="Rechercher par marque, modèle, description..." 
-                       style="width: 70%; display: inline-block;">
-                <button onclick="rechercherDocuments()" style="width: 25%;">🔍 Rechercher</button>
-            </div>
-            
-            <div id="searchResults">
-                <!-- Les résultats de recherche apparaîtront ici -->
-            </div>
-        </div>
-
-        <!-- Section Liste des documents -->
-        <div class="section">
-            <h2>📋 Tous les documents</h2>
-            <button onclick="chargerDocuments()">🔄 Actualiser la liste</button>
-            <div id="documentsList">
-                Chargement en cours...
-            </div>
-        </div>
-    </div>
+    <h1>🔍 STRUCTURE RÉELLE DE VOTRE TABLE</h1>
+    <button onclick="afficherStructure()">📊 Afficher les vraies colonnes</button>
+    <button onclick="afficherDonnees()">📋 Afficher les données</button>
+    
+    <div id="resultat" style="margin: 20px; padding: 15px; border: 1px solid #ccc; background: #f9f9f9;"></div>
 
     <script>
-        // Configuration Supabase
         const supabaseUrl = 'https://prrzsosrbrskmeozmmmu.supabase.co';
         const supabaseKey = 'sb_publishable_2nwtPyBWSeUNNtx06wROTw_Txpyk2W3';
         const { createClient } = supabase;
         const client = createClient(supabaseUrl, supabaseKey);
 
-        let selectedFile = null;
-
-        // Charger les documents au démarrage
-        document.addEventListener('DOMContentLoaded', function() {
-            chargerDocuments();
-        });
-
-        // Gestion de la sélection de fichier
-        document.getElementById('fileInput').addEventListener('change', function(e) {
-            selectedFile = e.target.files[0];
-            if (selectedFile && selectedFile.type === 'application/pdf') {
-                document.getElementById('fileName').textContent = 
-                    `Fichier sélectionné: ${selectedFile.name} (${(selectedFile.size / 1024 / 1024).toFixed(2)} MB)`;
-                document.getElementById('uploadBtn').disabled = false;
-            } else {
-                alert('❌ Veuillez sélectionner un fichier PDF');
-                selectedFile = null;
-                document.getElementById('fileName').textContent = '';
-                document.getElementById('uploadBtn').disabled = true;
-            }
-        });
-
-        // Drag and drop
-        const fileDrop = document.getElementById('fileDrop');
-        ['dragover', 'dragleave', 'drop'].forEach(eventName => {
-            fileDrop.addEventListener(eventName, function(e) {
-                e.preventDefault();
-                if (eventName === 'dragover') {
-                    fileDrop.style.background = '#e6f3ff';
-                } else if (eventName === 'dragleave') {
-                    fileDrop.style.background = '#f0f8ff';
-                } else if (eventName === 'drop') {
-                    fileDrop.style.background = '#f0f8ff';
-                    selectedFile = e.dataTransfer.files[0];
-                    if (selectedFile && selectedFile.type === 'application/pdf') {
-                        document.getElementById('fileName').textContent = 
-                            `Fichier sélectionné: ${selectedFile.name} (${(selectedFile.size / 1024 / 1024).toFixed(2)} MB)`;
-                        document.getElementById('uploadBtn').disabled = false;
-                    } else {
-                        alert('❌ Veuillez déposer un fichier PDF');
-                        selectedFile = null;
-                    }
-                }
-            });
-        });
-
-        // Enregistrer le document
-        async function uploadDocument() {
-            const uploadBtn = document.getElementById('uploadBtn');
-            const resultDiv = document.getElementById('uploadResult');
-
-            const marque = document.getElementById('marque').value;
-            const model = document.getElementById('model').value;
-            const programmation = document.getElementById('programmation').value;
-            const schemas = document.getElementById('schemas').value;
-            const description = document.getElementById('description').value;
-
-            if (!marque || !model) {
-                resultDiv.innerHTML = '<div class="error">❌ Veuillez remplir au moins la marque et le modèle</div>';
-                return;
-            }
-
-            uploadBtn.disabled = true;
-            uploadBtn.textContent = 'Enregistrement en cours...';
-            resultDiv.innerHTML = '';
-
+        async function afficherStructure() {
+            const resultat = document.getElementById('resultat');
+            resultat.innerHTML = "🔍 Analyse de la structure en cours...";
+            
             try {
-                // Préparer les données
-                const documentData = {
-                    marque: marque,
-                    model: model,
-                    filename: selectedFile ? selectedFile.name : null,
-                    created_at: new Date().toISOString()
-                };
-
-                // Ajouter les champs optionnels s'ils sont remplis
-                if (programmation) documentData.programmation = programmation;
-                if (schemas) documentData.schemas = schemas;
-                if (description) documentData.description = description;
-
-                // Enregistrement dans la base de données
+                // Requête SIMPLE pour voir les colonnes
                 const { data, error } = await client
                     .from('documents')
-                    .insert([documentData]);
+                    .select('*')
+                    .limit(1);
 
-                if (error) throw error;
+                if (error) {
+                    resultat.innerHTML = `❌ Erreur: ${error.message}`;
+                    return;
+                }
 
-                resultDiv.innerHTML = '<div class="success">✅ Document enregistré avec succès!</div>';
+                if (data.length === 0) {
+                    resultat.innerHTML = "📭 La table est VIDE - Aucune donnée pour analyser la structure";
+                    return;
+                }
+
+                // Afficher la structure réelle
+                const premierDocument = data[0];
+                const colonnes = Object.keys(premierDocument);
                 
-                // Réinitialiser le formulaire
-                document.getElementById('marque').value = '';
-                document.getElementById('model').value = '';
-                document.getElementById('programmation').value = '';
-                document.getElementById('schemas').value = '';
-                document.getElementById('description').value = '';
-                document.getElementById('fileName').textContent = '';
-                selectedFile = null;
-                document.getElementById('fileInput').value = '';
-                uploadBtn.disabled = true;
-                uploadBtn.textContent = '🚀 Enregistrer le document';
+                let html = `<h3>📊 STRUCTURE RÉELLE DE VOTRE TABLE "documents"</h3>`;
+                html += `<p><strong>${colonnes.length} colonnes détectées :</strong></p>`;
+                html += `<table border="1" style="border-collapse: collapse; width: 100%;">`;
+                html += `<tr><th>Nom Colonne</th><th>Valeur Exemple</th><th>Type</th></tr>`;
+                
+                colonnes.forEach(colonne => {
+                    const valeur = premierDocument[colonne];
+                    const type = Array.isArray(valeur) ? 'array' : typeof valeur;
+                    html += `<tr>
+                        <td><strong>${colonne}</strong></td>
+                        <td>${valeur !== null ? JSON.stringify(valeur) : 'NULL'}</td>
+                        <td>${type}</td>
+                    </tr>`;
+                });
+                
+                html += `</table>`;
+                resultat.innerHTML = html;
 
-                // Recharger les documents
-                setTimeout(() => {
-                    chargerDocuments();
-                }, 1000);
-
-            } catch (error) {
-                resultDiv.innerHTML = `<div class="error">❌ Erreur: ${error.message}</div>`;
-                uploadBtn.disabled = false;
-                uploadBtn.textContent = '🚀 Enregistrer le document';
+            } catch (err) {
+                resultat.innerHTML = `❌ Erreur critique: ${err.message}`;
             }
         }
 
-        // Charger tous les documents
-        async function chargerDocuments() {
-            const listDiv = document.getElementById('documentsList');
-            listDiv.innerHTML = 'Chargement...';
-
+        async function afficherDonnees() {
+            const resultat = document.getElementById('resultat');
+            resultat.innerHTML = "📋 Chargement des données...";
+            
             try {
-                // Requête SIMPLIFIÉE pour éviter les erreurs
                 const { data, error } = await client
                     .from('documents')
                     .select('*')
-                    .order('created_at', { ascending: false });
+                    .limit(10);
 
-                if (error) throw error;
-
-                if (data.length === 0) {
-                    listDiv.innerHTML = '<p class="info">Aucun document trouvé.</p>';
+                if (error) {
+                    resultat.innerHTML = `❌ Erreur: ${error.message}`;
                     return;
                 }
 
-                let html = `<p>📄 ${data.length} document(s) trouvé(s)</p>`;
-                data.forEach(doc => {
-                    html += `
-                        <div class="document-item">
-                            <h4>${doc.marque || 'N/A'} - ${doc.model || 'N/A'}</h4>
-                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; margin: 10px 0;">
-                    `;
-                    
-                    // Afficher les champs disponibles
-                    if (doc.programmation) html += `<div><strong>Programmation:</strong> ${doc.programmation}</div>`;
-                    if (doc.schemas) html += `<div><strong>Schémas:</strong> ${doc.schemas}</div>`;
-                    if (doc.description) html += `<div><strong>Description:</strong> ${doc.description}</div>`;
-                    if (doc.filename) html += `<div><strong>Fichier:</strong> ${doc.filename}</div>`;
-                    
-                    html += `
-                            </div>
-                            <p><em>Créé le: ${new Date(doc.created_at).toLocaleDateString('fr-FR')}</em></p>
-                        </div>
-                    `;
-                });
-
-                listDiv.innerHTML = html;
-            } catch (error) {
-                listDiv.innerHTML = `<div class="error">Erreur chargement: ${error.message}</div>`;
-            }
-        }
-
-        // Rechercher des documents
-        async function rechercherDocuments() {
-            const searchTerm = document.getElementById('searchInput').value;
-            const resultsDiv = document.getElementById('searchResults');
-
-            if (!searchTerm) {
-                resultsDiv.innerHTML = '<p class="info">⚠️ Veuillez entrer un terme de recherche</p>';
-                return;
-            }
-
-            resultsDiv.innerHTML = 'Recherche en cours...';
-
-            try {
-                // Recherche SIMPLIFIÉE
-                const { data, error } = await client
-                    .from('documents')
-                    .select('*')
-                    .or(`marque.ilike.%${searchTerm}%,model.ilike.%${searchTerm}%`)
-                    .order('created_at', { ascending: false });
-
-                if (error) throw error;
-
                 if (data.length === 0) {
-                    resultsDiv.innerHTML = '<p class="info">🔍 Aucun document trouvé pour cette recherche.</p>';
+                    resultat.innerHTML = "📭 La table est VIDE";
                     return;
                 }
 
-                let html = `<h3>🔍 ${data.length} résultat(s) pour "${searchTerm}"</h3>`;
-                data.forEach(doc => {
-                    html += `
-                        <div class="document-item">
-                            <h4>${doc.marque || 'N/A'} - ${doc.model || 'N/A'}</h4>
-                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; margin: 10px 0;">
-                    `;
+                let html = `<h3>📋 DONNÉES RÉELLES (${data.length} premiers documents)</h3>`;
+                
+                data.forEach((doc, index) => {
+                    html += `<div style="border: 1px solid #ccc; padding: 10px; margin: 10px 0; background: white;">`;
+                    html += `<h4>Document ${index + 1}</h4>`;
+                    html += `<table border="1" style="border-collapse: collapse; width: 100%;">`;
+                    html += `<tr><th>Colonne</th><th>Valeur</th></tr>`;
                     
-                    if (doc.programmation) html += `<div><strong>Programmation:</strong> ${doc.programmation}</div>`;
-                    if (doc.schemas) html += `<div><strong>Schémas:</strong> ${doc.schemas}</div>`;
-                    if (doc.description) html += `<div><strong>Description:</strong> ${doc.description}</div>`;
-                    if (doc.filename) html += `<div><strong>Fichier:</strong> ${doc.filename}</div>`;
+                    Object.keys(doc).forEach(colonne => {
+                        html += `<tr>
+                            <td><strong>${colonne}</strong></td>
+                            <td>${doc[colonne] !== null ? doc[colonne] : 'NULL'}</td>
+                        </tr>`;
+                    });
                     
-                    html += `
-                            </div>
-                        </div>
-                    `;
+                    html += `</table></div>`;
                 });
 
-                resultsDiv.innerHTML = html;
-            } catch (error) {
-                resultsDiv.innerHTML = `<div class="error">Erreur recherche: ${error.message}</div>`;
+                resultat.innerHTML = html;
+
+            } catch (err) {
+                resultat.innerHTML = `❌ Erreur: ${err.message}`;
             }
         }
+
+        // Afficher la structure au chargement
+        setTimeout(afficherStructure, 1000);
     </script>
 </body>
 </html>
