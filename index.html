@@ -8,76 +8,73 @@
     <style>
         body { font-family: Arial, sans-serif; margin: 20px; background: #f5f5f5; }
         .container { max-width: 1200px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; }
-        .header { background: #007cba; color: white; padding: 15px; border-radius: 8px; margin-bottom: 20px; }
-        .btn { padding: 10px 15px; margin: 5px; background: #007cba; color: white; border: none; border-radius: 4px; cursor: pointer; }
-        .btn-success { background: #28a745; }
-        .btn-danger { background: #dc3545; }
-        table { width: 100%; border-collapse: collapse; margin: 15px 0; }
-        th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
-        th { background: #f8f9fa; }
+        .header { background: #007cba; color: white; padding: 20px; border-radius: 8px; margin-bottom: 20px; }
+        .doc-card { border: 1px solid #ddd; padding: 15px; margin: 10px 0; border-radius: 8px; background: #f9f9f9; }
+        .doc-header { display: flex; justify-content: space-between; align-items: center; }
+        .doc-actions { margin-top: 10px; }
+        button { padding: 8px 15px; margin: 5px; background: #007cba; color: white; border: none; border-radius: 4px; cursor: pointer; }
+        button:hover { background: #005a87; }
+        .upload-section { background: #e7f3ff; padding: 15px; border-radius: 8px; margin: 20px 0; }
+        input, textarea { width: 100%; padding: 8px; margin: 5px 0; border: 1px solid #ccc; border-radius: 4px; }
         .form-group { margin: 10px 0; }
-        label { display: block; margin-bottom: 5px; font-weight: bold; }
-        input, textarea { width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; }
-        .tabs { display: flex; margin-bottom: 20px; }
-        .tab { padding: 10px 20px; cursor: pointer; border: 1px solid #ddd; }
-        .tab.active { background: #007cba; color: white; }
-        .tab-content { display: none; }
-        .tab-content.active { display: block; }
+        label { font-weight: bold; display: block; margin-bottom: 5px; }
+        .success { color: green; font-weight: bold; }
+        .error { color: red; font-weight: bold; }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <h1>🔧 Gestion des Documents Ascenseurs</h1>
-            <p>Table: documents | Connexion: ✅ Active</p>
+            <h1>📁 Gestion des Documents Ascenseurs</h1>
+            <p>Interface de gestion pour vos fichiers PDF et documentation</p>
         </div>
 
-        <div class="tabs">
-            <div class="tab active" onclick="showTab('view')">👀 Voir les Documents</div>
-            <div class="tab" onclick="showTab('add')">➕ Ajouter un Document</div>
-            <div class="tab" onclick="showTab('structure')">📊 Structure de la Table</div>
-        </div>
-
-        <!-- TAB 1: Voir les documents -->
-        <div id="view" class="tab-content active">
-            <h2>Liste des Documents</h2>
-            <button class="btn" onclick="chargerDocuments()">🔄 Actualiser</button>
-            <div id="documentsList"></div>
-        </div>
-
-        <!-- TAB 2: Ajouter un document -->
-        <div id="add" class="tab-content">
-            <h2>Ajouter un Nouveau Document</h2>
-            <form id="addForm">
+        <!-- Section Upload -->
+        <div class="upload-section">
+            <h2>📤 Ajouter un nouveau document</h2>
+            <form id="uploadForm">
                 <div class="form-group">
-                    <label for="marque">Marque *</label>
-                    <input type="text" id="marque" required>
+                    <label for="marque">Marque :</label>
+                    <input type="text" id="marque" placeholder="Ex: Schindler, Otis, Kone..." required>
                 </div>
+                
                 <div class="form-group">
-                    <label for="model">Modèle *</label>
-                    <input type="text" id="model" required>
+                    <label for="model">Modèle :</label>
+                    <input type="text" id="model" placeholder="Ex: 3300, Gen2, MonoSpace..." required>
                 </div>
+                
                 <div class="form-group">
-                    <label for="description">Description</label>
-                    <textarea id="description" rows="3"></textarea>
+                    <label for="description">Description :</label>
+                    <textarea id="description" placeholder="Description du document..." rows="3"></textarea>
                 </div>
+                
                 <div class="form-group">
-                    <label for="filename">Nom du fichier</label>
-                    <input type="text" id="filename">
+                    <label for="filepath">Chemin/URL du fichier PDF :</label>
+                    <input type="text" id="filepath" placeholder="Ex: https://... ou chemin local" required>
                 </div>
+                
                 <div class="form-group">
-                    <label for="path">Chemin/URL du document</label>
-                    <input type="text" id="path" placeholder="https://...">
+                    <label for="filename">Nom du fichier :</label>
+                    <input type="text" id="filename" placeholder="Ex: schema-electrique.pdf" required>
                 </div>
-                <button type="submit" class="btn btn-success">💾 Enregistrer</button>
+                
+                <button type="submit">💾 Enregistrer le document</button>
             </form>
-            <div id="formMessage"></div>
+            <div id="uploadMessage"></div>
         </div>
 
-        <!-- TAB 3: Structure de la table -->
-        <div id="structure" class="tab-content">
-            <h2>Structure de la Table</h2>
-            <div id="tableStructure"></div>
+        <!-- Section Recherche -->
+        <div class="search-section">
+            <h2>🔍 Rechercher des documents</h2>
+            <input type="text" id="searchInput" placeholder="Rechercher par marque, modèle, description..." style="width: 300px; padding: 10px;">
+            <button onclick="rechercherDocuments()">Rechercher</button>
+            <button onclick="afficherTousDocuments()">Afficher tous</button>
+        </div>
+
+        <!-- Résultats -->
+        <div id="results">
+            <h2>📋 Liste des documents</h2>
+            <div id="documentsList"></div>
         </div>
     </div>
 
@@ -85,182 +82,171 @@
         // Configuration Supabase
         const supabaseUrl = 'https://prrzsosrbrskmeozmmmu.supabase.co';
         const supabaseKey = 'sb_publishable_2nwtPyBWSeUNNtx06wROTw_Txpyk2W3';
-        const supabase = supabase.createClient(supabaseUrl, supabaseKey);
+        const { createClient } = supabase;
+        const client = createClient(supabaseUrl, supabaseKey);
 
-        // Navigation par onglets
-        function showTab(tabName) {
-            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
-            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+        // Charger tous les documents au démarrage
+        document.addEventListener('DOMContentLoaded', function() {
+            afficherTousDocuments();
             
-            document.querySelector(`.tab[onclick="showTab('${tabName}')"]`).classList.add('active');
-            document.getElementById(tabName).classList.add('active');
-        }
+            // Gestion du formulaire d'upload
+            document.getElementById('uploadForm').addEventListener('submit', async function(e) {
+                e.preventDefault();
+                await ajouterDocument();
+            });
+        });
 
-        // Charger tous les documents
-        async function chargerDocuments() {
-            const list = document.getElementById('documentsList');
-            list.innerHTML = "Chargement...";
+        // Fonction pour ajouter un document
+        async function ajouterDocument() {
+            const messageDiv = document.getElementById('uploadMessage');
+            messageDiv.innerHTML = "Enregistrement en cours...";
+            
+            const marque = document.getElementById('marque').value;
+            const model = document.getElementById('model').value;
+            const description = document.getElementById('description').value;
+            const filepath = document.getElementById('filepath').value;
+            const filename = document.getElementById('filename').value;
             
             try {
-                const { data, error } = await supabase
+                const { data, error } = await client
+                    .from('documents')
+                    .insert([
+                        {
+                            marque: marque,
+                            model: model,
+                            description: description,
+                            path: filepath,
+                            filename: filename,
+                            created_at: new Date().toISOString()
+                        }
+                    ]);
+
+                if (error) {
+                    messageDiv.innerHTML = `<span class="error">❌ Erreur: ${error.message}</span>`;
+                } else {
+                    messageDiv.innerHTML = `<span class="success">✅ Document ajouté avec succès!</span>`;
+                    // Vider le formulaire
+                    document.getElementById('uploadForm').reset();
+                    // Recharger la liste
+                    afficherTousDocuments();
+                }
+            } catch (err) {
+                messageDiv.innerHTML = `<span class="error">❌ Erreur: ${err.message}</span>`;
+            }
+        }
+
+        // Fonction pour afficher tous les documents
+        async function afficherTousDocuments() {
+            const listeDiv = document.getElementById('documentsList');
+            listeDiv.innerHTML = "Chargement...";
+            
+            try {
+                const { data, error } = await client
                     .from('documents')
                     .select('*')
                     .order('created_at', { ascending: false });
                 
-                if (error) throw error;
-                
-                if (data.length === 0) {
-                    list.innerHTML = "<p>Aucun document trouvé. Ajoutez-en un !</p>";
-                    return;
-                }
-                
-                let html = `
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Marque</th>
-                                <th>Modèle</th>
-                                <th>Description</th>
-                                <th>Fichier</th>
-                                <th>Date</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                `;
-                
-                data.forEach(doc => {
-                    html += `
-                        <tr>
-                            <td>${doc.marque || '-'}</td>
-                            <td>${doc.model || '-'}</td>
-                            <td>${doc.description || '-'}</td>
-                            <td>${doc.filename || '-'}</td>
-                            <td>${new Date(doc.created_at).toLocaleDateString('fr-FR')}</td>
-                            <td>
-                                <button class="btn" onclick="voirDetails('${doc.id}')">👁️</button>
-                                <button class="btn btn-danger" onclick="supprimerDocument('${doc.id}')">🗑️</button>
-                            </td>
-                        </tr>
-                    `;
-                });
-                
-                html += `</tbody></table>`;
-                list.innerHTML = html;
-                
-            } catch (error) {
-                list.innerHTML = `<p style="color: red;">Erreur: ${error.message}</p>`;
-            }
-        }
-
-        // Ajouter un document
-        document.getElementById('addForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const message = document.getElementById('formMessage');
-            
-            const nouveauDoc = {
-                marque: document.getElementById('marque').value,
-                model: document.getElementById('model').value,
-                description: document.getElementById('description').value,
-                filename: document.getElementById('filename').value,
-                path: document.getElementById('path').value,
-                created_at: new Date().toISOString()
-            };
-            
-            try {
-                const { data, error } = await supabase
-                    .from('documents')
-                    .insert([nouveauDoc]);
-                
-                if (error) throw error;
-                
-                message.innerHTML = '<p style="color: green;">✅ Document ajouté avec succès!</p>';
-                document.getElementById('addForm').reset();
-                chargerDocuments(); // Recharger la liste
-                
-            } catch (error) {
-                message.innerHTML = `<p style="color: red;">❌ Erreur: ${error.message}</p>`;
-            }
-        });
-
-        // Voir la structure de la table
-        async function afficherStructure() {
-            const structureDiv = document.getElementById('tableStructure');
-            structureDiv.innerHTML = "Chargement de la structure...";
-            
-            try {
-                const { data, error } = await supabase
-                    .from('documents')
-                    .select('*')
-                    .limit(1);
-                
-                if (error) throw error;
-                
-                if (data.length > 0) {
-                    const colonnes = Object.keys(data[0]);
-                    let html = '<h3>Colonnes de la table:</h3><ul>';
+                if (error) {
+                    listeDiv.innerHTML = `<span class="error">Erreur: ${error.message}</span>`;
+                } else if (data.length === 0) {
+                    listeDiv.innerHTML = "<p>Aucun document trouvé. Ajoutez votre premier document!</p>";
+                } else {
+                    let html = `<p>${data.length} document(s) trouvé(s)</p>`;
                     
-                    colonnes.forEach(col => {
-                        html += `<li><strong>${col}</strong>: ${typeof data[0][col]}</li>`;
+                    data.forEach(doc => {
+                        html += `
+                            <div class="doc-card">
+                                <div class="doc-header">
+                                    <h3>${doc.marque} - ${doc.model}</h3>
+                                    <small>${new Date(doc.created_at).toLocaleDateString('fr-FR')}</small>
+                                </div>
+                                <p><strong>Description:</strong> ${doc.description || 'Non renseignée'}</p>
+                                <p><strong>Fichier:</strong> ${doc.filename}</p>
+                                <p><strong>Chemin:</strong> ${doc.path}</p>
+                                <div class="doc-actions">
+                                    ${doc.path ? `<a href="${doc.path}" target="_blank"><button>📎 Ouvrir le PDF</button></a>` : ''}
+                                    <button onclick="supprimerDocument(${doc.id})">🗑️ Supprimer</button>
+                                </div>
+                            </div>
+                        `;
                     });
                     
-                    html += '</ul><h3>Exemple de données:</h3><pre>' + JSON.stringify(data[0], null, 2) + '</pre>';
-                    structureDiv.innerHTML = html;
-                } else {
-                    structureDiv.innerHTML = "<p>La table est vide. Aucune structure à afficher.</p>";
+                    listeDiv.innerHTML = html;
                 }
-                
-            } catch (error) {
-                structureDiv.innerHTML = `<p style="color: red;">Erreur: ${error.message}</p>`;
+            } catch (err) {
+                listeDiv.innerHTML = `<span class="error">Erreur: ${err.message}</span>`;
             }
         }
 
-        // Supprimer un document
-        async function supprimerDocument(id) {
-            if (!confirm('Êtes-vous sûr de vouloir supprimer ce document ?')) return;
+        // Fonction de recherche
+        async function rechercherDocuments() {
+            const searchTerm = document.getElementById('searchInput').value;
+            const listeDiv = document.getElementById('documentsList');
+            
+            if (!searchTerm) {
+                afficherTousDocuments();
+                return;
+            }
+            
+            listeDiv.innerHTML = "Recherche en cours...";
             
             try {
-                const { error } = await supabase
-                    .from('documents')
-                    .delete()
-                    .eq('id', id);
-                
-                if (error) throw error;
-                
-                alert('✅ Document supprimé!');
-                chargerDocuments(); // Recharger la liste
-                
-            } catch (error) {
-                alert('❌ Erreur: ' + error.message);
-            }
-        }
-
-        // Voir les détails d'un document
-        async function voirDetails(id) {
-            try {
-                const { data, error } = await supabase
+                const { data, error } = await client
                     .from('documents')
                     .select('*')
-                    .eq('id', id)
-                    .single();
+                    .or(`marque.ilike.%${searchTerm}%,model.ilike.%${searchTerm}%,description.ilike.%${searchTerm}%`)
+                    .order('created_at', { ascending: false });
                 
-                if (error) throw error;
-                
-                alert('Détails du document:\n\n' + JSON.stringify(data, null, 2));
-            } catch (error) {
-                alert('Erreur: ' + error.message);
+                if (error) {
+                    listeDiv.innerHTML = `<span class="error">Erreur: ${error.message}</span>`;
+                } else if (data.length === 0) {
+                    listeDiv.innerHTML = `<p>Aucun document trouvé pour "${searchTerm}"</p>`;
+                } else {
+                    let html = `<p>${data.length} document(s) trouvé(s) pour "${searchTerm}"</p>`;
+                    
+                    data.forEach(doc => {
+                        html += `
+                            <div class="doc-card">
+                                <div class="doc-header">
+                                    <h3>${doc.marque} - ${doc.model}</h3>
+                                    <small>${new Date(doc.created_at).toLocaleDateString('fr-FR')}</small>
+                                </div>
+                                <p><strong>Description:</strong> ${doc.description || 'Non renseignée'}</p>
+                                <p><strong>Fichier:</strong> ${doc.filename}</p>
+                                <div class="doc-actions">
+                                    ${doc.path ? `<a href="${doc.path}" target="_blank"><button>📎 Ouvrir le PDF</button></a>` : ''}
+                                </div>
+                            </div>
+                        `;
+                    });
+                    
+                    listeDiv.innerHTML = html;
+                }
+            } catch (err) {
+                listeDiv.innerHTML = `<span class="error">Erreur: ${err.message}</span>`;
             }
         }
 
-        // Initialisation au chargement
-        document.addEventListener('DOMContentLoaded', function() {
-            chargerDocuments();
-            afficherStructure();
-            
-            // Afficher la structure quand on clique sur l'onglet
-            document.querySelector('.tab[onclick="showTab(\'structure\')"]')
-                .addEventListener('click', afficherStructure);
-        });
+        // Fonction pour supprimer un document
+        async function supprimerDocument(id) {
+            if (confirm("Êtes-vous sûr de vouloir supprimer ce document ?")) {
+                try {
+                    const { error } = await client
+                        .from('documents')
+                        .delete()
+                        .eq('id', id);
+                    
+                    if (error) {
+                        alert("Erreur lors de la suppression: " + error.message);
+                    } else {
+                        alert("Document supprimé avec succès!");
+                        afficherTousDocuments();
+                    }
+                } catch (err) {
+                    alert("Erreur: " + err.message);
+                }
+            }
+        }
     </script>
 </body>
 </html>
