@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>V2 - TEST CONNEXION ASCENSEURS</title>
+    <title>V3 - TEST COMPLET ASCENSEURS</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         body { font-family: Arial; margin: 20px; background: #f0f8ff; }
@@ -17,11 +17,11 @@
     </style>
 </head>
 <body>
-    <h1>🔧 V2 - TEST COMPLET ASCENSORISTE PACA</h1>
+    <h1>🔧 V3 - TEST COMPLET ASCENSORISTE PACA</h1>
     
     <div class="info">
         <strong>🔍 Diagnostic en cours...</strong>
-        <p>Problème détecté : <span class="error">Erreur de résolution DNS</span></p>
+        <p>Version V3 - Erreurs de syntaxe corrigées</p>
     </div>
 
     <div class="test-section">
@@ -43,7 +43,7 @@
     </div>
 
     <script>
-        // CONFIGURATION V2
+        // CONFIGURATION V3
         const SUPABASE_CONFIG = {
             url: 'https://prrzsosrbrskmeczmmmu.supabase.co',
             key: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBycnpzb3NicnJza21lY3ptbW11Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjEzMTkwMDMsImV4cCI6MjA3Njg5NTAwM30.JuqL6tJC5LRXX30HXrznm_y9bca-aOJ_vnk_wPsP9Mc'
@@ -58,31 +58,18 @@
             
             try {
                 // Test de base de connexion internet
-                const response = await fetch('https://httpbin.org/get', { 
+                await fetch('https://httpbin.org/get', { 
                     method: 'GET',
                     mode: 'no-cors'
                 });
                 
-                div.innerHTML = `
-                    <span class="success">✅ Connexion internet OK</span>
-                    <br><br>
-                    <strong>Prochain test :</strong> Vérification Supabase...
-                    <script>
-                        setTimeout(testSupabase, 2000);
-                    </script>
-                `;
+                div.innerHTML = '<span class="success">✅ Connexion internet OK</span><br><br><strong>Prochain test :</strong> Vérification Supabase...';
+                
+                // Lancer le test Supabase après 2 secondes
+                setTimeout(testSupabase, 2000);
                 
             } catch (error) {
-                div.innerHTML = `
-                    <span class="error">❌ Problème de connexion internet</span>
-                    <br><br>
-                    <strong>Solutions :</strong>
-                    <ul>
-                        <li>Vérifiez votre connexion WiFi/4G</li>
-                        <li>Essayez un autre réseau</li>
-                        <li>Redémarrez votre routeur</li>
-                    </ul>
-                `;
+                div.innerHTML = '<span class="error">❌ Problème de connexion internet</span><br><br><strong>Solutions :</strong><ul><li>Vérifiez votre connexion WiFi/4G</li><li>Essayez un autre réseau</li><li>Redémarrez votre routeur</li></ul>';
             }
         }
 
@@ -103,71 +90,27 @@
                 const { data, error } = await supabaseClient
                     .from('documents')
                     .select('*')
-                    .limit(1)
-                    .timeout(10000); // 10 secondes timeout
+                    .limit(1);
                 
                 if (error) {
                     if (error.message.includes('Failed to fetch') || error.message.includes('resolve')) {
-                        div.innerHTML = `
-                            <span class="error">❌ ERREUR DNS - Impossible de joindre Supabase</span>
-                            <br><br>
-                            <strong>Problème :</strong> L'URL Supabase n'est pas accessible
-                            <br><br>
-                            <strong>Solutions :</strong>
-                            <ul>
-                                <li>Vérifiez que 'prrzsosrbrskmeczmmmu.supabase.co' est correct</li>
-                                <li>Testez l'URL dans votre navigateur</li>
-                                <li>Contactez le support Supabase</li>
-                            </ul>
-                        `;
+                        div.innerHTML = '<span class="error">❌ ERREUR DNS - Impossible de joindre Supabase</span><br><br><strong>Problème :</strong> L\'URL Supabase n\'est pas accessible<br><br><strong>Solutions :</strong><ul><li>Vérifiez que \'prrzsosrbrskmeczmmmu.supabase.co\' est correct</li><li>Testez l\'URL dans votre navigateur</li><li>Contactez le support Supabase</li></ul>';
                     } else {
-                        div.innerHTML = `<span class="warning">⚠️ Connexion établie mais erreur: ${error.message}</span>`;
+                        div.innerHTML = '<span class="warning">⚠️ Connexion établie mais erreur: ' + error.message + '</span>';
                     }
                 } else {
-                    div.innerHTML = `
-                        <span class="success">✅ CONNEXION SUPABASE RÉUSSIE!</span>
-                        <br><br>
-                        <strong>${data.length} document(s) accessible(s)</strong>
-                        <pre>${JSON.stringify(data, null, 2)}</pre>
-                    `;
+                    div.innerHTML = '<span class="success">✅ CONNEXION SUPABASE RÉUSSIE!</span><br><br><strong>' + data.length + ' document(s) accessible(s)</strong><pre>' + JSON.stringify(data, null, 2) + '</pre>';
                 }
                 
             } catch (error) {
-                div.innerHTML = `
-                    <span class="error">❌ ERREUR CRITIQUE: ${error.message}</span>
-                    <br><br>
-                    <strong>Diagnostic :</strong>
-                    <ul>
-                        <li>URL Supabase: ${SUPABASE_CONFIG.url}</li>
-                        <li>Statut: Non accessible</li>
-                        <li>Type: Erreur réseau/DNS</li>
-                    </ul>
-                `;
+                div.innerHTML = '<span class="error">❌ ERREUR CRITIQUE: ' + error.message + '</span><br><br><strong>Diagnostic :</strong><ul><li>URL Supabase: ' + SUPABASE_CONFIG.url + '</li><li>Statut: Non accessible</li><li>Type: Erreur réseau/DNS</li></ul>';
             }
         }
 
         // SOLUTION ALTERNATIVE
         function solutionSecours() {
             const div = document.getElementById('solutionSecours');
-            div.innerHTML = `
-                <div class="info">
-                    <h3>🔄 Mode Secours Activé</h3>
-                    <p><strong>Problème confirmé :</strong> L'URL Supabase n'est pas résolue</p>
-                    
-                    <strong>Étapes de dépannage :</strong>
-                    <ol>
-                        <li>Ouvrez un nouvel onglet</li>
-                        <li>Allez à : <a href="https://prrzsosrbrskmeczmmmu.supabase.co" target="_blank">https://prrzsosrbrskmeczmmmu.supabase.co</a></li>
-                        <li>Si la page ne s'ouvre pas, le problème vient de Supabase</li>
-                        <li>Contactez le support Supabase</li>
-                    </ol>
-                    
-                    <strong>Solution temporaire :</strong>
-                    <p>Utilisez cette URL alternative pour tester :</p>
-                    <button onclick="testerURLOption()">🌐 Tester URL Alternative</button>
-                    <div id="testURL"></div>
-                </div>
-            `;
+            div.innerHTML = '<div class="info"><h3>🔄 Mode Secours Activé</h3><p><strong>Problème confirmé :</strong> L\'URL Supabase n\'est pas résolue</p><strong>Étapes de dépannage :</strong><ol><li>Ouvrez un nouvel onglet</li><li>Allez à : <a href="https://prrzsosrbrskmeczmmmu.supabase.co" target="_blank">https://prrzsosrbrskmeczmmmu.supabase.co</a></li><li>Si la page ne s\'ouvre pas, le problème vient de Supabase</li><li>Contactez le support Supabase</li></ol><strong>Solution temporaire :</strong><p>Utilisez cette URL alternative pour tester :</p><button onclick="testerURLOption()">🌐 Tester URL Alternative</button><div id="testURL"></div></div>';
         }
 
         // Test d'URL alternative
@@ -186,21 +129,20 @@
                 });
                 
                 if (response.ok) {
-                    div.innerHTML = `<span class="success">✅ URL accessible via fetch direct</span>`;
+                    div.innerHTML = '<span class="success">✅ URL accessible via fetch direct</span>';
                 } else {
-                    div.innerHTML = `<span class="error">❌ URL inaccessible (Status: ${response.status})</span>`;
+                    div.innerHTML = '<span class="error">❌ URL inaccessible (Status: ' + response.status + ')</span>';
                 }
             } catch (error) {
-                div.innerHTML = `<span class="error">❌ Erreur fetch: ${error.message}</span>`;
+                div.innerHTML = '<span class="error">❌ Erreur fetch: ' + error.message + '</span>';
             }
         }
 
         // Test automatique au chargement
         document.addEventListener('DOMContentLoaded', function() {
-            console.log("🚀 V2 - Diagnostic ASCENSORISTE PACA chargé");
+            console.log("🚀 V3 - Diagnostic ASCENSORISTE PACA chargé");
             setTimeout(testReseau, 1000);
         });
-
     </script>
 </body>
 </html>
