@@ -3,22 +3,31 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Structure Réelle Table Documents</title>
+    <title>Interface Dépannage - Structure Réelle</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <style>
-        body { font-family: Arial; margin: 20px; }
-        .structure { background: #f0f8ff; padding: 20px; border-radius: 8px; margin: 20px 0; }
-        .column { background: white; padding: 10px; margin: 5px 0; border-left: 4px solid #007cba; }
-    </style>
 </head>
 <body>
-    <h1>🔍 STRUCTURE RÉELLE DE VOTRE TABLE</h1>
-    <button onclick="afficherStructureReelle()">🔄 Actualiser la Structure</button>
+    <h1>🔧 Interface avec Structure Réelle</h1>
     
-    <div id="structure" class="structure">
-        <h3>Structure détectée :</h3>
-        <div id="colonnes"></div>
-    </div>
+    <form onsubmit="ajouterDocument(event)">
+        <h3>Ajouter un document :</h3>
+        
+        <label>Marque:</label><br>
+        <input type="text" id="marque" required><br><br>
+        
+        <label>Modèle:</label><br>
+        <input type="text" id="model" required><br><br>
+        
+        <label>Programmation:</label><br>
+        <input type="text" id="programmation"><br><br>
+        
+        <label>Schémas:</label><br>
+        <input type="text" id="schémas"><br><br>
+        
+        <button type="submit">💾 Enregistrer</button>
+    </form>
+
+    <div id="resultat"></div>
 
     <script>
         const supabaseUrl = 'https://prrzsosrbrskmeozmmmu.supabase.co';
@@ -26,98 +35,31 @@
         const { createClient } = supabase;
         const client = createClient(supabaseUrl, supabaseKey);
 
-        async function afficherStructureReelle() {
-            const colonnesDiv = document.getElementById('colonnes');
-            colonnesDiv.innerHTML = "⏳ Détection en cours...";
+        async function ajouterDocument(event) {
+            event.preventDefault();
+            const resultat = document.getElementById('resultat');
             
-            try {
-                // Test de connexion simple
-                const { data, error } = await client
-                    .from('documents')
-                    .select('*')
-                    .limit(1);
+            const documentData = {
+                marque: document.getElementById('marque').value,
+                model: document.getElementById('model').value,
+                programmation: document.getElementById('programmation').value,
+                schémas: document.getElementById('schémas').value
+            };
 
-                if (error) {
-                    colonnesDiv.innerHTML = `❌ Erreur: ${error.message}`;
-                    return;
-                }
-
-                // Structure FIXE basée sur votre capture
-                const structure = [
-                    { nom: 'id', type: 'int8', description: 'Clé primaire' },
-                    { nom: 'marque', type: 'text', description: 'Marque de l\'ascenseur' },
-                    { nom: 'model', type: 'text', description: 'Modèle de l\'ascenseur' },
-                    { nom: 'programmation', type: 'text', description: 'Documentation programmation' },
-                    { nom: 'schémas', type: 'text', description: 'Schémas techniques' }
-                ];
-
-                let html = '';
-                structure.forEach(colonne => {
-                    html += `
-                        <div class="column">
-                            <strong>${colonne.nom}</strong> 
-                            <span style="color: #666;">(${colonne.type})</span>
-                            <br><small>${colonne.description}</small>
-                        </div>
-                    `;
-                });
-
-                colonnesDiv.innerHTML = html;
-
-            } catch (err) {
-                colonnesDiv.innerHTML = `❌ Erreur: ${err.message}`;
-            }
-        }
-
-        // Afficher au chargement
-        afficherStructureReelle();
-    </script>
-
-    <div style="background: #fff3cd; padding: 15px; border-radius: 8px; margin: 20px 0;">
-        <h3>📋 VOTRE STRUCTURE RÉELLE (d'après votre capture) :</h3>
-        <ul>
-            <li><strong>id</strong> (int8) - Identifiant unique</li>
-            <li><strong>marque</strong> (text) - Marque de l'ascenseur</li>
-            <li><strong>model</strong> (text) - Modèle de l'ascenseur</li>
-            <li><strong>programmation</strong> (text) - Documentation programmation</li>
-            <li><strong>schémas</strong> (text) - Schémas techniques</li>
-        </ul>
-        <p><strong>Note :</strong> La table est actuellement vide (0 records)</p>
-    </div>
-
-    <!-- Test d'insertion simple -->
-    <div style="background: #e7f3ff; padding: 15px; border-radius: 8px;">
-        <h3>🧪 Test d'insertion</h3>
-        <button onclick="testerInsertion()">➕ Ajouter un document test</button>
-        <div id="testResult"></div>
-    </div>
-
-    <script>
-        async function testerInsertion() {
-            const resultDiv = document.getElementById('testResult');
-            resultDiv.innerHTML = "Insertion en cours...";
-            
             try {
                 const { data, error } = await client
                     .from('documents')
-                    .insert([
-                        {
-                            marque: 'Otis',
-                            model: 'Gen2',
-                            programmation: 'Documentation programmeur Otis',
-                            schémas: 'Schémas électriques Gen2'
-                        }
-                    ]);
+                    .insert([documentData]);
 
                 if (error) throw error;
 
-                resultDiv.innerHTML = "✅ Document test ajouté avec succès!";
+                resultat.innerHTML = "✅ Document ajouté avec succès!";
                 
-                // Recharger la structure
-                setTimeout(afficherStructureReelle, 1000);
+                // Vider le formulaire
+                document.querySelector('form').reset();
                 
             } catch (error) {
-                resultDiv.innerHTML = `❌ Erreur insertion: ${error.message}`;
+                resultat.innerHTML = `❌ Erreur: ${error.message}`;
             }
         }
     </script>
