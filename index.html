@@ -1,119 +1,33 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Structure Table Documents</title>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <title>Test Structure Ultra Simple</title>
 </head>
 <body>
-    <h1>🔍 STRUCTURE RÉELLE DE VOTRE TABLE</h1>
-    <button onclick="afficherStructure()">📊 Afficher les vraies colonnes</button>
-    <button onclick="afficherDonnees()">📋 Afficher les données</button>
-    
-    <div id="resultat" style="margin: 20px; padding: 15px; border: 1px solid #ccc; background: #f9f9f9;"></div>
+    <h1>Test Structure Table</h1>
+    <div id="result"></div>
 
     <script>
-        const supabaseUrl = 'https://prrzsosrbrskmeozmmmu.supabase.co';
-        const supabaseKey = 'sb_publishable_2nwtPyBWSeUNNtx06wROTw_Txpyk2W3';
-        const { createClient } = supabase;
-        const client = createClient(supabaseUrl, supabaseKey);
-
-        async function afficherStructure() {
-            const resultat = document.getElementById('resultat');
-            resultat.innerHTML = "🔍 Analyse de la structure en cours...";
-            
-            try {
-                // Requête SIMPLE pour voir les colonnes
-                const { data, error } = await client
-                    .from('documents')
-                    .select('*')
-                    .limit(1);
-
-                if (error) {
-                    resultat.innerHTML = `❌ Erreur: ${error.message}`;
-                    return;
-                }
-
-                if (data.length === 0) {
-                    resultat.innerHTML = "📭 La table est VIDE - Aucune donnée pour analyser la structure";
-                    return;
-                }
-
-                // Afficher la structure réelle
-                const premierDocument = data[0];
-                const colonnes = Object.keys(premierDocument);
-                
-                let html = `<h3>📊 STRUCTURE RÉELLE DE VOTRE TABLE "documents"</h3>`;
-                html += `<p><strong>${colonnes.length} colonnes détectées :</strong></p>`;
-                html += `<table border="1" style="border-collapse: collapse; width: 100%;">`;
-                html += `<tr><th>Nom Colonne</th><th>Valeur Exemple</th><th>Type</th></tr>`;
-                
-                colonnes.forEach(colonne => {
-                    const valeur = premierDocument[colonne];
-                    const type = Array.isArray(valeur) ? 'array' : typeof valeur;
-                    html += `<tr>
-                        <td><strong>${colonne}</strong></td>
-                        <td>${valeur !== null ? JSON.stringify(valeur) : 'NULL'}</td>
-                        <td>${type}</td>
-                    </tr>`;
-                });
-                
-                html += `</table>`;
-                resultat.innerHTML = html;
-
-            } catch (err) {
-                resultat.innerHTML = `❌ Erreur critique: ${err.message}`;
+        fetch('https://prrzsosrbrskmeozmmmu.supabase.co/rest/v1/documents?limit=1', {
+            headers: {
+                'apikey': 'sb_publishable_2nwtPyBWSeUNNtx06wROTw_Txpyk2W3',
+                'Content-Type': 'application/json'
             }
-        }
-
-        async function afficherDonnees() {
-            const resultat = document.getElementById('resultat');
-            resultat.innerHTML = "📋 Chargement des données...";
-            
-            try {
-                const { data, error } = await client
-                    .from('documents')
-                    .select('*')
-                    .limit(10);
-
-                if (error) {
-                    resultat.innerHTML = `❌ Erreur: ${error.message}`;
-                    return;
-                }
-
-                if (data.length === 0) {
-                    resultat.innerHTML = "📭 La table est VIDE";
-                    return;
-                }
-
-                let html = `<h3>📋 DONNÉES RÉELLES (${data.length} premiers documents)</h3>`;
-                
-                data.forEach((doc, index) => {
-                    html += `<div style="border: 1px solid #ccc; padding: 10px; margin: 10px 0; background: white;">`;
-                    html += `<h4>Document ${index + 1}</h4>`;
-                    html += `<table border="1" style="border-collapse: collapse; width: 100%;">`;
-                    html += `<tr><th>Colonne</th><th>Valeur</th></tr>`;
-                    
-                    Object.keys(doc).forEach(colonne => {
-                        html += `<tr>
-                            <td><strong>${colonne}</strong></td>
-                            <td>${doc[colonne] !== null ? doc[colonne] : 'NULL'}</td>
-                        </tr>`;
-                    });
-                    
-                    html += `</table></div>`;
-                });
-
-                resultat.innerHTML = html;
-
-            } catch (err) {
-                resultat.innerHTML = `❌ Erreur: ${err.message}`;
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
             }
-        }
-
-        // Afficher la structure au chargement
-        setTimeout(afficherStructure, 1000);
+            return response.json();
+        })
+        .then(data => {
+            document.getElementById('result').innerHTML = 
+                `<pre>${JSON.stringify(data, null, 2)}</pre>`;
+        })
+        .catch(error => {
+            document.getElementById('result').innerHTML = 
+                `❌ Erreur: ${error.message}`;
+        });
     </script>
 </body>
 </html>
