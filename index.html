@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Interface Technicien - Dépannage Ascenseurs</title>
+    <title>Interface Admin - Dépannage Ascenseurs</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         * {
@@ -13,7 +13,7 @@
         }
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #ff7e5f 0%, #feb47b 100%);
             min-height: 100vh;
             padding: 20px;
         }
@@ -26,7 +26,7 @@
             overflow: hidden;
         }
         header {
-            background: #2c3e50;
+            background: #c0392b;
             color: white;
             padding: 30px;
             text-align: center;
@@ -35,120 +35,120 @@
             font-size: 2.5em;
             margin-bottom: 10px;
         }
-        .search-section {
-            padding: 30px;
+        .nav-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            padding: 20px;
             background: #f8f9fa;
             border-bottom: 1px solid #e9ecef;
         }
-        .search-box {
-            display: flex;
-            gap: 15px;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-        }
-        .search-box input {
-            flex: 1;
-            min-width: 300px;
-            padding: 15px;
-            border: 2px solid #e9ecef;
-            border-radius: 8px;
-            font-size: 16px;
-            transition: border-color 0.3s;
-        }
-        .search-box input:focus {
-            outline: none;
-            border-color: #3498db;
-        }
-        .search-box button {
+        .nav-buttons a {
             background: #3498db;
             color: white;
-            border: none;
-            padding: 15px 30px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 16px;
-            font-weight: bold;
+            padding: 12px 25px;
+            border-radius: 6px;
+            text-decoration: none;
             transition: background 0.3s;
         }
-        .search-box button:hover {
+        .nav-buttons a:hover {
             background: #2980b9;
         }
-        .filters {
-            display: flex;
-            gap: 15px;
-            flex-wrap: wrap;
-        }
-        .filters select, .filters input {
-            padding: 12px;
-            border: 1px solid #ddd;
-            border-radius: 6px;
-            background: white;
-        }
-        .results {
+        .admin-section {
             padding: 30px;
-            min-height: 400px;
         }
-        .document-card {
-            background: white;
-            border: 1px solid #e9ecef;
-            border-radius: 10px;
+        .form-section {
+            background: #f8f9fa;
             padding: 25px;
-            margin-bottom: 20px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            transition: transform 0.2s;
+            border-radius: 10px;
+            margin-bottom: 30px;
         }
-        .document-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
-        }
-        .doc-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-        .doc-header h3 {
-            color: #2c3e50;
-            font-size: 1.4em;
-        }
-        .doc-date {
-            color: #7f8c8d;
-            font-size: 0.9em;
-        }
-        .doc-content {
+        .form-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
             gap: 15px;
-            margin-bottom: 15px;
+            margin-bottom: 20px;
         }
-        .doc-field {
-            padding: 10px;
-            background: #f8f9fa;
-            border-radius: 6px;
+        .form-group {
+            display: flex;
+            flex-direction: column;
         }
-        .doc-field strong {
+        .form-group label {
+            font-weight: bold;
+            margin-bottom: 8px;
             color: #2c3e50;
-            display: block;
+        }
+        .form-group input, .form-group textarea {
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 16px;
+        }
+        .form-group textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+        .form-actions {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+        .btn-primary {
+            background: #27ae60;
+            color: white;
+        }
+        .btn-primary:hover {
+            background: #219a52;
+        }
+        .btn-secondary {
+            background: #95a5a6;
+            color: white;
+        }
+        .btn-secondary:hover {
+            background: #7f8c8d;
+        }
+        .btn-danger {
+            background: #e74c3c;
+            color: white;
+        }
+        .btn-danger:hover {
+            background: #c0392b;
+        }
+        .documents-list {
+            margin-top: 30px;
+        }
+        .document-item {
+            background: white;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        .doc-info h4 {
+            color: #2c3e50;
             margin-bottom: 5px;
+        }
+        .doc-meta {
+            color: #7f8c8d;
+            font-size: 0.9em;
         }
         .doc-actions {
             display: flex;
             gap: 10px;
-            flex-wrap: wrap;
-        }
-        .doc-actions a {
-            background: #27ae60;
-            color: white;
-            padding: 8px 16px;
-            border-radius: 5px;
-            text-decoration: none;
-            font-size: 0.9em;
-            transition: background 0.3s;
-        }
-        .doc-actions a:hover {
-            background: #219a52;
         }
         .loading {
             text-align: center;
@@ -161,45 +161,30 @@
             padding: 60px 20px;
             color: #7f8c8d;
         }
-        .empty-state h3 {
-            margin-bottom: 10px;
-            color: #2c3e50;
-        }
-        .nav-buttons {
-            display: flex;
-            gap: 15px;
-            justify-content: center;
-            padding: 20px;
-            background: #f8f9fa;
-            border-top: 1px solid #e9ecef;
-        }
-        .nav-buttons a {
-            background: #95a5a6;
-            color: white;
-            padding: 12px 25px;
+        .success-message {
+            background: #d4edda;
+            color: #155724;
+            padding: 15px;
             border-radius: 6px;
-            text-decoration: none;
-            transition: background 0.3s;
+            margin-bottom: 20px;
+            border: 1px solid #c3e6cb;
         }
-        .nav-buttons a:hover {
-            background: #7f8c8d;
-        }
-        .nav-buttons a.admin {
-            background: #e74c3c;
-        }
-        .nav-buttons a.admin:hover {
-            background: #c0392b;
+        .error-message {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            border: 1px solid #f5c6cb;
         }
         @media (max-width: 768px) {
-            .search-box {
-                flex-direction: column;
-            }
-            .search-box input {
-                min-width: auto;
-            }
-            .doc-header {
+            .document-item {
                 flex-direction: column;
                 align-items: flex-start;
+            }
+            .doc-actions {
+                width: 100%;
+                justify-content: flex-start;
             }
         }
     </style>
@@ -207,38 +192,54 @@
 <body>
     <div class="container">
         <header>
-            <h1>🔧 Dépannage Ascenseurs</h1>
-            <p>Interface Technicien - Recherche de documentation</p>
+            <h1>👨‍💼 Interface Administrateur</h1>
+            <p>Gestion de la documentation technique</p>
         </header>
 
-        <div class="search-section">
-            <div class="search-box">
-                <input type="text" id="searchInput" 
-                       placeholder="🔍 Rechercher par marque, modèle, description, type de panne...">
-                <button onclick="searchDocuments()">Rechercher</button>
-            </div>
-            
-            <div class="filters">
-                <select id="marqueFilter">
-                    <option value="">Toutes les marques</option>
-                </select>
-                <input type="text" id="modelFilter" placeholder="Filtrer par modèle...">
-                <select id="sortFilter">
-                    <option value="newest">Plus récents</option>
-                    <option value="oldest">Plus anciens</option>
-                </select>
-            </div>
-        </div>
-
-        <div class="results" id="results">
-            <div class="loading" id="loading">
-                ⏳ Chargement des documents...
-            </div>
-        </div>
-
         <div class="nav-buttons">
-            <a href="admin.html">📊 Interface Admin</a>
-            <a href="#" onclick="addTestData()" style="background: #9b59b6;">➕ Données Test</a>
+            <a href="index.html">← Retour à l'interface Technicien</a>
+        </div>
+
+        <div class="admin-section">
+            <div class="form-section">
+                <h2>➕ Ajouter un nouveau document</h2>
+                <form id="documentForm">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="marque">Marque *</label>
+                            <input type="text" id="marque" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="model">Modèle *</label>
+                            <input type="text" id="model" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="filename">Nom du fichier</label>
+                            <input type="text" id="filename">
+                        </div>
+                        <div class="form-group">
+                            <label for="path">URL/Lien du document</label>
+                            <input type="url" id="path" placeholder="https://...">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="description">Description</label>
+                        <textarea id="description" placeholder="Description du document, type de panne couvert, procédures..."></textarea>
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary">💾 Enregistrer le document</button>
+                        <button type="button" class="btn btn-secondary" onclick="clearForm()">🗑️ Effacer le formulaire</button>
+                    </div>
+                </form>
+            </div>
+
+            <div id="message"></div>
+
+            <div class="documents-list">
+                <h2>📋 Documents existants</h2>
+                <div id="documentsLoading" class="loading">Chargement des documents...</div>
+                <div id="documentsList"></div>
+            </div>
         </div>
     </div>
 
@@ -249,23 +250,86 @@
         const { createClient } = supabase;
         const client = createClient(supabaseUrl, supabaseKey);
 
-        let allDocuments = [];
-        let marques = [];
+        let currentEditingId = null;
 
         // Chargement initial
-        document.addEventListener('DOMContentLoaded', async function() {
-            await loadDocuments();
-            await loadFilters();
+        document.addEventListener('DOMContentLoaded', function() {
+            loadDocuments();
+            setupForm();
         });
+
+        // Configuration du formulaire
+        function setupForm() {
+            const form = document.getElementById('documentForm');
+            form.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                await saveDocument();
+            });
+        }
+
+        // Sauvegarder un document
+        async function saveDocument() {
+            const messageDiv = document.getElementById('message');
+            const form = document.getElementById('documentForm');
+            
+            const documentData = {
+                marque: document.getElementById('marque').value,
+                model: document.getElementById('model').value,
+                filename: document.getElementById('filename').value,
+                path: document.getElementById('path').value,
+                description: document.getElementById('description').value,
+                created_at: new Date().toISOString()
+            };
+
+            try {
+                let result;
+                if (currentEditingId) {
+                    // Mise à jour
+                    result = await client
+                        .from('documents')
+                        .update(documentData)
+                        .eq('id', currentEditingId);
+                } else {
+                    // Insertion
+                    result = await client
+                        .from('documents')
+                        .insert([documentData]);
+                }
+
+                if (result.error) throw result.error;
+
+                messageDiv.innerHTML = `
+                    <div class="success-message">
+                        ✅ Document ${currentEditingId ? 'modifié' : 'ajouté'} avec succès !
+                    </div>
+                `;
+
+                // Recharger la liste et réinitialiser le formulaire
+                loadDocuments();
+                clearForm();
+                
+                // Masquer le message après 5 secondes
+                setTimeout(() => {
+                    messageDiv.innerHTML = '';
+                }, 5000);
+
+            } catch (error) {
+                messageDiv.innerHTML = `
+                    <div class="error-message">
+                        ❌ Erreur: ${error.message}
+                    </div>
+                `;
+            }
+        }
 
         // Charger tous les documents
         async function loadDocuments() {
-            const loading = document.getElementById('loading');
-            const results = document.getElementById('results');
+            const loading = document.getElementById('documentsLoading');
+            const list = document.getElementById('documentsList');
             
             try {
                 loading.style.display = 'block';
-                results.innerHTML = '';
+                list.innerHTML = '';
 
                 const { data, error } = await client
                     .from('documents')
@@ -274,14 +338,44 @@
 
                 if (error) throw error;
 
-                allDocuments = data || [];
-                displayDocuments(allDocuments);
+                if (data.length === 0) {
+                    list.innerHTML = `
+                        <div class="empty-state">
+                            <h3>📭 Aucun document</h3>
+                            <p>Commencez par ajouter votre premier document.</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                let html = '';
+                data.forEach(doc => {
+                    const date = new Date(doc.created_at).toLocaleDateString('fr-FR');
+                    html += `
+                        <div class="document-item">
+                            <div class="doc-info">
+                                <h4>${doc.marque} - ${doc.model}</h4>
+                                <div class="doc-meta">
+                                    ${doc.filename ? `Fichier: ${doc.filename} • ` : ''}
+                                    Créé le: ${date}
+                                </div>
+                                ${doc.description ? `<p>${doc.description}</p>` : ''}
+                                ${doc.path ? `<p><a href="${doc.path}" target="_blank">🔗 ${doc.path}</a></p>` : ''}
+                            </div>
+                            <div class="doc-actions">
+                                <button class="btn btn-secondary" onclick="editDocument('${doc.id}')">✏️ Modifier</button>
+                                <button class="btn btn-danger" onclick="deleteDocument('${doc.id}')">🗑️ Supprimer</button>
+                            </div>
+                        </div>
+                    `;
+                });
+
+                list.innerHTML = html;
 
             } catch (error) {
-                results.innerHTML = `
-                    <div class="empty-state">
-                        <h3>❌ Erreur de chargement</h3>
-                        <p>${error.message}</p>
+                list.innerHTML = `
+                    <div class="error-message">
+                        ❌ Erreur de chargement: ${error.message}
                     </div>
                 `;
             } finally {
@@ -289,173 +383,78 @@
             }
         }
 
-        // Charger les filtres
-        async function loadFilters() {
-            const marqueFilter = document.getElementById('marqueFilter');
-            
-            // Extraire les marques uniques
-            marques = [...new Set(allDocuments.map(doc => doc.marque).filter(Boolean))];
-            
-            marques.forEach(marque => {
-                const option = document.createElement('option');
-                option.value = marque;
-                option.textContent = marque;
-                marqueFilter.appendChild(option);
-            });
-        }
-
-        // Recherche de documents
-        async function searchDocuments() {
-            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
-            const marqueFilter = document.getElementById('marqueFilter').value;
-            const modelFilter = document.getElementById('modelFilter').value.toLowerCase();
-            const sortFilter = document.getElementById('sortFilter').value;
-
-            let filteredDocs = allDocuments;
-
-            // Filtre par recherche texte
-            if (searchTerm) {
-                filteredDocs = filteredDocs.filter(doc => 
-                    (doc.marque && doc.marque.toLowerCase().includes(searchTerm)) ||
-                    (doc.model && doc.model.toLowerCase().includes(searchTerm)) ||
-                    (doc.description && doc.description.toLowerCase().includes(searchTerm)) ||
-                    (doc.filename && doc.filename.toLowerCase().includes(searchTerm))
-                );
-            }
-
-            // Filtre par marque
-            if (marqueFilter) {
-                filteredDocs = filteredDocs.filter(doc => doc.marque === marqueFilter);
-            }
-
-            // Filtre par modèle
-            if (modelFilter) {
-                filteredDocs = filteredDocs.filter(doc => 
-                    doc.model && doc.model.toLowerCase().includes(modelFilter)
-                );
-            }
-
-            // Tri
-            if (sortFilter === 'newest') {
-                filteredDocs.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
-            } else {
-                filteredDocs.sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
-            }
-
-            displayDocuments(filteredDocs);
-        }
-
-        // Affichage des documents
-        function displayDocuments(documents) {
-            const results = document.getElementById('results');
-            
-            if (documents.length === 0) {
-                results.innerHTML = `
-                    <div class="empty-state">
-                        <h3>📭 Aucun document trouvé</h3>
-                        <p>Essayez de modifier vos critères de recherche ou ajoutez de nouveaux documents.</p>
-                    </div>
-                `;
-                return;
-            }
-
-            let html = `<h3 style="margin-bottom: 20px; color: #2c3e50;">📄 ${documents.length} document(s) trouvé(s)</h3>`;
-            
+        // Modifier un document
+        function editDocument(id) {
+            const documents = document.querySelectorAll('.document-item');
             documents.forEach(doc => {
-                const date = new Date(doc.created_at).toLocaleDateString('fr-FR');
-                
-                html += `
-                    <div class="document-card">
-                        <div class="doc-header">
-                            <h3>${doc.marque || 'Sans marque'} - ${doc.model || 'Sans modèle'}</h3>
-                            <span class="doc-date">📅 ${date}</span>
-                        </div>
-                        
-                        <div class="doc-content">
-                            ${doc.description ? `
-                                <div class="doc-field">
-                                    <strong>Description</strong>
-                                    <div>${doc.description}</div>
-                                </div>
-                            ` : ''}
-                            
-                            ${doc.filename ? `
-                                <div class="doc-field">
-                                    <strong>Fichier</strong>
-                                    <div>${doc.filename}</div>
-                                </div>
-                            ` : ''}
-                            
-                            ${doc.path ? `
-                                <div class="doc-field">
-                                    <strong>Emplacement</strong>
-                                    <div>${doc.path}</div>
-                                </div>
-                            ` : ''}
-                        </div>
-                        
-                        ${doc.path ? `
-                            <div class="doc-actions">
-                                <a href="${doc.path}" target="_blank">📎 Ouvrir le document</a>
-                                ${doc.path.includes('.pdf') ? `<a href="${doc.path}" download>Télécharger PDF</a>` : ''}
-                            </div>
-                        ` : ''}
-                    </div>
-                `;
+                const docId = doc.querySelector('.btn-danger').getAttribute('onclick').split("'")[1];
+                if (docId === id) {
+                    const docInfo = doc.querySelector('.doc-info');
+                    
+                    const marque = docInfo.querySelector('h4').textContent.split(' - ')[0];
+                    const model = docInfo.querySelector('h4').textContent.split(' - ')[1];
+                    const filename = docInfo.querySelector('.doc-meta').textContent.includes('Fichier:') 
+                        ? docInfo.querySelector('.doc-meta').textContent.split('Fichier: ')[1].split(' • ')[0]
+                        : '';
+                    const description = docInfo.querySelector('p') ? docInfo.querySelector('p').textContent : '';
+                    const path = docInfo.querySelector('a') ? docInfo.querySelector('a').getAttribute('href') : '';
+
+                    // Remplir le formulaire
+                    document.getElementById('marque').value = marque;
+                    document.getElementById('model').value = model;
+                    document.getElementById('filename').value = filename;
+                    document.getElementById('description').value = description;
+                    document.getElementById('path').value = path;
+
+                    currentEditingId = id;
+
+                    // Scroll vers le formulaire
+                    document.querySelector('.form-section').scrollIntoView({ behavior: 'smooth' });
+                    
+                    // Changer le texte du bouton
+                    document.querySelector('button[type="submit"]').textContent = '💾 Mettre à jour';
+                }
             });
-            
-            results.innerHTML = html;
         }
 
-        // Ajouter des données de test
-        async function addTestData() {
-            if (!confirm('Ajouter des données de test ?')) return;
-
-            const testData = [
-                {
-                    marque: 'Schindler',
-                    model: '3300',
-                    description: 'Ascenseur électrique moyenne capacité - Documentation technique complète',
-                    filename: 'schindler-3300-manual.pdf',
-                    path: 'https://example.com/schindler-3300.pdf'
-                },
-                {
-                    marque: 'Otis',
-                    model: 'Gen2',
-                    description: 'Ascenseur moderne avec système de commande numérique - Guide dépannage',
-                    filename: 'otis-gen2-guide.pdf',
-                    path: 'https://example.com/otis-gen2.pdf'
-                },
-                {
-                    marque: 'KONE',
-                    model: 'MonoSpace',
-                    description: 'Ascenseur hydraulique - Schémas électriques et procédures de maintenance',
-                    filename: 'kone-monospace-schemas.pdf',
-                    path: 'https://example.com/kone-monospace.pdf'
-                }
-            ];
+        // Supprimer un document
+        async function deleteDocument(id) {
+            if (!confirm('Êtes-vous sûr de vouloir supprimer ce document ?')) return;
 
             try {
-                const { data, error } = await client
+                const { error } = await client
                     .from('documents')
-                    .insert(testData);
+                    .delete()
+                    .eq('id', id);
 
                 if (error) throw error;
 
-                alert('✅ Données de test ajoutées avec succès !');
-                await loadDocuments();
-                await loadFilters();
+                // Recharger la liste
+                loadDocuments();
                 
+                // Afficher message de succès
+                const messageDiv = document.getElementById('message');
+                messageDiv.innerHTML = `
+                    <div class="success-message">
+                        ✅ Document supprimé avec succès !
+                    </div>
+                `;
+
+                setTimeout(() => {
+                    messageDiv.innerHTML = '';
+                }, 5000);
+
             } catch (error) {
-                alert('❌ Erreur: ' + error.message);
+                alert('❌ Erreur de suppression: ' + error.message);
             }
         }
 
-        // Recherche en temps réel
-        document.getElementById('searchInput').addEventListener('input', searchDocuments);
-        document.getElementById('marqueFilter').addEventListener('change', searchDocuments);
-        document.getElementById('modelFilter').addEventListener('input', searchDocuments);
-        document.getElementById('sortFilter').addEventListener('change', searchDocuments);
+        // Effacer le formulaire
+        function clearForm() {
+            document.getElementById('documentForm').reset();
+            currentEditingId = null;
+            document.querySelector('button[type="submit"]').textContent = '💾 Enregistrer le document';
+        }
     </script>
 </body>
 </html>
