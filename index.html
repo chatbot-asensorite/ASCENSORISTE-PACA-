@@ -13,20 +13,30 @@
         input, select, textarea { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box; }
         button { background: #007cba; color: white; padding: 12px 20px; border: none; border-radius: 5px; cursor: pointer; margin: 5px; }
         button:hover { background: #005a87; }
-        button:disabled { background: #ccc; cursor: not-allowed; }
         .file-drop { border: 2px dashed #007cba; padding: 40px; text-align: center; border-radius: 10px; margin: 20px 0; background: #f0f8ff; }
-        .progress { background: #f0f0f0; border-radius: 10px; margin: 10px 0; }
-        .progress-bar { background: #007cba; height: 20px; border-radius: 10px; width: 0%; transition: width 0.3s; }
-        .document-list { margin-top: 30px; }
-        .document-item { border: 1px solid #ddd; padding: 15px; margin: 10px 0; border-radius: 5px; }
-        .success { color: green; font-weight: bold; }
-        .error { color: red; font-weight: bold; }
+        .error { color: red; font-weight: bold; background: #ffe6e6; padding: 10px; border-radius: 5px; }
+        .success { color: green; font-weight: bold; background: #e6ffe6; padding: 10px; border-radius: 5px; }
+        .warning { color: orange; font-weight: bold; background: #fff3cd; padding: 10px; border-radius: 5px; }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>📤 Upload Documents Ascenseurs</h1>
         
+        <!-- Message de configuration -->
+        <div class="warning" id="configMessage">
+            <h3>⚠️ Configuration Requise</h3>
+            <p>Avant de pouvoir uploader, créez le bucket Storage dans Supabase :</p>
+            <ol>
+                <li>Allez dans <strong>Storage</strong></li>
+                <li>Cliquez sur <strong>"New Bucket"</strong></li>
+                <li>Nom: <strong>"documents"</strong></li>
+                <li>Public: <strong>ACTIVÉ</strong></li>
+                <li>Cliquez sur <strong>"Create bucket"</strong></li>
+            </ol>
+            <button onclick="verifierBucket()">🔄 Vérifier le bucket</button>
+        </div>
+
         <!-- Formulaire d'upload -->
         <div class="form-section">
             <h2>Ajouter un nouveau document</h2>
@@ -61,10 +71,6 @@
             <button onclick="uploadDocument()" id="uploadBtn" disabled>🚀 Uploader le document</button>
             <button onclick="chargerDocuments()">🔄 Actualiser la liste</button>
             
-            <div class="progress" id="progressBar" style="display: none;">
-                <div class="progress-bar" id="progressFill"></div>
-            </div>
-            
             <div id="uploadResult"></div>
         </div>
         
@@ -85,6 +91,42 @@
         const client = createClient(supabaseUrl, supabaseKey);
 
         let selectedFile = null;
+
+        // Vérifier si le bucket existe
+        async function verifierBucket() {
+            const messageDiv = document.getElementById('configMessage');
+            
+            try {
+                const { data, error } = await client.storage
+                    .from('documents')
+                    .list();
+                
+                if (error && error.message.includes('Bucket')) {
+                    messageDiv.innerHTML = `
+                        <div class="error">
+                            <h3>❌ Bucket non trouvé</h3>
+                            <p>Le bucket "documents" n'existe pas. Créez-le dans Supabase Storage.</p>
+                            <button onclick="verifierBucket()">🔄 Réessayer</button>
+                        </div>
+                    `;
+                } else {
+                    messageDiv.innerHTML = `
+                        <div class="success">
+                            <h3>✅ Bucket trouvé!</h3>
+                            <p>Le bucket "documents" est accessible. Vous pouvez maintenant uploader des fichiers.</p>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                messageDiv.innerHTML = `
+                    <div class="error">
+                        <h3>❌ Erreur de vérification</h3>
+                        <p>${error.message}</p>
+                        <button onclick="verifierBucket()">🔄 Réessayer</button>
+                    </div>
+                `;
+            }
+        }
 
         // Gestion de la sélection de fichier
         document.getElementById('fileInput').addEventListener('change', function(e) {
@@ -133,8 +175,6 @@
             const model = document.getElementById('model').value;
             const description = document.getElementById('description').value;
             const uploadBtn = document.getElementById('uploadBtn');
-            const progressBar = document.getElementById('progressBar');
-            const progressFill = document.getElementById('progressFill');
             const resultDiv = document.getElementById('uploadResult');
 
             if (!marque || !model || !selectedFile) {
@@ -144,14 +184,13 @@
 
             uploadBtn.disabled = true;
             uploadBtn.textContent = 'Upload en cours...';
-            progressBar.style.display = 'block';
             resultDiv.innerHTML = '';
 
             try {
                 // Créer un nom de fichier unique
                 const fileExt = selectedFile.name.split('.').pop();
                 const fileName = `${marque}_${model}_${Date.now()}.${fileExt}`;
-                const filePath = `documents/${fileName}`;
+                const filePath = `${fileName}`;
 
                 // Upload du fichier
                 const { data: uploadData, error: uploadError } = await client.storage
@@ -162,11 +201,11 @@
                     });
 
                 if (uploadError) {
+                    if (uploadError.message.includes('Bucket')) {
+                        throw new Error('Bucket "documents" non trouvé. Créez-le dans Supabase Storage.');
+                    }
                     throw new Error(`Erreur upload: ${uploadError.message}`);
                 }
-
-                // Mise à jour de la barre de progression
-                progressFill.style.width = '50%';
 
                 // Enregistrement dans la table documents
                 const { data: dbData, error: dbError } = await client
@@ -181,8 +220,6 @@
                             created_at: new Date().toISOString()
                         }
                     ]);
-
-                progressFill.style.width = '100%';
 
                 if (dbError) {
                     throw new Error(`Erreur base de données: ${dbError.message}`);
@@ -201,25 +238,19 @@
                 document.getElementById('uploadBtn').textContent = '🚀 Uploader le document';
 
                 // Recharger la liste
-                setTimeout(() => {
-                    progressBar.style.display = 'none';
-                    progressFill.style.width = '0%';
-                    chargerDocuments();
-                }, 2000);
+                chargerDocuments();
 
             } catch (error) {
-                resultDiv.innerHTML = `<div class="error">❌ Erreur: ${error.message}</div>`;
+                resultDiv.innerHTML = `<div class="error">❌ ${error.message}</div>`;
                 uploadBtn.disabled = false;
                 uploadBtn.textContent = '🚀 Uploader le document';
-                progressBar.style.display = 'none';
             }
         }
 
         // Charger la liste des documents
         async function chargerDocuments() {
             const listDiv = document.getElementById('documentsList');
-            listDiv.innerHTML = 'Chargement...';
-
+            
             try {
                 const { data, error } = await client
                     .from('documents')
@@ -236,12 +267,11 @@
                 let html = '';
                 data.forEach(doc => {
                     html += `
-                        <div class="document-item">
+                        <div style="border: 1px solid #ddd; padding: 15px; margin: 10px 0; border-radius: 5px;">
                             <h4>${doc.marque} - ${doc.model}</h4>
                             <p><strong>Fichier:</strong> ${doc.filename}</p>
                             ${doc.description ? `<p><strong>Description:</strong> ${doc.description}</p>` : ''}
                             <p><strong>Date:</strong> ${new Date(doc.created_at).toLocaleDateString('fr-FR')}</p>
-                            ${doc.path ? `<button onclick="telechargerDocument('${doc.path}', '${doc.filename}')">📥 Télécharger</button>` : ''}
                         </div>
                     `;
                 });
@@ -252,30 +282,8 @@
             }
         }
 
-        // Télécharger un document
-        async function telechargerDocument(filePath, fileName) {
-            try {
-                const { data, error } = await client.storage
-                    .from('documents')
-                    .download(filePath);
-
-                if (error) throw error;
-
-                // Créer un lien de téléchargement
-                const url = URL.createObjectURL(data);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = fileName;
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                URL.revokeObjectURL(url);
-            } catch (error) {
-                alert(`❌ Erreur téléchargement: ${error.message}`);
-            }
-        }
-
-        // Charger les documents au démarrage
+        // Vérifier le bucket au chargement
+        verifierBucket();
         chargerDocuments();
     </script>
 </body>
