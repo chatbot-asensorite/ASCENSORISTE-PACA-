@@ -3,243 +3,81 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Interface Admin - Dépannage Ascenseurs</title>
+    <title>Gestion Documents Ascenseurs</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #ff7e5f 0%, #feb47b 100%);
-            min-height: 100vh;
-            padding: 20px;
-        }
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            background: white;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-            overflow: hidden;
-        }
-        header {
-            background: #c0392b;
-            color: white;
-            padding: 30px;
-            text-align: center;
-        }
-        header h1 {
-            font-size: 2.5em;
-            margin-bottom: 10px;
-        }
-        .nav-buttons {
-            display: flex;
-            gap: 15px;
-            justify-content: center;
-            padding: 20px;
-            background: #f8f9fa;
-            border-bottom: 1px solid #e9ecef;
-        }
-        .nav-buttons a {
-            background: #3498db;
-            color: white;
-            padding: 12px 25px;
-            border-radius: 6px;
-            text-decoration: none;
-            transition: background 0.3s;
-        }
-        .nav-buttons a:hover {
-            background: #2980b9;
-        }
-        .admin-section {
-            padding: 30px;
-        }
-        .form-section {
-            background: #f8f9fa;
-            padding: 25px;
-            border-radius: 10px;
-            margin-bottom: 30px;
-        }
-        .form-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 15px;
-            margin-bottom: 20px;
-        }
-        .form-group {
-            display: flex;
-            flex-direction: column;
-        }
-        .form-group label {
-            font-weight: bold;
-            margin-bottom: 8px;
-            color: #2c3e50;
-        }
-        .form-group input, .form-group textarea {
-            padding: 12px;
-            border: 1px solid #ddd;
-            border-radius: 6px;
-            font-size: 16px;
-        }
-        .form-group textarea {
-            min-height: 80px;
-            resize: vertical;
-        }
-        .form-actions {
-            display: flex;
-            gap: 15px;
-            flex-wrap: wrap;
-        }
-        .btn {
-            padding: 12px 25px;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 16px;
-            font-weight: bold;
-            transition: all 0.3s;
-        }
-        .btn-primary {
-            background: #27ae60;
-            color: white;
-        }
-        .btn-primary:hover {
-            background: #219a52;
-        }
-        .btn-secondary {
-            background: #95a5a6;
-            color: white;
-        }
-        .btn-secondary:hover {
-            background: #7f8c8d;
-        }
-        .btn-danger {
-            background: #e74c3c;
-            color: white;
-        }
-        .btn-danger:hover {
-            background: #c0392b;
-        }
-        .documents-list {
-            margin-top: 30px;
-        }
-        .document-item {
-            background: white;
-            border: 1px solid #e9ecef;
-            border-radius: 8px;
-            padding: 20px;
-            margin-bottom: 15px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 15px;
-        }
-        .doc-info h4 {
-            color: #2c3e50;
-            margin-bottom: 5px;
-        }
-        .doc-meta {
-            color: #7f8c8d;
-            font-size: 0.9em;
-        }
-        .doc-actions {
-            display: flex;
-            gap: 10px;
-        }
-        .loading {
-            text-align: center;
-            padding: 40px;
-            color: #7f8c8d;
-            font-size: 1.2em;
-        }
-        .empty-state {
-            text-align: center;
-            padding: 60px 20px;
-            color: #7f8c8d;
-        }
-        .success-message {
-            background: #d4edda;
-            color: #155724;
-            padding: 15px;
-            border-radius: 6px;
-            margin-bottom: 20px;
-            border: 1px solid #c3e6cb;
-        }
-        .error-message {
-            background: #f8d7da;
-            color: #721c24;
-            padding: 15px;
-            border-radius: 6px;
-            margin-bottom: 20px;
-            border: 1px solid #f5c6cb;
-        }
-        @media (max-width: 768px) {
-            .document-item {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-            .doc-actions {
-                width: 100%;
-                justify-content: flex-start;
-            }
-        }
+        body { font-family: Arial, sans-serif; margin: 20px; background: #f5f5f5; }
+        .container { max-width: 1200px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; }
+        .header { background: #007cba; color: white; padding: 15px; border-radius: 8px; margin-bottom: 20px; }
+        .btn { padding: 10px 15px; margin: 5px; background: #007cba; color: white; border: none; border-radius: 4px; cursor: pointer; }
+        .btn-success { background: #28a745; }
+        .btn-danger { background: #dc3545; }
+        table { width: 100%; border-collapse: collapse; margin: 15px 0; }
+        th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
+        th { background: #f8f9fa; }
+        .form-group { margin: 10px 0; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; }
+        input, textarea { width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; }
+        .tabs { display: flex; margin-bottom: 20px; }
+        .tab { padding: 10px 20px; cursor: pointer; border: 1px solid #ddd; }
+        .tab.active { background: #007cba; color: white; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
     </style>
 </head>
 <body>
     <div class="container">
-        <header>
-            <h1>👨‍💼 Interface Administrateur</h1>
-            <p>Gestion de la documentation technique</p>
-        </header>
-
-        <div class="nav-buttons">
-            <a href="index.html">← Retour à l'interface Technicien</a>
+        <div class="header">
+            <h1>🔧 Gestion des Documents Ascenseurs</h1>
+            <p>Table: documents | Connexion: ✅ Active</p>
         </div>
 
-        <div class="admin-section">
-            <div class="form-section">
-                <h2>➕ Ajouter un nouveau document</h2>
-                <form id="documentForm">
-                    <div class="form-grid">
-                        <div class="form-group">
-                            <label for="marque">Marque *</label>
-                            <input type="text" id="marque" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="model">Modèle *</label>
-                            <input type="text" id="model" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="filename">Nom du fichier</label>
-                            <input type="text" id="filename">
-                        </div>
-                        <div class="form-group">
-                            <label for="path">URL/Lien du document</label>
-                            <input type="url" id="path" placeholder="https://...">
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label for="description">Description</label>
-                        <textarea id="description" placeholder="Description du document, type de panne couvert, procédures..."></textarea>
-                    </div>
-                    <div class="form-actions">
-                        <button type="submit" class="btn btn-primary">💾 Enregistrer le document</button>
-                        <button type="button" class="btn btn-secondary" onclick="clearForm()">🗑️ Effacer le formulaire</button>
-                    </div>
-                </form>
-            </div>
+        <div class="tabs">
+            <div class="tab active" onclick="showTab('view')">👀 Voir les Documents</div>
+            <div class="tab" onclick="showTab('add')">➕ Ajouter un Document</div>
+            <div class="tab" onclick="showTab('structure')">📊 Structure de la Table</div>
+        </div>
 
-            <div id="message"></div>
+        <!-- TAB 1: Voir les documents -->
+        <div id="view" class="tab-content active">
+            <h2>Liste des Documents</h2>
+            <button class="btn" onclick="chargerDocuments()">🔄 Actualiser</button>
+            <div id="documentsList"></div>
+        </div>
 
-            <div class="documents-list">
-                <h2>📋 Documents existants</h2>
-                <div id="documentsLoading" class="loading">Chargement des documents...</div>
-                <div id="documentsList"></div>
-            </div>
+        <!-- TAB 2: Ajouter un document -->
+        <div id="add" class="tab-content">
+            <h2>Ajouter un Nouveau Document</h2>
+            <form id="addForm">
+                <div class="form-group">
+                    <label for="marque">Marque *</label>
+                    <input type="text" id="marque" required>
+                </div>
+                <div class="form-group">
+                    <label for="model">Modèle *</label>
+                    <input type="text" id="model" required>
+                </div>
+                <div class="form-group">
+                    <label for="description">Description</label>
+                    <textarea id="description" rows="3"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="filename">Nom du fichier</label>
+                    <input type="text" id="filename">
+                </div>
+                <div class="form-group">
+                    <label for="path">Chemin/URL du document</label>
+                    <input type="text" id="path" placeholder="https://...">
+                </div>
+                <button type="submit" class="btn btn-success">💾 Enregistrer</button>
+            </form>
+            <div id="formMessage"></div>
+        </div>
+
+        <!-- TAB 3: Structure de la table -->
+        <div id="structure" class="tab-content">
+            <h2>Structure de la Table</h2>
+            <div id="tableStructure"></div>
         </div>
     </div>
 
@@ -247,214 +85,182 @@
         // Configuration Supabase
         const supabaseUrl = 'https://prrzsosrbrskmeozmmmu.supabase.co';
         const supabaseKey = 'sb_publishable_2nwtPyBWSeUNNtx06wROTw_Txpyk2W3';
-        const { createClient } = supabase;
-        const client = createClient(supabaseUrl, supabaseKey);
+        const supabase = supabase.createClient(supabaseUrl, supabaseKey);
 
-        let currentEditingId = null;
-
-        // Chargement initial
-        document.addEventListener('DOMContentLoaded', function() {
-            loadDocuments();
-            setupForm();
-        });
-
-        // Configuration du formulaire
-        function setupForm() {
-            const form = document.getElementById('documentForm');
-            form.addEventListener('submit', async function(e) {
-                e.preventDefault();
-                await saveDocument();
-            });
-        }
-
-        // Sauvegarder un document
-        async function saveDocument() {
-            const messageDiv = document.getElementById('message');
-            const form = document.getElementById('documentForm');
+        // Navigation par onglets
+        function showTab(tabName) {
+            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
             
-            const documentData = {
-                marque: document.getElementById('marque').value,
-                model: document.getElementById('model').value,
-                filename: document.getElementById('filename').value,
-                path: document.getElementById('path').value,
-                description: document.getElementById('description').value,
-                created_at: new Date().toISOString()
-            };
-
-            try {
-                let result;
-                if (currentEditingId) {
-                    // Mise à jour
-                    result = await client
-                        .from('documents')
-                        .update(documentData)
-                        .eq('id', currentEditingId);
-                } else {
-                    // Insertion
-                    result = await client
-                        .from('documents')
-                        .insert([documentData]);
-                }
-
-                if (result.error) throw result.error;
-
-                messageDiv.innerHTML = `
-                    <div class="success-message">
-                        ✅ Document ${currentEditingId ? 'modifié' : 'ajouté'} avec succès !
-                    </div>
-                `;
-
-                // Recharger la liste et réinitialiser le formulaire
-                loadDocuments();
-                clearForm();
-                
-                // Masquer le message après 5 secondes
-                setTimeout(() => {
-                    messageDiv.innerHTML = '';
-                }, 5000);
-
-            } catch (error) {
-                messageDiv.innerHTML = `
-                    <div class="error-message">
-                        ❌ Erreur: ${error.message}
-                    </div>
-                `;
-            }
+            document.querySelector(`.tab[onclick="showTab('${tabName}')"]`).classList.add('active');
+            document.getElementById(tabName).classList.add('active');
         }
 
         // Charger tous les documents
-        async function loadDocuments() {
-            const loading = document.getElementById('documentsLoading');
+        async function chargerDocuments() {
             const list = document.getElementById('documentsList');
+            list.innerHTML = "Chargement...";
             
             try {
-                loading.style.display = 'block';
-                list.innerHTML = '';
-
-                const { data, error } = await client
+                const { data, error } = await supabase
                     .from('documents')
                     .select('*')
                     .order('created_at', { ascending: false });
-
+                
                 if (error) throw error;
-
+                
                 if (data.length === 0) {
-                    list.innerHTML = `
-                        <div class="empty-state">
-                            <h3>📭 Aucun document</h3>
-                            <p>Commencez par ajouter votre premier document.</p>
-                        </div>
-                    `;
+                    list.innerHTML = "<p>Aucun document trouvé. Ajoutez-en un !</p>";
                     return;
                 }
-
-                let html = '';
+                
+                let html = `
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Marque</th>
+                                <th>Modèle</th>
+                                <th>Description</th>
+                                <th>Fichier</th>
+                                <th>Date</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                `;
+                
                 data.forEach(doc => {
-                    const date = new Date(doc.created_at).toLocaleDateString('fr-FR');
                     html += `
-                        <div class="document-item">
-                            <div class="doc-info">
-                                <h4>${doc.marque} - ${doc.model}</h4>
-                                <div class="doc-meta">
-                                    ${doc.filename ? `Fichier: ${doc.filename} • ` : ''}
-                                    Créé le: ${date}
-                                </div>
-                                ${doc.description ? `<p>${doc.description}</p>` : ''}
-                                ${doc.path ? `<p><a href="${doc.path}" target="_blank">🔗 ${doc.path}</a></p>` : ''}
-                            </div>
-                            <div class="doc-actions">
-                                <button class="btn btn-secondary" onclick="editDocument('${doc.id}')">✏️ Modifier</button>
-                                <button class="btn btn-danger" onclick="deleteDocument('${doc.id}')">🗑️ Supprimer</button>
-                            </div>
-                        </div>
+                        <tr>
+                            <td>${doc.marque || '-'}</td>
+                            <td>${doc.model || '-'}</td>
+                            <td>${doc.description || '-'}</td>
+                            <td>${doc.filename || '-'}</td>
+                            <td>${new Date(doc.created_at).toLocaleDateString('fr-FR')}</td>
+                            <td>
+                                <button class="btn" onclick="voirDetails('${doc.id}')">👁️</button>
+                                <button class="btn btn-danger" onclick="supprimerDocument('${doc.id}')">🗑️</button>
+                            </td>
+                        </tr>
                     `;
                 });
-
+                
+                html += `</tbody></table>`;
                 list.innerHTML = html;
-
+                
             } catch (error) {
-                list.innerHTML = `
-                    <div class="error-message">
-                        ❌ Erreur de chargement: ${error.message}
-                    </div>
-                `;
-            } finally {
-                loading.style.display = 'none';
+                list.innerHTML = `<p style="color: red;">Erreur: ${error.message}</p>`;
             }
         }
 
-        // Modifier un document
-        function editDocument(id) {
-            const documents = document.querySelectorAll('.document-item');
-            documents.forEach(doc => {
-                const docId = doc.querySelector('.btn-danger').getAttribute('onclick').split("'")[1];
-                if (docId === id) {
-                    const docInfo = doc.querySelector('.doc-info');
+        // Ajouter un document
+        document.getElementById('addForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const message = document.getElementById('formMessage');
+            
+            const nouveauDoc = {
+                marque: document.getElementById('marque').value,
+                model: document.getElementById('model').value,
+                description: document.getElementById('description').value,
+                filename: document.getElementById('filename').value,
+                path: document.getElementById('path').value,
+                created_at: new Date().toISOString()
+            };
+            
+            try {
+                const { data, error } = await supabase
+                    .from('documents')
+                    .insert([nouveauDoc]);
+                
+                if (error) throw error;
+                
+                message.innerHTML = '<p style="color: green;">✅ Document ajouté avec succès!</p>';
+                document.getElementById('addForm').reset();
+                chargerDocuments(); // Recharger la liste
+                
+            } catch (error) {
+                message.innerHTML = `<p style="color: red;">❌ Erreur: ${error.message}</p>`;
+            }
+        });
+
+        // Voir la structure de la table
+        async function afficherStructure() {
+            const structureDiv = document.getElementById('tableStructure');
+            structureDiv.innerHTML = "Chargement de la structure...";
+            
+            try {
+                const { data, error } = await supabase
+                    .from('documents')
+                    .select('*')
+                    .limit(1);
+                
+                if (error) throw error;
+                
+                if (data.length > 0) {
+                    const colonnes = Object.keys(data[0]);
+                    let html = '<h3>Colonnes de la table:</h3><ul>';
                     
-                    const marque = docInfo.querySelector('h4').textContent.split(' - ')[0];
-                    const model = docInfo.querySelector('h4').textContent.split(' - ')[1];
-                    const filename = docInfo.querySelector('.doc-meta').textContent.includes('Fichier:') 
-                        ? docInfo.querySelector('.doc-meta').textContent.split('Fichier: ')[1].split(' • ')[0]
-                        : '';
-                    const description = docInfo.querySelector('p') ? docInfo.querySelector('p').textContent : '';
-                    const path = docInfo.querySelector('a') ? docInfo.querySelector('a').getAttribute('href') : '';
-
-                    // Remplir le formulaire
-                    document.getElementById('marque').value = marque;
-                    document.getElementById('model').value = model;
-                    document.getElementById('filename').value = filename;
-                    document.getElementById('description').value = description;
-                    document.getElementById('path').value = path;
-
-                    currentEditingId = id;
-
-                    // Scroll vers le formulaire
-                    document.querySelector('.form-section').scrollIntoView({ behavior: 'smooth' });
+                    colonnes.forEach(col => {
+                        html += `<li><strong>${col}</strong>: ${typeof data[0][col]}</li>`;
+                    });
                     
-                    // Changer le texte du bouton
-                    document.querySelector('button[type="submit"]').textContent = '💾 Mettre à jour';
+                    html += '</ul><h3>Exemple de données:</h3><pre>' + JSON.stringify(data[0], null, 2) + '</pre>';
+                    structureDiv.innerHTML = html;
+                } else {
+                    structureDiv.innerHTML = "<p>La table est vide. Aucune structure à afficher.</p>";
                 }
-            });
+                
+            } catch (error) {
+                structureDiv.innerHTML = `<p style="color: red;">Erreur: ${error.message}</p>`;
+            }
         }
 
         // Supprimer un document
-        async function deleteDocument(id) {
+        async function supprimerDocument(id) {
             if (!confirm('Êtes-vous sûr de vouloir supprimer ce document ?')) return;
-
+            
             try {
-                const { error } = await client
+                const { error } = await supabase
                     .from('documents')
                     .delete()
                     .eq('id', id);
-
-                if (error) throw error;
-
-                // Recharger la liste
-                loadDocuments();
                 
-                // Afficher message de succès
-                const messageDiv = document.getElementById('message');
-                messageDiv.innerHTML = `
-                    <div class="success-message">
-                        ✅ Document supprimé avec succès !
-                    </div>
-                `;
-
-                setTimeout(() => {
-                    messageDiv.innerHTML = '';
-                }, 5000);
-
+                if (error) throw error;
+                
+                alert('✅ Document supprimé!');
+                chargerDocuments(); // Recharger la liste
+                
             } catch (error) {
-                alert('❌ Erreur de suppression: ' + error.message);
+                alert('❌ Erreur: ' + error.message);
             }
         }
 
-        // Effacer le formulaire
-        function clearForm() {
-            document.getElementById('documentForm').reset();
-            currentEditingId = null;
-            document.querySelector('button[type="submit"]').textContent = '💾 Enregistrer le document';
+        // Voir les détails d'un document
+        async function voirDetails(id) {
+            try {
+                const { data, error } = await supabase
+                    .from('documents')
+                    .select('*')
+                    .eq('id', id)
+                    .single();
+                
+                if (error) throw error;
+                
+                alert('Détails du document:\n\n' + JSON.stringify(data, null, 2));
+            } catch (error) {
+                alert('Erreur: ' + error.message);
+            }
         }
+
+        // Initialisation au chargement
+        document.addEventListener('DOMContentLoaded', function() {
+            chargerDocuments();
+            afficherStructure();
+            
+            // Afficher la structure quand on clique sur l'onglet
+            document.querySelector('.tab[onclick="showTab(\'structure\')"]')
+                .addEventListener('click', afficherStructure);
+        });
     </script>
 </body>
 </html>
