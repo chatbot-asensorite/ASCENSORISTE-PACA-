@@ -2,40 +2,52 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Test Connexion Supabase</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TEST URL CORRECTE</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
-    <h1>🔍 Test Connexion Supabase</h1>
-    <div id="resultat">En cours...</div>
-    
+    <h1>🧪 TEST AVEC LA BONNE URL</h1>
+    <div id="resultat"></div>
+
     <script>
-        const SUPABASE_URL = 'https://prrzsosrbrskmeozmmu.supabase.co';
-        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBycnpzb3NicnNrbWVvem1tbXUiLCJyb2xlIjoiYW5vbiIsImlhdCI6MTczNzIxMTI2MSwiZXhwIjoyMDUyNzg3MjYxfQ.JuqL6tJC5LRXX3OHXrznm_v9bca-aOJ_vnk_wPsP9Mc';
-        
-        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-        
-        async function tester() {
-            const div = document.getElementById('resultat');
+        async function testerConnexion() {
+            const resultat = document.getElementById('resultat');
+            resultat.innerHTML = "Test de connexion...";
+            
+            // ✅ BONNE URL avec "sos" au lieu de "scor"
+            const supabaseUrl = 'https://prrzsosrbrskmeozmmmu.supabase.co';
+            const supabaseKey = 'sb_publishable_2nwtPyBWSeUNNtx06wROTw_Txpyk2W3';
             
             try {
-                // Test simple : lire la table equipements
-                const { data, error } = await supabase
-                    .from('equipements')
-                    .select('*')
-                    .limit(1);
+                const { createClient } = supabase;
+                const client = createClient(supabaseUrl, supabaseKey);
+                
+                // Test avec la structure exacte de votre table
+                const { data, error } = await client
+                    .from('documents')
+                    .select('marque, model, description, filename, path')
+                    .limit(2);
                 
                 if (error) {
-                    div.innerHTML = `❌ ERREUR: ${error.message}`;
+                    resultat.innerHTML = "❌ Erreur: " + error.message;
+                    
+                    // Si erreur RLS, on peut quand même tester la connexion
+                    if (error.message.includes('row level security')) {
+                        resultat.innerHTML += "<br>⚠️ RLS activé - mais connexion OK!";
+                    }
                 } else {
-                    div.innerHTML = `✅ CONNEXION RÉUSSIE !<br>Données: ${JSON.stringify(data)}`;
+                    resultat.innerHTML = "✅ SUCCÈS! Connexion établie<br>" + 
+                                        "Documents trouvés: " + data.length +
+                                        "<pre>" + JSON.stringify(data, null, 2) + "</pre>";
                 }
-            } catch (e) {
-                div.innerHTML = `❌ ERREUR: ${e.message}`;
+            } catch (err) {
+                resultat.innerHTML = "❌ Erreur: " + err.message;
             }
         }
         
-        tester();
+        // Test automatique
+        testerConnexion();
     </script>
 </body>
 </html>
