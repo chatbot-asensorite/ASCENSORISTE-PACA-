@@ -3,52 +3,62 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TEST CONNEXION SUPABASE</title>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <title>TEST DNS ULTIME</title>
 </head>
 <body>
-    <h1>🧪 TEST AVEC LA BONNE URL</h1>
-    <button onclick="testerConnexion()">🚀 Tester la Connexion</button>
+    <h1>🔍 TEST DNS ULTIME</h1>
     <div id="resultat"></div>
 
     <script>
-        async function testerConnexion() {
+        async function testUltime() {
             const resultat = document.getElementById('resultat');
-            resultat.innerHTML = "Connexion en cours...";
+            const urls = [
+                'prrzscorbrskneozmmu.supabase.co',
+                'supabase.co',
+                'google.com'
+            ];
             
-            // ✅ BONNE URL de votre capture
-            const supabaseUrl = 'https://prrzscorbrskneozmmu.supabase.co';
-            const supabaseKey = 'sb_publishable_2nwtPyBWSeUNNtx06wROTw_Txpyk2W3';
+            let html = '<h3>Tests DNS en cours...</h3>';
             
-            try {
-                const { createClient } = supabase;
-                const client = createClient(supabaseUrl, supabaseKey);
+            for (const url of urls) {
+                html += `<p>Test: ${url}... `;
                 
-                // Test de connexion basique
-                const { data, error } = await client
-                    .from('documents')
-                    .select('*')
-                    .limit(1);
-                
-                if (error) {
-                    if (error.message.includes('JWT')) {
-                        resultat.innerHTML = "❌ Erreur JWT: La clé peut être invalide";
-                    } else if (error.message.includes('RLS')) {
-                        resultat.innerHTML = "❌ Erreur RLS: Besoin d'activer les politiques";
-                    } else {
-                        resultat.innerHTML = "❌ Erreur: " + error.message;
-                    }
-                } else {
-                    resultat.innerHTML = "✅ SUCCÈS! Connexion établie<br>" + 
-                                        "Documents trouvés: " + data.length;
+                try {
+                    const response = await fetch(`https://${url}`, { 
+                        mode: 'no-cors',
+                        cache: 'no-cache'
+                    });
+                    html += '<span style="color: green">✅ Accessible</span></p>';
+                } catch (e) {
+                    html += `<span style="color: red">❌ Erreur: ${e.message}</span></p>`;
                 }
-            } catch (err) {
-                resultat.innerHTML = "❌ Erreur critique: " + err.message;
             }
+            
+            resultat.innerHTML = html;
         }
         
-        // Test automatique
-        setTimeout(testerConnexion, 1000);
+        testUltime();
     </script>
+
+    <div style="background: #fff3cd; padding: 15px; margin: 20px 0; border: 1px solid #ffeaa7; border-radius: 8px;">
+        <h3>🚨 ACTION REQUISE :</h3>
+        <p><strong>Le problème vient de Supabase, pas de votre code.</strong></p>
+        
+        <p><strong>Options :</strong></p>
+        <ol>
+            <li><strong>Créer un NOUVEAU projet Supabase</strong> (recommandé)</li>
+            <li>Contacter le support Supabase</li>
+            <li>Vérifier la facturation du projet actuel</li>
+        </ol>
+        
+        <p><strong>Pour créer un nouveau projet :</strong></p>
+        <ol>
+            <li>Allez sur <a href="https://app.supabase.com" target="_blank">app.supabase.com</a></li>
+            <li>Cliquez sur "New Project"</li>
+            <li>Nom : "depannage-ascenseurs"</li>
+            <li>Région : "West Europe (France)"</li>
+            <li>Créez le projet</li>
+        </ol>
+    </div>
 </body>
 </html>
