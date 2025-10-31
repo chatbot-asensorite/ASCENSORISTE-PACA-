@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TEST URGENT - NOUVELLE URL</title>
+    <title>TEST CORRIGÉ - URL SUPABASE</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
-    <h1>🔧 TEST NOUVELLE URL SUPABASE</h1>
+    <h1>🔧 TEST CORRIGÉ - NOUVELLE URL SUPABASE</h1>
     <button onclick="testerNouvelleURL()">🚀 Tester prrscostbrskneozmmu.supabase.co</button>
     <div id="resultat"></div>
 
@@ -21,17 +21,19 @@
             const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBycnpzb3NicnJza21lY3ptbW11Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjEzMTkwMDMsImV4cCI6MjA3Njg5NTAwM30.JuqL6tJC5LRXX30HXrznm_y9bca-aOJ_vnk_wPsP9Mc';
             
             try {
-                const supabase = supabase.createClient(supabaseUrl, supabaseKey);
+                // ✅ INITIALISATION CORRECTE
+                const { createClient } = supabase;
+                const client = createClient(supabaseUrl, supabaseKey);
                 
-                const { data, error } = await supabase
+                const { data, error } = await client
                     .from('documents')
                     .select('*')
                     .limit(1);
                 
                 if (error) {
-                    resultat.innerHTML = "❌ Erreur: " + error.message;
+                    resultat.innerHTML = "❌ Erreur Supabase: " + error.message;
                 } else {
-                    resultat.innerHTML = "✅ SUCCÈS! Connexion établie avec la NOUVELLE URL";
+                    resultat.innerHTML = "✅ SUCCÈS! Connexion établie avec " + data.length + " document(s) trouvé(s)";
                 }
             } catch (err) {
                 resultat.innerHTML = "❌ Erreur critique: " + err.message;
