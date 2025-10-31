@@ -3,59 +3,49 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Upload Documents Ascenseurs</title>
+    <title>Interface Dépannage Ascenseurs - Auto-détection</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         body { font-family: Arial; margin: 20px; background: #f5f5f5; }
-        .container { max-width: 800px; margin: 0 auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .container { max-width: 1200px; margin: 0 auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .section { margin: 30px 0; padding: 20px; border: 1px solid #ddd; border-radius: 8px; }
         .form-group { margin: 15px 0; }
         label { display: block; margin-bottom: 5px; font-weight: bold; }
         input, select, textarea { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box; }
-        button { background: #007cba; color: white; padding: 12px 20px; border: none; border-radius: 5px; cursor: pointer; margin: 5px; }
+        button { background: #007cba; color: white; padding: 10px 15px; border: none; border-radius: 5px; cursor: pointer; margin: 5px; }
         button:hover { background: #005a87; }
-        .file-drop { border: 2px dashed #007cba; padding: 40px; text-align: center; border-radius: 10px; margin: 20px 0; background: #f0f8ff; }
-        .error { color: red; font-weight: bold; background: #ffe6e6; padding: 10px; border-radius: 5px; }
-        .success { color: green; font-weight: bold; background: #e6ffe6; padding: 10px; border-radius: 5px; }
-        .warning { color: orange; font-weight: bold; background: #fff3cd; padding: 10px; border-radius: 5px; }
+        button:disabled { background: #ccc; cursor: not-allowed; }
+        .file-drop { border: 2px dashed #007cba; padding: 30px; text-align: center; border-radius: 10px; margin: 15px 0; background: #f0f8ff; }
+        .document-item { border: 1px solid #ddd; padding: 15px; margin: 10px 0; border-radius: 5px; }
+        .success { color: green; font-weight: bold; }
+        .error { color: red; font-weight: bold; }
+        .info { background: #e7f3ff; padding: 10px; border-radius: 5px; margin: 10px 0; }
+        .table-info { background: #fff3cd; padding: 15px; border-radius: 5px; margin: 15px 0; }
+        .columns-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 10px; margin: 15px 0; }
+        .column-item { background: #f8f9fa; padding: 10px; border-radius: 5px; border-left: 4px solid #007cba; }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>📤 Upload Documents Ascenseurs</h1>
+        <h1>🔧 Interface Dépannage Ascenseurs - Auto-détection</h1>
         
-        <!-- Message de configuration -->
-        <div class="warning" id="configMessage">
-            <h3>⚠️ Configuration Requise</h3>
-            <p>Avant de pouvoir uploader, créez le bucket Storage dans Supabase :</p>
-            <ol>
-                <li>Allez dans <strong>Storage</strong></li>
-                <li>Cliquez sur <strong>"New Bucket"</strong></li>
-                <li>Nom: <strong>"documents"</strong></li>
-                <li>Public: <strong>ACTIVÉ</strong></li>
-                <li>Cliquez sur <strong>"Create bucket"</strong></li>
-            </ol>
-            <button onclick="verifierBucket()">🔄 Vérifier le bucket</button>
+        <!-- Section Information Table -->
+        <div class="table-info">
+            <h3>📊 Structure de votre table détectée automatiquement</h3>
+            <div id="tableStructure">
+                <p>Chargement de la structure...</p>
+            </div>
         </div>
 
-        <!-- Formulaire d'upload -->
-        <div class="form-section">
-            <h2>Ajouter un nouveau document</h2>
+        <!-- Section Upload -->
+        <div class="section">
+            <h2>📤 Ajouter un nouveau document</h2>
             
-            <div class="form-group">
-                <label>Marque *</label>
-                <input type="text" id="marque" placeholder="Schindler, Otis, Kone..." required>
+            <div id="dynamicForm">
+                <!-- Le formulaire sera généré automatiquement ici -->
+                <p>Chargement du formulaire...</p>
             </div>
-            
-            <div class="form-group">
-                <label>Modèle *</label>
-                <input type="text" id="model" placeholder="3300, Gen2, MonoSpace..." required>
-            </div>
-            
-            <div class="form-group">
-                <label>Description</label>
-                <textarea id="description" placeholder="Description du document..." rows="3"></textarea>
-            </div>
-            
+
             <div class="form-group">
                 <label>Sélectionner le fichier PDF *</label>
                 <div class="file-drop" id="fileDrop">
@@ -69,14 +59,30 @@
             </div>
             
             <button onclick="uploadDocument()" id="uploadBtn" disabled>🚀 Uploader le document</button>
-            <button onclick="chargerDocuments()">🔄 Actualiser la liste</button>
+            <button onclick="chargerStructure()">🔄 Actualiser la structure</button>
             
             <div id="uploadResult"></div>
         </div>
-        
-        <!-- Liste des documents -->
-        <div class="document-list">
-            <h2>📋 Documents existants</h2>
+
+        <!-- Section Recherche -->
+        <div class="section">
+            <h2>🔍 Rechercher dans les documents</h2>
+            
+            <div class="form-group">
+                <input type="text" id="searchInput" placeholder="Rechercher par marque, modèle, description..." 
+                       style="width: 70%; display: inline-block;">
+                <button onclick="rechercherDocuments()" style="width: 25%;">🔍 Rechercher</button>
+            </div>
+            
+            <div id="searchResults">
+                <!-- Les résultats de recherche apparaîtront ici -->
+            </div>
+        </div>
+
+        <!-- Section Liste des documents -->
+        <div class="section">
+            <h2>📋 Tous les documents</h2>
+            <button onclick="chargerDocuments()">🔄 Actualiser la liste</button>
             <div id="documentsList">
                 Chargement en cours...
             </div>
@@ -91,94 +97,128 @@
         const client = createClient(supabaseUrl, supabaseKey);
 
         let selectedFile = null;
+        let tableStructure = [];
 
-        // Vérifier si le bucket existe
-        async function verifierBucket() {
-            const messageDiv = document.getElementById('configMessage');
-            
+        // Charger la structure de la table au démarrage
+        document.addEventListener('DOMContentLoaded', function() {
+            chargerStructure();
+            chargerDocuments();
+        });
+
+        // Fonction pour détecter la structure de la table
+        async function chargerStructure() {
+            const structureDiv = document.getElementById('tableStructure');
+            structureDiv.innerHTML = "🔍 Détection de la structure en cours...";
+
             try {
-                const { data, error } = await client.storage
+                // Récupérer un échantillon pour détecter les colonnes
+                const { data, error } = await client
                     .from('documents')
-                    .list();
-                
-                if (error && error.message.includes('Bucket')) {
-                    messageDiv.innerHTML = `
-                        <div class="error">
-                            <h3>❌ Bucket non trouvé</h3>
-                            <p>Le bucket "documents" n'existe pas. Créez-le dans Supabase Storage.</p>
-                            <button onclick="verifierBucket()">🔄 Réessayer</button>
-                        </div>
-                    `;
+                    .select('*')
+                    .limit(1);
+
+                if (error) throw error;
+
+                if (data && data.length > 0) {
+                    // Détecter les colonnes (exclure id, created_at, etc.)
+                    const sample = data[0];
+                    tableStructure = Object.keys(sample).filter(col => 
+                        !['id', 'created_at', 'updated_at', 'path', 'filename'].includes(col)
+                    );
+
+                    // Afficher la structure détectée
+                    let html = '<div class="columns-list">';
+                    tableStructure.forEach(column => {
+                        html += `<div class="column-item">${column}</div>`;
+                    });
+                    html += '</div>';
+                    structureDiv.innerHTML = html;
+
+                    // Générer le formulaire dynamique
+                    genererFormulaire();
                 } else {
-                    messageDiv.innerHTML = `
-                        <div class="success">
-                            <h3>✅ Bucket trouvé!</h3>
-                            <p>Le bucket "documents" est accessible. Vous pouvez maintenant uploader des fichiers.</p>
-                        </div>
-                    `;
+                    structureDiv.innerHTML = '<p class="info">📭 La table est vide. Les colonnes seront détectées après le premier upload.</p>';
+                    // Structure par défaut basée sur votre description
+                    tableStructure = ['marque', 'model', 'programmation', 'schemas'];
+                    genererFormulaire();
                 }
             } catch (error) {
-                messageDiv.innerHTML = `
-                    <div class="error">
-                        <h3>❌ Erreur de vérification</h3>
-                        <p>${error.message}</p>
-                        <button onclick="verifierBucket()">🔄 Réessayer</button>
+                structureDiv.innerHTML = `<p class="error">❌ Erreur lors de la détection: ${error.message}</p>`;
+            }
+        }
+
+        // Générer le formulaire dynamiquement
+        function genererFormulaire() {
+            const formDiv = document.getElementById('dynamicForm');
+            let html = '';
+
+            tableStructure.forEach(column => {
+                const label = column.charAt(0).toUpperCase() + column.slice(1);
+                const required = ['marque', 'model'].includes(column);
+                
+                html += `
+                    <div class="form-group">
+                        <label>${label} ${required ? '*' : ''}</label>
+                        <input type="text" id="form_${column}" 
+                               placeholder="Entrez ${column}..." 
+                               ${required ? 'required' : ''}>
                     </div>
                 `;
-            }
+            });
+
+            formDiv.innerHTML = html;
         }
 
         // Gestion de la sélection de fichier
         document.getElementById('fileInput').addEventListener('change', function(e) {
             selectedFile = e.target.files[0];
-            if (selectedFile) {
-                if (selectedFile.type === 'application/pdf') {
-                    document.getElementById('fileName').textContent = `Fichier sélectionné: ${selectedFile.name} (${(selectedFile.size / 1024 / 1024).toFixed(2)} MB)`;
-                    document.getElementById('uploadBtn').disabled = false;
-                } else {
-                    alert('❌ Veuillez sélectionner un fichier PDF');
-                    selectedFile = null;
-                    document.getElementById('fileName').textContent = '';
-                    document.getElementById('uploadBtn').disabled = true;
-                }
+            if (selectedFile && selectedFile.type === 'application/pdf') {
+                document.getElementById('fileName').textContent = 
+                    `Fichier sélectionné: ${selectedFile.name} (${(selectedFile.size / 1024 / 1024).toFixed(2)} MB)`;
+                document.getElementById('uploadBtn').disabled = false;
+            } else {
+                alert('❌ Veuillez sélectionner un fichier PDF');
+                selectedFile = null;
+                document.getElementById('fileName').textContent = '';
+                document.getElementById('uploadBtn').disabled = true;
             }
         });
 
         // Drag and drop
         const fileDrop = document.getElementById('fileDrop');
-        fileDrop.addEventListener('dragover', function(e) {
-            e.preventDefault();
-            fileDrop.style.background = '#e6f3ff';
-        });
-        
-        fileDrop.addEventListener('dragleave', function(e) {
-            e.preventDefault();
-            fileDrop.style.background = '#f0f8ff';
-        });
-        
-        fileDrop.addEventListener('drop', function(e) {
-            e.preventDefault();
-            fileDrop.style.background = '#f0f8ff';
-            selectedFile = e.dataTransfer.files[0];
-            if (selectedFile && selectedFile.type === 'application/pdf') {
-                document.getElementById('fileName').textContent = `Fichier sélectionné: ${selectedFile.name} (${(selectedFile.size / 1024 / 1024).toFixed(2)} MB)`;
-                document.getElementById('uploadBtn').disabled = false;
-            } else {
-                alert('❌ Veuillez déposer un fichier PDF');
-                selectedFile = null;
-            }
+        ['dragover', 'dragleave', 'drop'].forEach(eventName => {
+            fileDrop.addEventListener(eventName, function(e) {
+                e.preventDefault();
+                if (eventName === 'dragover') {
+                    fileDrop.style.background = '#e6f3ff';
+                } else if (eventName === 'dragleave') {
+                    fileDrop.style.background = '#f0f8ff';
+                } else if (eventName === 'drop') {
+                    fileDrop.style.background = '#f0f8ff';
+                    selectedFile = e.dataTransfer.files[0];
+                    if (selectedFile && selectedFile.type === 'application/pdf') {
+                        document.getElementById('fileName').textContent = 
+                            `Fichier sélectionné: ${selectedFile.name} (${(selectedFile.size / 1024 / 1024).toFixed(2)} MB)`;
+                        document.getElementById('uploadBtn').disabled = false;
+                    } else {
+                        alert('❌ Veuillez déposer un fichier PDF');
+                        selectedFile = null;
+                    }
+                }
+            });
         });
 
-        // Fonction d'upload
+        // Upload du document
         async function uploadDocument() {
-            const marque = document.getElementById('marque').value;
-            const model = document.getElementById('model').value;
-            const description = document.getElementById('description').value;
             const uploadBtn = document.getElementById('uploadBtn');
             const resultDiv = document.getElementById('uploadResult');
 
+            // Vérifier les champs requis
+            const marque = document.getElementById('form_marque')?.value;
+            const model = document.getElementById('form_model')?.value;
+
             if (!marque || !model || !selectedFile) {
-                resultDiv.innerHTML = '<div class="error">❌ Veuillez remplir tous les champs obligatoires</div>';
+                resultDiv.innerHTML = '<div class="error">❌ Veuillez remplir les champs marque, modèle et sélectionner un fichier</div>';
                 return;
             }
 
@@ -187,70 +227,60 @@
             resultDiv.innerHTML = '';
 
             try {
-                // Créer un nom de fichier unique
-                const fileExt = selectedFile.name.split('.').pop();
-                const fileName = `${marque}_${model}_${Date.now()}.${fileExt}`;
-                const filePath = `${fileName}`;
+                // Créer l'objet de données dynamiquement
+                const documentData = {
+                    created_at: new Date().toISOString()
+                };
 
-                // Upload du fichier
-                const { data: uploadData, error: uploadError } = await client.storage
-                    .from('documents')
-                    .upload(filePath, selectedFile, {
-                        cacheControl: '3600',
-                        upsert: false
-                    });
-
-                if (uploadError) {
-                    if (uploadError.message.includes('Bucket')) {
-                        throw new Error('Bucket "documents" non trouvé. Créez-le dans Supabase Storage.');
+                // Remplir avec les données du formulaire
+                tableStructure.forEach(column => {
+                    const input = document.getElementById(`form_${column}`);
+                    if (input && input.value) {
+                        documentData[column] = input.value;
                     }
-                    throw new Error(`Erreur upload: ${uploadError.message}`);
-                }
+                });
 
-                // Enregistrement dans la table documents
+                // Ajouter le nom du fichier
+                documentData.filename = selectedFile.name;
+
+                // Enregistrement dans la base de données
                 const { data: dbData, error: dbError } = await client
                     .from('documents')
-                    .insert([
-                        {
-                            marque: marque,
-                            model: model,
-                            description: description,
-                            filename: selectedFile.name,
-                            path: filePath,
-                            created_at: new Date().toISOString()
-                        }
-                    ]);
+                    .insert([documentData]);
 
-                if (dbError) {
-                    throw new Error(`Erreur base de données: ${dbError.message}`);
-                }
+                if (dbError) throw dbError;
 
-                resultDiv.innerHTML = '<div class="success">✅ Document uploadé avec succès!</div>';
+                resultDiv.innerHTML = '<div class="success">✅ Document enregistré avec succès dans la base de données!</div>';
                 
                 // Réinitialiser le formulaire
-                document.getElementById('marque').value = '';
-                document.getElementById('model').value = '';
-                document.getElementById('description').value = '';
+                tableStructure.forEach(column => {
+                    const input = document.getElementById(`form_${column}`);
+                    if (input) input.value = '';
+                });
                 document.getElementById('fileName').textContent = '';
                 selectedFile = null;
                 document.getElementById('fileInput').value = '';
-                document.getElementById('uploadBtn').disabled = true;
-                document.getElementById('uploadBtn').textContent = '🚀 Uploader le document';
+                uploadBtn.disabled = true;
+                uploadBtn.textContent = '🚀 Uploader le document';
 
-                // Recharger la liste
-                chargerDocuments();
+                // Recharger les données
+                setTimeout(() => {
+                    chargerDocuments();
+                    chargerStructure();
+                }, 1000);
 
             } catch (error) {
-                resultDiv.innerHTML = `<div class="error">❌ ${error.message}</div>`;
+                resultDiv.innerHTML = `<div class="error">❌ Erreur: ${error.message}</div>`;
                 uploadBtn.disabled = false;
                 uploadBtn.textContent = '🚀 Uploader le document';
             }
         }
 
-        // Charger la liste des documents
+        // Charger tous les documents
         async function chargerDocuments() {
             const listDiv = document.getElementById('documentsList');
-            
+            listDiv.innerHTML = 'Chargement...';
+
             try {
                 const { data, error } = await client
                     .from('documents')
@@ -260,18 +290,28 @@
                 if (error) throw error;
 
                 if (data.length === 0) {
-                    listDiv.innerHTML = '<p>Aucun document trouvé.</p>';
+                    listDiv.innerHTML = '<p class="info">Aucun document trouvé.</p>';
                     return;
                 }
 
-                let html = '';
+                let html = `<p>📄 ${data.length} document(s) trouvé(s)</p>`;
                 data.forEach(doc => {
                     html += `
-                        <div style="border: 1px solid #ddd; padding: 15px; margin: 10px 0; border-radius: 5px;">
-                            <h4>${doc.marque} - ${doc.model}</h4>
-                            <p><strong>Fichier:</strong> ${doc.filename}</p>
-                            ${doc.description ? `<p><strong>Description:</strong> ${doc.description}</p>` : ''}
-                            <p><strong>Date:</strong> ${new Date(doc.created_at).toLocaleDateString('fr-FR')}</p>
+                        <div class="document-item">
+                            <h4>${doc.marque || 'N/A'} - ${doc.model || 'N/A'}</h4>
+                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; margin: 10px 0;">
+                    `;
+                    
+                    // Afficher dynamiquement toutes les colonnes
+                    Object.keys(doc).forEach(key => {
+                        if (doc[key] && !['id', 'created_at', 'updated_at'].includes(key)) {
+                            html += `<div><strong>${key}:</strong> ${doc[key]}</div>`;
+                        }
+                    });
+                    
+                    html += `
+                            </div>
+                            <p><em>Créé le: ${new Date(doc.created_at).toLocaleDateString('fr-FR')}</em></p>
                         </div>
                     `;
                 });
@@ -282,9 +322,57 @@
             }
         }
 
-        // Vérifier le bucket au chargement
-        verifierBucket();
-        chargerDocuments();
+        // Rechercher des documents
+        async function rechercherDocuments() {
+            const searchTerm = document.getElementById('searchInput').value;
+            const resultsDiv = document.getElementById('searchResults');
+
+            if (!searchTerm) {
+                resultsDiv.innerHTML = '<p class="info">⚠️ Veuillez entrer un terme de recherche</p>';
+                return;
+            }
+
+            resultsDiv.innerHTML = 'Recherche en cours...';
+
+            try {
+                const { data, error } = await client
+                    .from('documents')
+                    .select('*')
+                    .or(`marque.ilike.%${searchTerm}%,model.ilike.%${searchTerm}%,description.ilike.%${searchTerm}%`)
+                    .order('created_at', { ascending: false });
+
+                if (error) throw error;
+
+                if (data.length === 0) {
+                    resultsDiv.innerHTML = '<p class="info">🔍 Aucun document trouvé pour cette recherche.</p>';
+                    return;
+                }
+
+                let html = `<h3>🔍 ${data.length} résultat(s) pour "${searchTerm}"</h3>`;
+                data.forEach(doc => {
+                    html += `
+                        <div class="document-item">
+                            <h4>${doc.marque || 'N/A'} - ${doc.model || 'N/A'}</h4>
+                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; margin: 10px 0;">
+                    `;
+                    
+                    Object.keys(doc).forEach(key => {
+                        if (doc[key] && !['id', 'created_at', 'updated_at'].includes(key)) {
+                            html += `<div><strong>${key}:</strong> ${doc[key]}</div>`;
+                        }
+                    });
+                    
+                    html += `
+                            </div>
+                        </div>
+                    `;
+                });
+
+                resultsDiv.innerHTML = html;
+            } catch (error) {
+                resultsDiv.innerHTML = `<div class="error">Erreur recherche: ${error.message}</div>`;
+            }
+        }
     </script>
 </body>
 </html>
