@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TEST COMPLET - Documents Ascenseurs</title>
+    <title>TEST CORRIGÉ - Documents Ascenseurs</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         body { font-family: Arial; margin: 20px; }
@@ -15,7 +15,7 @@
     </style>
 </head>
 <body>
-    <h1>🧪 TEST COMPLET - Connexion Supabase</h1>
+    <h1>🧪 TEST CORRIGÉ - Connexion Supabase</h1>
     
     <div class="test-section">
         <h2>1. Test de Connexion Base</h2>
@@ -42,10 +42,13 @@
     </div>
 
     <script>
-        // CONFIGURATION
+        // CONFIGURATION CORRECTE
         const supabaseUrl = 'https://prrzsosrbrskmeczmmmu.supabase.co';
         const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBycnpzb3NicnJza21lY3ptbW11Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjEzMTkwMDMsImV4cCI6MjA3Njg5NTAwM30.JuqL6tJC5LRXX30HXrznm_y9bca-aOJ_vnk_wPsP9Mc';
-        const supabase = supabase.createClient(supabaseUrl, supabaseKey);
+        
+        // INITIALISATION CORRECTE de Supabase
+        const { createClient } = supabase;
+        const supabaseClient = createClient(supabaseUrl, supabaseKey);
 
         // TEST 1: Connexion de base
         async function testConnexion() {
@@ -54,7 +57,7 @@
             
             try {
                 // Test simple de connexion
-                const { data, error } = await supabase.from('documents').select('count');
+                const { data, error } = await supabaseClient.from('documents').select('count');
                 
                 if (error) {
                     div.innerHTML = `<span class="error">❌ ÉCHEC: ${error.message}</span>`;
@@ -72,7 +75,7 @@
             div.innerHTML = "Test d'accès à la table...";
             
             try {
-                const { data, error } = await supabase
+                const { data, error } = await supabaseClient
                     .from('documents')
                     .select('*')
                     .limit(5);
@@ -107,7 +110,7 @@
             div.innerHTML = "Analyse de la structure...";
             
             try {
-                const { data, error } = await supabase
+                const { data, error } = await supabaseClient
                     .from('documents')
                     .select('*')
                     .limit(1);
@@ -149,7 +152,7 @@
                     created_at: new Date().toISOString()
                 };
                 
-                const { data, error } = await supabase
+                const { data, error } = await supabaseClient
                     .from('documents')
                     .insert([docTest]);
                 
@@ -173,10 +176,11 @@
             }
         }
 
-        // Lance les tests automatiquement au chargement
+        // Test automatique au chargement
         document.addEventListener('DOMContentLoaded', function() {
+            console.log("🚀 Page chargée - Prêt pour les tests");
+            // Lance le test de connexion après 1 seconde
             setTimeout(testConnexion, 1000);
-            setTimeout(testTable, 2000);
         });
 
     </script>
