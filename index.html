@@ -3,42 +3,46 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TEST CORRIGÉ - URL SUPABASE</title>
+    <title>TEST CONNEXION SUPABASE</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
-    <h1>🔧 TEST CORRIGÉ - NOUVELLE URL SUPABASE</h1>
-    <button onclick="testerNouvelleURL()">🚀 Tester prrscostbrskneozmmu.supabase.co</button>
+    <h1>🧪 TEST NOUVELLE CLÉ SUPABASE</h1>
+    <button onclick="testerConnexion()">🚀 Tester la Connexion</button>
     <div id="resultat"></div>
 
     <script>
-        async function testerNouvelleURL() {
+        async function testerConnexion() {
             const resultat = document.getElementById('resultat');
-            resultat.innerHTML = "Test en cours...";
+            resultat.innerHTML = "Connexion en cours...";
             
-            // NOUVELLE URL depuis API Settings
+            // NOUVELLE CONFIGURATION
             const supabaseUrl = 'https://prrscostbrskneozmmu.supabase.co';
-            const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBycnpzb3NicnJza21lY3ptbW11Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjEzMTkwMDMsImV4cCI6MjA3Njg5NTAwM30.JuqL6tJC5LRXX30HXrznm_y9bca-aOJ_vnk_wPsP9Mc';
+            const supabaseKey = 'sb_publishable_2nwtPyBWSeUNNtx06wROTw_Txpyk2W3';
             
             try {
-                // ✅ INITIALISATION CORRECTE
                 const { createClient } = supabase;
                 const client = createClient(supabaseUrl, supabaseKey);
                 
+                // Test de connexion basique
                 const { data, error } = await client
                     .from('documents')
                     .select('*')
                     .limit(1);
                 
                 if (error) {
-                    resultat.innerHTML = "❌ Erreur Supabase: " + error.message;
+                    resultat.innerHTML = "❌ Erreur: " + error.message;
                 } else {
-                    resultat.innerHTML = "✅ SUCCÈS! Connexion établie avec " + data.length + " document(s) trouvé(s)";
+                    resultat.innerHTML = "✅ SUCCÈS! Connexion établie<br>" + 
+                                        "Documents trouvés: " + data.length;
                 }
             } catch (err) {
                 resultat.innerHTML = "❌ Erreur critique: " + err.message;
             }
         }
+        
+        // Test automatique après 2 secondes
+        setTimeout(testerConnexion, 2000);
     </script>
 </body>
 </html>
