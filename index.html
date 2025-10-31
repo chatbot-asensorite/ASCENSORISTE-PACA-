@@ -7,7 +7,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
-    <h1>🧪 TEST NOUVELLE CLÉ SUPABASE</h1>
+    <h1>🧪 TEST AVEC LA BONNE URL</h1>
     <button onclick="testerConnexion()">🚀 Tester la Connexion</button>
     <div id="resultat"></div>
 
@@ -16,8 +16,8 @@
             const resultat = document.getElementById('resultat');
             resultat.innerHTML = "Connexion en cours...";
             
-            // NOUVELLE CONFIGURATION
-            const supabaseUrl = 'https://prrscostbrskneozmmu.supabase.co';
+            // ✅ BONNE URL de votre capture
+            const supabaseUrl = 'https://prrzscorbrskneozmmu.supabase.co';
             const supabaseKey = 'sb_publishable_2nwtPyBWSeUNNtx06wROTw_Txpyk2W3';
             
             try {
@@ -31,7 +31,13 @@
                     .limit(1);
                 
                 if (error) {
-                    resultat.innerHTML = "❌ Erreur: " + error.message;
+                    if (error.message.includes('JWT')) {
+                        resultat.innerHTML = "❌ Erreur JWT: La clé peut être invalide";
+                    } else if (error.message.includes('RLS')) {
+                        resultat.innerHTML = "❌ Erreur RLS: Besoin d'activer les politiques";
+                    } else {
+                        resultat.innerHTML = "❌ Erreur: " + error.message;
+                    }
                 } else {
                     resultat.innerHTML = "✅ SUCCÈS! Connexion établie<br>" + 
                                         "Documents trouvés: " + data.length;
@@ -41,8 +47,8 @@
             }
         }
         
-        // Test automatique après 2 secondes
-        setTimeout(testerConnexion, 2000);
+        // Test automatique
+        setTimeout(testerConnexion, 1000);
     </script>
 </body>
 </html>
