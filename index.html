@@ -2,63 +2,40 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TEST DNS ULTIME</title>
+    <title>Test Connexion Supabase</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
-    <h1>🔍 TEST DNS ULTIME</h1>
-    <div id="resultat"></div>
-
+    <h1>🔍 Test Connexion Supabase</h1>
+    <div id="resultat">En cours...</div>
+    
     <script>
-        async function testUltime() {
-            const resultat = document.getElementById('resultat');
-            const urls = [
-                'prrzscorbrskneozmmu.supabase.co',
-                'supabase.co',
-                'google.com'
-            ];
+        const SUPABASE_URL = 'https://prrzsosrbrskmeozmmu.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBycnpzb3NicnNrbWVvem1tbXUiLCJyb2xlIjoiYW5vbiIsImlhdCI6MTczNzIxMTI2MSwiZXhwIjoyMDUyNzg3MjYxfQ.JuqL6tJC5LRXX3OHXrznm_v9bca-aOJ_vnk_wPsP9Mc';
+        
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        
+        async function tester() {
+            const div = document.getElementById('resultat');
             
-            let html = '<h3>Tests DNS en cours...</h3>';
-            
-            for (const url of urls) {
-                html += `<p>Test: ${url}... `;
+            try {
+                // Test simple : lire la table equipements
+                const { data, error } = await supabase
+                    .from('equipements')
+                    .select('*')
+                    .limit(1);
                 
-                try {
-                    const response = await fetch(`https://${url}`, { 
-                        mode: 'no-cors',
-                        cache: 'no-cache'
-                    });
-                    html += '<span style="color: green">✅ Accessible</span></p>';
-                } catch (e) {
-                    html += `<span style="color: red">❌ Erreur: ${e.message}</span></p>`;
+                if (error) {
+                    div.innerHTML = `❌ ERREUR: ${error.message}`;
+                } else {
+                    div.innerHTML = `✅ CONNEXION RÉUSSIE !<br>Données: ${JSON.stringify(data)}`;
                 }
+            } catch (e) {
+                div.innerHTML = `❌ ERREUR: ${e.message}`;
             }
-            
-            resultat.innerHTML = html;
         }
         
-        testUltime();
+        tester();
     </script>
-
-    <div style="background: #fff3cd; padding: 15px; margin: 20px 0; border: 1px solid #ffeaa7; border-radius: 8px;">
-        <h3>🚨 ACTION REQUISE :</h3>
-        <p><strong>Le problème vient de Supabase, pas de votre code.</strong></p>
-        
-        <p><strong>Options :</strong></p>
-        <ol>
-            <li><strong>Créer un NOUVEAU projet Supabase</strong> (recommandé)</li>
-            <li>Contacter le support Supabase</li>
-            <li>Vérifier la facturation du projet actuel</li>
-        </ol>
-        
-        <p><strong>Pour créer un nouveau projet :</strong></p>
-        <ol>
-            <li>Allez sur <a href="https://app.supabase.com" target="_blank">app.supabase.com</a></li>
-            <li>Cliquez sur "New Project"</li>
-            <li>Nom : "depannage-ascenseurs"</li>
-            <li>Région : "West Europe (France)"</li>
-            <li>Créez le projet</li>
-        </ol>
-    </div>
 </body>
 </html>
