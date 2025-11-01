@@ -9,14 +9,14 @@
     <div id="result"></div>
 
     <script>
-        // ⚠️ REMPLACEZ PAR VOS VRAIES VALEURS ⚠️
-        const supabaseUrl = 'https://przscsorbtskmecommmunks.supabase.co'; // Votre URL
-        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...'; // Votre clé anon publique
+        // ✅ URL CORRECTE d'après vos captures
+        const supabaseUrl = 'https://przscsorbtskmecommmunks.supabase.co';
         
-        // Créer le client Supabase
+        // ⚠️ REMPLACEZ SEULEMENT LA CLÉ API !
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...'; // Votre clé anon publique de Supabase → Settings → API
+        
         const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
         
-        // TEST SIMPLE
         async function testSupabase() {
             const resultElement = document.getElementById('result');
             resultElement.innerHTML = "⏳ Test en cours...";
@@ -33,14 +33,14 @@
                 } else {
                     resultElement.innerHTML = `✅ SUCCÈS! Données: ${JSON.stringify(data)}`;
                     resultElement.style.color = 'green';
+                    console.log('Données complètes:', data);
                 }
             } catch (err) {
-                resultElement.innerHTML = `❌ ERREUR: ${err}`;
+                resultElement.innerHTML = `❌ ERREUR: ${err.message}`;
                 resultElement.style.color = 'red';
             }
         }
         
-        // Lancer le test
         testSupabase();
     </script>
 </body>
