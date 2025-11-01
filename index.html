@@ -9,9 +9,9 @@
     <div id="result"></div>
 
     <script>
-        // REMPLACEZ CES VALEURS par les vôtres (Supabase → Settings → API)
-        const supabaseUrl = 'https://votre-projet.supabase.co';
-        const supabaseKey = 'votre-cle-anon-publique';
+        // ⚠️ REMPLACEZ PAR VOS VRAIES VALEURS ⚠️
+        const supabaseUrl = 'https://przscsorbtskmecommmunks.supabase.co'; // Votre URL
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...'; // Votre clé anon publique
         
         // Créer le client Supabase
         const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
@@ -19,6 +19,7 @@
         // TEST SIMPLE
         async function testSupabase() {
             const resultElement = document.getElementById('result');
+            resultElement.innerHTML = "⏳ Test en cours...";
             
             try {
                 const { data, error } = await supabase
