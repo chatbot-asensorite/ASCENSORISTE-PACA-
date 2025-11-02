@@ -254,6 +254,26 @@
             cursor: not-allowed;
         }
         
+        .toggle-table-btn {
+            background: #17a2b8;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            margin: 20px 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: background 0.3s;
+        }
+        
+        .toggle-table-btn:hover {
+            background: #138496;
+        }
+        
         .status {
             padding: 10px;
             border-radius: 5px;
@@ -285,12 +305,17 @@
             background: #f8f9fa;
             border-radius: 10px;
             padding: 25px;
-            margin-top: 30px;
+            margin-top: 20px;
+            display: none; /* Caché par défaut */
+        }
+        
+        .table-section.active {
+            display: block; /* Affiché quand actif */
         }
         
         .table-header {
             display: flex;
-            justify-content: between;
+            justify-content: space-between;
             align-items: center;
             margin-bottom: 20px;
         }
@@ -397,6 +422,12 @@
                 display: block;
                 overflow-x: auto;
             }
+            
+            .table-header {
+                flex-direction: column;
+                gap: 15px;
+                align-items: flex-start;
+            }
         }
     </style>
 </head>
@@ -491,8 +522,13 @@
                 <div id="statusMessage"></div>
             </div>
             
-            <!-- Tableau Supabase -->
-            <div class="table-section">
+            <!-- Bouton pour afficher/masquer le tableau -->
+            <button id="toggleTableBtn" class="toggle-table-btn">
+                📊 Afficher le tableau Supabase
+            </button>
+            
+            <!-- Tableau Supabase (caché par défaut) -->
+            <div class="table-section" id="tableSection">
                 <div class="table-header">
                     <h3 class="table-title">📊 Tableau Supabase - Tous les documents</h3>
                     <button class="refresh-btn" id="refreshTable">🔄 Actualiser</button>
@@ -520,6 +556,8 @@
         const statusMessage = document.getElementById('statusMessage');
         const tableContainer = document.getElementById('tableContainer');
         const refreshTableBtn = document.getElementById('refreshTable');
+        const toggleTableBtn = document.getElementById('toggleTableBtn');
+        const tableSection = document.getElementById('tableSection');
         
         // Gestion des marques et types
         const marqueSelect = document.getElementById('marque');
@@ -539,11 +577,13 @@
         let marques = JSON.parse(localStorage.getItem('ascenseur_marques')) || ['Otis', 'Schindler', 'Kone', 'ThyssenKrupp'];
         let typesAscenseur = JSON.parse(localStorage.getItem('ascenseur_types')) || ['Hydraulique', 'Électrique', 'MRL', 'LVA'];
         
+        // État du tableau
+        let isTableVisible = false;
+        
         // Initialisation
         function initApp() {
             updateMarquesList();
             updateTypesList();
-            loadTableData();
             
             // Gestion des panels
             manageMarquesBtn.addEventListener('click', function() {
@@ -566,6 +606,20 @@
             
             // Actualiser le tableau
             refreshTableBtn.addEventListener('click', loadTableData);
+            
+            // Afficher/masquer le tableau
+            toggleTableBtn.addEventListener('click', function() {
+                isTableVisible = !isTableVisible;
+                
+                if (isTableVisible) {
+                    tableSection.classList.add('active');
+                    toggleTableBtn.innerHTML = '📊 Masquer le tableau Supabase';
+                    loadTableData(); // Charger les données quand on affiche le tableau
+                } else {
+                    tableSection.classList.remove('active');
+                    toggleTableBtn.innerHTML = '📊 Afficher le tableau Supabase';
+                }
+            });
         }
         
         // Mettre à jour la liste des marques
@@ -737,8 +791,10 @@
                         uploadForm.reset();
                         fileName.textContent = 'Aucun fichier sélectionné';
                         
-                        // Recharger le tableau
-                        loadTableData();
+                        // Si le tableau est visible, le recharger
+                        if (isTableVisible) {
+                            loadTableData();
+                        }
                         
                     } catch (error) {
                         console.error('Erreur:', error);
