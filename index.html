@@ -3,76 +3,474 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Diagnostic Structure Table</title>
+    <title>Ascensoriste PACA - Upload Documents</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: #2c3e50;
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 2.2em;
+            margin-bottom: 10px;
+        }
+        
+        .content {
+            padding: 30px;
+        }
+        
+        .upload-section {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 25px;
+            margin-bottom: 30px;
+            border: 2px dashed #dee2e6;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        input[type="text"] {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .file-input-wrapper {
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+            width: 100%;
+        }
+        
+        .file-input-wrapper input[type=file] {
+            position: absolute;
+            left: 0;
+            top: 0;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+        
+        .file-input-custom {
+            background: #667eea;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            text-align: center;
+            cursor: pointer;
+            transition: background 0.3s;
+            display: block;
+        }
+        
+        .file-input-custom:hover {
+            background: #5a6fd8;
+        }
+        
+        .file-name {
+            margin-top: 8px;
+            font-size: 14px;
+            color: #6c757d;
+        }
+        
+        .btn {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            transition: background 0.3s;
+        }
+        
+        .btn:hover {
+            background: #218838;
+        }
+        
+        .btn:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+        }
+        
+        .status {
+            padding: 10px;
+            border-radius: 5px;
+            margin-top: 15px;
+            text-align: center;
+            font-weight: 600;
+        }
+        
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .status.loading {
+            background: #cce7ff;
+            color: #004085;
+            border: 1px solid #b3d7ff;
+        }
+        
+        .document-item {
+            background: white;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .download-btn {
+            background: #007bff;
+            color: white;
+            padding: 8px 15px;
+            border-radius: 5px;
+            text-decoration: none;
+            border: none;
+            cursor: pointer;
+            margin-left: 10px;
+            font-size: 14px;
+        }
+        
+        .download-btn:hover {
+            background: #0056b3;
+        }
+    </style>
 </head>
 <body>
-    <h1>🔍 Diagnostic de la table "documents"</h1>
-    <div id="diagnosticResult"></div>
+    <div class="container">
+        <div class="header">
+            <h1>📄 Ascensoriste PACA</h1>
+            <p>Gestion des documents techniques</p>
+        </div>
+        
+        <div class="content">
+            <div class="upload-section">
+                <h2>Ajouter un nouveau document</h2>
+                <form id="uploadForm">
+                    <div class="form-group">
+                        <label for="programmation">Programmation :</label>
+                        <input type="text" id="programmation" name="programmation" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="model">Modèle :</label>
+                        <input type="text" id="model" name="model" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="marque">Marque :</label>
+                        <input type="text" id="marque" name="marque" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="schemas">Schémas :</label>
+                        <input type="text" id="schemas" name="schemas">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="pdfFile">Document PDF :</label>
+                        <div class="file-input-wrapper">
+                            <div class="file-input-custom">
+                                📎 Choisir un fichier PDF
+                            </div>
+                            <input type="file" id="pdfFile" name="pdfFile" accept=".pdf" required>
+                        </div>
+                        <div class="file-name" id="fileName">Aucun fichier sélectionné</div>
+                    </div>
+                    
+                    <button type="submit" class="btn" id="submitBtn">
+                        💾 Enregistrer le document
+                    </button>
+                </form>
+                
+                <div id="statusMessage"></div>
+            </div>
+            
+            <div class="documents-list">
+                <h2>Documents existants</h2>
+                <div id="documentsContainer">
+                    <!-- Les documents seront chargés ici -->
+                </div>
+            </div>
+        </div>
+    </div>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
+        // Configuration Supabase
         const SUPABASE_URL = 'https://prrzsosrbrskmeozmmmu.supabase.co';
         const SUPABASE_KEY = 'sb_publishable_2nwtPyBWSeUNNtx06wROTw_Txpyk2W3';
+        
         const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
-        async function diagnoseTable() {
+        
+        // Éléments DOM
+        const uploadForm = document.getElementById('uploadForm');
+        const pdfFileInput = document.getElementById('pdfFile');
+        const fileName = document.getElementById('fileName');
+        const submitBtn = document.getElementById('submitBtn');
+        const statusMessage = document.getElementById('statusMessage');
+        const documentsContainer = document.getElementById('documentsContainer');
+        
+        // Afficher le nom du fichier sélectionné
+        pdfFileInput.addEventListener('change', function() {
+            if (this.files.length > 0) {
+                fileName.textContent = this.files[0].name;
+            } else {
+                fileName.textContent = 'Aucun fichier sélectionné';
+            }
+        });
+        
+        // Gestion de l'upload
+        uploadForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const programmation = document.getElementById('programmation').value;
+            const model = document.getElementById('model').value;
+            const marque = document.getElementById('marque').value;
+            const schemas = document.getElementById('schemas').value;
+            const file = pdfFileInput.files[0];
+            
+            if (!file) {
+                showStatus('Veuillez sélectionner un fichier PDF', 'error');
+                return;
+            }
+            
+            if (file.type !== 'application/pdf') {
+                showStatus('Veuillez sélectionner un fichier PDF valide', 'error');
+                return;
+            }
+            
+            // Désactiver le bouton pendant l'upload
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Enregistrement en cours...';
+            
             try {
-                // Test 1: Récupérer un document existant pour voir sa structure
+                showStatus('Conversion du PDF en base64...', 'loading');
+                
+                // Convertir le PDF en base64
+                const reader = new FileReader();
+                
+                reader.onload = async function(e) {
+                    try {
+                        const pdfBase64 = e.target.result.split(',')[1];
+                        
+                        // Préparer les données avec les VRAIS noms de colonnes
+                        const documentData = {
+                            programmation: programmation,  // VRAI nom : programmation
+                            model: model,                  // VRAI nom : model
+                            marque: marque,               // VRAI nom : marque
+                            schémas: schemas,             // VRAI nom : schémas
+                            nom_fichier: file.name,
+                            date_upload: new Date().toISOString(),
+                            pdf_data: pdfBase64,          // Stocker le PDF en base64
+                            taille_fichier: file.size
+                        };
+                        
+                        // Enregistrer dans la table documents
+                        const { data: dbData, error: dbError } = await supabase
+                            .from('documents')
+                            .insert([documentData]);
+                        
+                        if (dbError) {
+                            throw new Error(`Erreur base de données: ${dbError.message}`);
+                        }
+                        
+                        showStatus('✅ Document enregistré avec succès!', 'success');
+                        uploadForm.reset();
+                        fileName.textContent = 'Aucun fichier sélectionné';
+                        
+                        // Recharger la liste des documents
+                        loadDocuments();
+                        
+                    } catch (error) {
+                        console.error('Erreur:', error);
+                        showStatus(`❌ Erreur: ${error.message}`, 'error');
+                    } finally {
+                        // Réactiver le bouton
+                        submitBtn.disabled = false;
+                        submitBtn.textContent = '💾 Enregistrer le document';
+                    }
+                };
+                
+                reader.onerror = function() {
+                    showStatus('❌ Erreur lors de la lecture du fichier', 'error');
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = '💾 Enregistrer le document';
+                };
+                
+                // Lire le fichier comme Data URL (base64)
+                reader.readAsDataURL(file);
+                
+            } catch (error) {
+                console.error('Erreur:', error);
+                showStatus(`❌ Erreur: ${error.message}`, 'error');
+                submitBtn.disabled = false;
+                submitBtn.textContent = '💾 Enregistrer le document';
+            }
+        });
+        
+        // Fonction pour afficher les messages de statut
+        function showStatus(message, type) {
+            statusMessage.textContent = message;
+            statusMessage.className = 'status ' + type;
+        }
+        
+        // Charger les documents existants
+        async function loadDocuments() {
+            try {
                 const { data: documents, error } = await supabase
                     .from('documents')
                     .select('*')
-                    .limit(1);
-
-                if (error) throw error;
-
-                const resultDiv = document.getElementById('diagnosticResult');
+                    .order('id', { ascending: false });
                 
-                if (documents.length > 0) {
-                    const firstDoc = documents[0];
-                    resultDiv.innerHTML = `
-                        <h2>✅ Structure trouvée :</h2>
-                        <pre>${JSON.stringify(firstDoc, null, 2)}</pre>
-                        <h3>Noms de colonnes réels :</h3>
-                        <ul>
-                            ${Object.keys(firstDoc).map(col => `<li><strong>${col}</strong>: ${firstDoc[col]}</li>`).join('')}
-                        </ul>
-                    `;
-                } else {
-                    resultDiv.innerHTML = `
-                        <h2>Table vide - Test d'insertion simple</h2>
-                        <button onclick="testInsert()">Tester l'insertion</button>
-                    `;
+                if (error) {
+                    throw error;
                 }
+                
+                documentsContainer.innerHTML = '';
+                
+                if (documents.length === 0) {
+                    documentsContainer.innerHTML = '<p>Aucun document trouvé.</p>';
+                    return;
+                }
+                
+                documents.forEach(doc => {
+                    const docElement = document.createElement('div');
+                    docElement.className = 'document-item';
+                    
+                    // Vérifier si le PDF est stocké en base64
+                    const hasPDF = doc.pdf_data;
+                    
+                    docElement.innerHTML = `
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div style="flex-grow: 1;">
+                                <div style="font-weight: 600; color: #2c3e50;">${doc.nom_fichier || 'Document sans nom'}</div>
+                                <div style="font-size: 14px; color: #6c757d; margin-top: 5px;">
+                                    ${doc.programmation} • ${doc.model} • ${doc.marque}
+                                    ${doc.schémas ? '• ' + doc.schémas : ''}
+                                </div>
+                                <div style="font-size: 14px; color: #6c757d; margin-top: 5px;">
+                                    Uploadé le ${new Date(doc.date_upload).toLocaleDateString()}
+                                    ${doc.taille_fichier ? '• Taille: ' + Math.round(doc.taille_fichier / 1024) + ' KB' : ''}
+                                </div>
+                            </div>
+                            <div>
+                                ${hasPDF ? 
+                                    `<button class="download-btn" data-filename="${doc.nom_fichier}" data-pdfdata="${doc.pdf_data}">
+                                        📥 Télécharger
+                                    </button>` 
+                                    : 
+                                    '<span style="color: #6c757d;">Aucun PDF</span>'
+                                }
+                            </div>
+                        </div>
+                    `;
+                    documentsContainer.appendChild(docElement);
+                });
+                
+                // Ajouter les événements de clic pour les boutons de téléchargement
+                document.querySelectorAll('.download-btn').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const filename = this.getAttribute('data-filename');
+                        const pdfData = this.getAttribute('data-pdfdata');
+                        downloadPDF(filename, pdfData);
+                    });
+                });
+                
             } catch (error) {
-                document.getElementById('diagnosticResult').innerHTML = `
-                    <h2>❌ Erreur :</h2>
-                    <p>${error.message}</p>
-                    <button onclick="testSimpleInsert()">Tester avec insertion basique</button>
-                `;
+                console.error('Erreur chargement documents:', error);
+                documentsContainer.innerHTML = '<p>Erreur lors du chargement des documents.</p>';
             }
         }
-
-        async function testSimpleInsert() {
+        
+        // Fonction pour télécharger le PDF
+        function downloadPDF(filename, base64Data) {
             try {
-                // Test avec seulement les colonnes de base
-                const { data, error } = await supabase
-                    .from('documents')
-                    .insert([
-                        { 
-                            nom_fichier: 'test_simple.pdf',
-                            date_upload: new Date().toISOString()
-                        }
-                    ]);
-
-                if (error) throw error;
-                alert('✅ Insertion simple réussie!');
-                diagnoseTable();
+                // Créer un blob à partir des données base64
+                const byteCharacters = atob(base64Data);
+                const byteNumbers = new Array(byteCharacters.length);
+                for (let i = 0; i < byteCharacters.length; i++) {
+                    byteNumbers[i] = byteCharacters.charCodeAt(i);
+                }
+                const byteArray = new Uint8Array(byteNumbers);
+                const blob = new Blob([byteArray], { type: 'application/pdf' });
+                
+                // Créer un URL object pour le blob
+                const url = URL.createObjectURL(blob);
+                
+                // Créer un lien de téléchargement
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = filename || 'document.pdf';
+                document.body.appendChild(a);
+                a.click();
+                
+                // Nettoyer
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                
+                showStatus('✅ Téléchargement démarré!', 'success');
             } catch (error) {
-                alert(`❌ Erreur insertion simple: ${error.message}`);
+                console.error('Erreur téléchargement:', error);
+                showStatus('❌ Erreur lors du téléchargement', 'error');
             }
         }
-
-        diagnoseTable();
+        
+        // Charger les documents au démarrage
+        loadDocuments();
     </script>
 </body>
 </html>
