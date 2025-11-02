@@ -422,9 +422,9 @@
                     
                     <div class="form-row">
                         <div class="form-group">
-                            <label for="categorie">Catégorie *</label>
+                            <label for="categorie">Type de document *</label>
                             <select id="categorie" name="categorie" required>
-                                <option value="">Sélectionnez une catégorie</option>
+                                <option value="">Sélectionnez un type</option>
                                 <option value="programmation">Programmation</option>
                                 <option value="schemas">Schémas</option>
                             </select>
@@ -645,7 +645,7 @@
             }
         });
         
-        // Gestion de l'upload
+        // Gestion de l'upload - UTILISE UNIQUEMENT LES COLONNES EXISTANTES
         uploadForm.addEventListener('submit', async function(e) {
             e.preventDefault();
             
@@ -680,16 +680,19 @@
                     try {
                         const pdfBase64 = e.target.result.split(',')[1];
                         
-                        // Préparer les données
+                        // PRÉPARER LES DONNÉES AVEC UNIQUEMENT LES COLONNES EXISTANTES
+                        // Votre table a: id, programmation, model, marque, schémas, fichier_url, nom_fichier, date_upload, pdf_data, taille_fichier
                         const documentData = {
+                            // Colonnes existantes
                             marque: marque,
-                            type_ascenseur: type_ascenseur,
-                            categorie: categorie,
                             model: model,
                             nom_fichier: file.name,
                             date_upload: new Date().toISOString(),
                             pdf_data: pdfBase64,
-                            taille_fichier: file.size
+                            taille_fichier: file.size,
+                            // On utilise 'programmation' et 'schémas' pour stocker la catégorie
+                            programmation: categorie === 'programmation' ? type_ascenseur : null,
+                            schémas: categorie === 'schemas' ? type_ascenseur : null
                         };
                         
                         // Enregistrer dans la table documents
@@ -741,7 +744,7 @@
             statusMessage.className = 'status ' + type;
         }
         
-        // Charger les documents existants
+        // Charger les documents existants - ADAPTÉ AUX COLONNES EXISTANTES
         async function loadDocuments() {
             try {
                 const { data: documents, error } = await supabase
@@ -764,15 +767,17 @@
                 }
                 
                 // Séparer les documents par catégorie
-                const programmationDocs = documents.filter(doc => doc.categorie === 'programmation');
-                const schemasDocs = documents.filter(doc => doc.categorie === 'schemas');
+                // Programmation = documents avec 'programmation' non null
+                // Schémas = documents avec 'schémas' non null
+                const programmationDocs = documents.filter(doc => doc.programmation !== null);
+                const schemasDocs = documents.filter(doc => doc.schémas !== null);
                 
                 // Afficher les documents de programmation
                 if (programmationDocs.length === 0) {
                     programmationContainer.innerHTML = '<p>Aucun document de programmation trouvé.</p>';
                 } else {
                     programmationDocs.forEach(doc => {
-                        programmationContainer.appendChild(createDocumentElement(doc));
+                        programmationContainer.appendChild(createDocumentElement(doc, 'programmation'));
                     });
                 }
                 
@@ -781,7 +786,7 @@
                     schemasContainer.innerHTML = '<p>Aucun schéma trouvé.</p>';
                 } else {
                     schemasDocs.forEach(doc => {
-                        schemasContainer.appendChild(createDocumentElement(doc));
+                        schemasContainer.appendChild(createDocumentElement(doc, 'schemas'));
                     });
                 }
                 
@@ -792,12 +797,15 @@
             }
         }
         
-        // Créer un élément document
-        function createDocumentElement(doc) {
+        // Créer un élément document - ADAPTÉ AUX COLONNES EXISTANTES
+        function createDocumentElement(doc, categorie) {
             const docElement = document.createElement('div');
             docElement.className = 'document-item';
             
             const hasPDF = doc.pdf_data;
+            
+            // Déterminer le type d'ascenseur en fonction de la catégorie
+            const typeAscenseur = categorie === 'programmation' ? doc.programmation : doc.schémas;
             
             docElement.innerHTML = `
                 <div style="display: flex; justify-content: space-between; align-items: flex-start;">
@@ -805,7 +813,7 @@
                         <div style="font-weight: 600; color: #2c3e50; margin-bottom: 5px;">
                             ${doc.nom_fichier || 'Document sans nom'}
                             <span class="document-badge">${doc.marque}</span>
-                            ${doc.type_ascenseur ? `<span class="document-badge" style="background: #ff6b6b;">${doc.type_ascenseur}</span>` : ''}
+                            ${typeAscenseur ? `<span class="document-badge" style="background: #ff6b6b;">${typeAscenseur}</span>` : ''}
                         </div>
                         
                         <div style="font-size: 12px; color: #6c757d;">
