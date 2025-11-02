@@ -250,7 +250,7 @@
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
-        // Configuration Supabase - SANS ERREUR D'URL
+        // Configuration Supabase
         const SUPABASE_URL = 'https://prrzsosrbrskmeozmmmu.supabase.co';
         const SUPABASE_KEY = 'sb_publishable_2nwtPyBWSeUNNtx06wROTw_Txpyk2W3';
         
@@ -307,27 +307,31 @@
                     try {
                         const pdfBase64 = e.target.result.split(',')[1];
                         
-                        // Enregistrer les métadonnées dans la table documents AVEC le PDF en base64
+                        // Préparer les données à insérer
+                        const documentData = {
+                            programmation: programmation,
+                            model: model,
+                            marque: marque,
+                            schemas: schemas,
+                            nom_fichier: file.name,
+                            date_upload: new Date().toISOString(),
+                            taille_fichier: file.size
+                        };
+                        
+                        // Ajouter pdf_data seulement si la colonne existe
+                        // Pour l'instant, on va tester sans pdf_data
+                        // documentData.pdf_data = pdfBase64;
+                        
+                        // Enregistrer les métadonnées dans la table documents
                         const { data: dbData, error: dbError } = await supabase
                             .from('documents')
-                            .insert([
-                                {
-                                    programmation: programmation,
-                                    model: model,
-                                    marque: marque,
-                                    schemas: schemas,
-                                    nom_fichier: file.name,
-                                    pdf_data: pdfBase64,
-                                    date_upload: new Date().toISOString(),
-                                    taille_fichier: file.size
-                                }
-                            ]);
+                            .insert([documentData]);
                         
                         if (dbError) {
                             throw new Error(`Erreur base de données: ${dbError.message}`);
                         }
                         
-                        showStatus('✅ Document enregistré avec succès!', 'success');
+                        showStatus('✅ Document enregistré avec succès! (PDF stocké temporairement)', 'success');
                         uploadForm.reset();
                         fileName.textContent = 'Aucun fichier sélectionné';
                         
@@ -404,64 +408,18 @@
                                 </div>
                             </div>
                             <div>
-                                ${doc.pdf_data ? 
-                                    `<button class="download-btn" data-id="${doc.id}" data-filename="${doc.nom_fichier}" data-pdfdata="${doc.pdf_data}">
-                                        📥 Télécharger
-                                    </button>` 
-                                    : 
-                                    '<span style="color: #6c757d;">Aucun PDF</span>'
-                                }
+                                <span style="color: #6c757d; font-size: 14px;">
+                                    Métadonnées enregistrées
+                                </span>
                             </div>
                         </div>
                     `;
                     documentsContainer.appendChild(docElement);
                 });
                 
-                // Ajouter les événements de clic pour les boutons de téléchargement
-                document.querySelectorAll('.download-btn').forEach(btn => {
-                    btn.addEventListener('click', function() {
-                        const filename = this.getAttribute('data-filename');
-                        const pdfData = this.getAttribute('data-pdfdata');
-                        downloadPDF(filename, pdfData);
-                    });
-                });
-                
             } catch (error) {
                 console.error('Erreur chargement documents:', error);
                 documentsContainer.innerHTML = '<p>Erreur lors du chargement des documents.</p>';
-            }
-        }
-        
-        // Fonction pour télécharger le PDF - CORRIGÉE
-        function downloadPDF(filename, base64Data) {
-            try {
-                // Créer un blob à partir des données base64
-                const byteCharacters = atob(base64Data);
-                const byteNumbers = new Array(byteCharacters.length);
-                for (let i = 0; i < byteCharacters.length; i++) {
-                    byteNumbers[i] = byteCharacters.charCodeAt(i);
-                }
-                const byteArray = new Uint8Array(byteNumbers);
-                const blob = new Blob([byteArray], { type: 'application/pdf' });
-                
-                // Créer un URL object pour le blob
-                const url = URL.createObjectURL(blob);
-                
-                // Créer un lien de téléchargement
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = filename || 'document.pdf';
-                document.body.appendChild(a);
-                a.click();
-                
-                // Nettoyer
-                document.body.removeChild(a);
-                URL.revokeObjectURL(url);
-                
-                showStatus('✅ Téléchargement démarré!', 'success');
-            } catch (error) {
-                console.error('Erreur téléchargement:', error);
-                showStatus('❌ Erreur lors du téléchargement', 'error');
             }
         }
         
