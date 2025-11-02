@@ -21,7 +21,7 @@
         }
         
         .container {
-            max-width: 1000px;
+            max-width: 1400px;
             margin: 0 auto;
             background: white;
             border-radius: 15px;
@@ -280,79 +280,110 @@
             border: 1px solid #b3d7ff;
         }
         
-        .documents-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 30px;
+        /* Styles pour le tableau Supabase */
+        .table-section {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 25px;
             margin-top: 30px;
         }
         
-        .section {
-            background: #f8f9fa;
-            border-radius: 10px;
-            padding: 20px;
-        }
-        
-        .section-title {
-            font-size: 1.5em;
+        .table-header {
+            display: flex;
+            justify-content: between;
+            align-items: center;
             margin-bottom: 20px;
+        }
+        
+        .table-title {
+            font-size: 1.5em;
             color: #2c3e50;
-            border-bottom: 2px solid #667eea;
-            padding-bottom: 10px;
+            margin: 0;
         }
         
-        .programming-section {
-            border-left: 4px solid #28a745;
-        }
-        
-        .schemas-section {
-            border-left: 4px solid #007bff;
-        }
-        
-        .document-item {
-            background: white;
-            border: 1px solid #e9ecef;
-            border-radius: 8px;
-            padding: 15px;
-            margin-bottom: 15px;
-            transition: transform 0.2s;
-        }
-        
-        .document-item:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-        }
-        
-        .document-badge {
-            background: #6c757d;
+        .refresh-btn {
+            background: #17a2b8;
             color: white;
-            padding: 3px 8px;
-            border-radius: 12px;
-            font-size: 0.7em;
-            margin-left: 8px;
-        }
-        
-        .download-btn {
-            background: #007bff;
-            color: white;
-            padding: 8px 15px;
-            border-radius: 5px;
-            text-decoration: none;
             border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
             cursor: pointer;
-            margin-left: 10px;
             font-size: 14px;
         }
         
-        .download-btn:hover {
-            background: #0056b3;
+        .refresh-btn:hover {
+            background: #138496;
+        }
+        
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .data-table th {
+            background: #2c3e50;
+            color: white;
+            padding: 12px 15px;
+            text-align: left;
+            font-weight: 600;
+        }
+        
+        .data-table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        .data-table tr:hover {
+            background: #f8f9fa;
+        }
+        
+        .data-table tr:last-child td {
+            border-bottom: none;
+        }
+        
+        .action-cell {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .table-btn {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: background 0.3s;
+        }
+        
+        .view-btn {
+            background: #17a2b8;
+            color: white;
+        }
+        
+        .view-btn:hover {
+            background: #138496;
+        }
+        
+        .delete-table-btn {
+            background: #dc3545;
+            color: white;
+        }
+        
+        .delete-table-btn:hover {
+            background: #c82333;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #6c757d;
         }
         
         @media (max-width: 768px) {
-            .documents-grid {
-                grid-template-columns: 1fr;
-            }
-            
             .form-row {
                 flex-direction: column;
             }
@@ -360,6 +391,11 @@
             .select-with-actions {
                 flex-direction: column;
                 align-items: stretch;
+            }
+            
+            .data-table {
+                display: block;
+                overflow-x: auto;
             }
         }
     </style>
@@ -455,22 +491,15 @@
                 <div id="statusMessage"></div>
             </div>
             
-            <!-- Sections Documents -->
-            <div class="documents-grid">
-                <!-- Section Programmation -->
-                <div class="section programming-section">
-                    <h3 class="section-title">🖥️ Programmation</h3>
-                    <div id="programmationContainer">
-                        <!-- Documents de programmation -->
-                    </div>
+            <!-- Tableau Supabase -->
+            <div class="table-section">
+                <div class="table-header">
+                    <h3 class="table-title">📊 Tableau Supabase - Tous les documents</h3>
+                    <button class="refresh-btn" id="refreshTable">🔄 Actualiser</button>
                 </div>
                 
-                <!-- Section Schémas -->
-                <div class="section schemas-section">
-                    <h3 class="section-title">📐 Schémas</h3>
-                    <div id="schemasContainer">
-                        <!-- Documents de schémas -->
-                    </div>
+                <div id="tableContainer">
+                    <!-- Le tableau sera généré ici dynamiquement -->
                 </div>
             </div>
         </div>
@@ -489,8 +518,8 @@
         const pdfFileInput = document.getElementById('pdfFile');
         const fileName = document.getElementById('fileName');
         const statusMessage = document.getElementById('statusMessage');
-        const programmationContainer = document.getElementById('programmationContainer');
-        const schemasContainer = document.getElementById('schemasContainer');
+        const tableContainer = document.getElementById('tableContainer');
+        const refreshTableBtn = document.getElementById('refreshTable');
         
         // Gestion des marques et types
         const marqueSelect = document.getElementById('marque');
@@ -514,7 +543,7 @@
         function initApp() {
             updateMarquesList();
             updateTypesList();
-            loadDocuments();
+            loadTableData();
             
             // Gestion des panels
             manageMarquesBtn.addEventListener('click', function() {
@@ -534,6 +563,9 @@
                     typesPanel.classList.remove('active');
                 }
             });
+            
+            // Actualiser le tableau
+            refreshTableBtn.addEventListener('click', loadTableData);
         }
         
         // Mettre à jour la liste des marques
@@ -645,7 +677,7 @@
             }
         });
         
-        // Gestion de l'upload - UTILISE UNIQUEMENT LES COLONNES EXISTANTES
+        // Gestion de l'upload
         uploadForm.addEventListener('submit', async function(e) {
             e.preventDefault();
             
@@ -680,17 +712,14 @@
                     try {
                         const pdfBase64 = e.target.result.split(',')[1];
                         
-                        // PRÉPARER LES DONNÉES AVEC UNIQUEMENT LES COLONNES EXISTANTES
-                        // Votre table a: id, programmation, model, marque, schémas, fichier_url, nom_fichier, date_upload, pdf_data, taille_fichier
+                        // Préparer les données avec les colonnes existantes
                         const documentData = {
-                            // Colonnes existantes
                             marque: marque,
                             model: model,
                             nom_fichier: file.name,
                             date_upload: new Date().toISOString(),
                             pdf_data: pdfBase64,
                             taille_fichier: file.size,
-                            // On utilise 'programmation' et 'schémas' pour stocker la catégorie
                             programmation: categorie === 'programmation' ? type_ascenseur : null,
                             schémas: categorie === 'schemas' ? type_ascenseur : null
                         };
@@ -708,8 +737,8 @@
                         uploadForm.reset();
                         fileName.textContent = 'Aucun fichier sélectionné';
                         
-                        // Recharger la liste des documents
-                        loadDocuments();
+                        // Recharger le tableau
+                        loadTableData();
                         
                     } catch (error) {
                         console.error('Erreur:', error);
@@ -744,107 +773,139 @@
             statusMessage.className = 'status ' + type;
         }
         
-        // Charger les documents existants - ADAPTÉ AUX COLONNES EXISTANTES
-        async function loadDocuments() {
+        // Charger les données du tableau
+        async function loadTableData() {
             try {
                 const { data: documents, error } = await supabase
                     .from('documents')
                     .select('*')
-                    .order('date_upload', { ascending: false });
+                    .order('id', { ascending: false });
                 
                 if (error) {
                     throw error;
                 }
                 
-                // Vider les conteneurs
-                programmationContainer.innerHTML = '';
-                schemasContainer.innerHTML = '';
-                
+                // Générer le tableau HTML
                 if (documents.length === 0) {
-                    programmationContainer.innerHTML = '<p>Aucun document de programmation trouvé.</p>';
-                    schemasContainer.innerHTML = '<p>Aucun schéma trouvé.</p>';
+                    tableContainer.innerHTML = `
+                        <div class="empty-state">
+                            <h3>📭 Aucun document trouvé</h3>
+                            <p>Ajoutez votre premier document en utilisant le formulaire ci-dessus.</p>
+                        </div>
+                    `;
                     return;
                 }
                 
-                // Séparer les documents par catégorie
-                // Programmation = documents avec 'programmation' non null
-                // Schémas = documents avec 'schémas' non null
-                const programmationDocs = documents.filter(doc => doc.programmation !== null);
-                const schemasDocs = documents.filter(doc => doc.schémas !== null);
+                let tableHTML = `
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Marque</th>
+                                <th>Type</th>
+                                <th>Catégorie</th>
+                                <th>Modèle</th>
+                                <th>Nom du fichier</th>
+                                <th>Date d'ajout</th>
+                                <th>Taille</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                `;
                 
-                // Afficher les documents de programmation
-                if (programmationDocs.length === 0) {
-                    programmationContainer.innerHTML = '<p>Aucun document de programmation trouvé.</p>';
-                } else {
-                    programmationDocs.forEach(doc => {
-                        programmationContainer.appendChild(createDocumentElement(doc, 'programmation'));
-                    });
-                }
+                documents.forEach(doc => {
+                    // Déterminer la catégorie et le type
+                    const categorie = doc.programmation ? 'Programmation' : (doc.schémas ? 'Schémas' : 'Non défini');
+                    const type = doc.programmation || doc.schémas || 'Non défini';
+                    
+                    tableHTML += `
+                        <tr>
+                            <td>${doc.id}</td>
+                            <td>${doc.marque || '-'}</td>
+                            <td>${type}</td>
+                            <td>${categorie}</td>
+                            <td>${doc.model || '-'}</td>
+                            <td>${doc.nom_fichier || '-'}</td>
+                            <td>${new Date(doc.date_upload).toLocaleDateString()}</td>
+                            <td>${doc.taille_fichier ? Math.round(doc.taille_fichier / 1024) + ' KB' : '-'}</td>
+                            <td class="action-cell">
+                                ${doc.pdf_data ? 
+                                    `<button class="table-btn view-btn" data-id="${doc.id}" data-filename="${doc.nom_fichier}" data-pdfdata="${doc.pdf_data}">
+                                        👁️ Voir
+                                    </button>` 
+                                    : 
+                                    '<span style="color: #6c757d; font-size: 12px;">Aucun PDF</span>'
+                                }
+                                <button class="table-btn delete-table-btn" data-id="${doc.id}">
+                                    🗑️ Supprimer
+                                </button>
+                            </td>
+                        </tr>
+                    `;
+                });
                 
-                // Afficher les documents de schémas
-                if (schemasDocs.length === 0) {
-                    schemasContainer.innerHTML = '<p>Aucun schéma trouvé.</p>';
-                } else {
-                    schemasDocs.forEach(doc => {
-                        schemasContainer.appendChild(createDocumentElement(doc, 'schemas'));
+                tableHTML += `
+                        </tbody>
+                    </table>
+                `;
+                
+                tableContainer.innerHTML = tableHTML;
+                
+                // Ajouter les événements pour les boutons
+                document.querySelectorAll('.view-btn').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const filename = this.getAttribute('data-filename');
+                        const pdfData = this.getAttribute('data-pdfdata');
+                        downloadPDF(filename, pdfData);
                     });
-                }
+                });
+                
+                document.querySelectorAll('.delete-table-btn').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const id = this.getAttribute('data-id');
+                        deleteDocument(id);
+                    });
+                });
                 
             } catch (error) {
-                console.error('Erreur chargement documents:', error);
-                programmationContainer.innerHTML = '<p>Erreur lors du chargement des documents.</p>';
-                schemasContainer.innerHTML = '<p>Erreur lors du chargement des documents.</p>';
+                console.error('Erreur chargement tableau:', error);
+                tableContainer.innerHTML = `
+                    <div class="empty-state">
+                        <h3>❌ Erreur lors du chargement des données</h3>
+                        <p>${error.message}</p>
+                    </div>
+                `;
             }
         }
         
-        // Créer un élément document - ADAPTÉ AUX COLONNES EXISTANTES
-        function createDocumentElement(doc, categorie) {
-            const docElement = document.createElement('div');
-            docElement.className = 'document-item';
-            
-            const hasPDF = doc.pdf_data;
-            
-            // Déterminer le type d'ascenseur en fonction de la catégorie
-            const typeAscenseur = categorie === 'programmation' ? doc.programmation : doc.schémas;
-            
-            docElement.innerHTML = `
-                <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-                    <div style="flex-grow: 1;">
-                        <div style="font-weight: 600; color: #2c3e50; margin-bottom: 5px;">
-                            ${doc.nom_fichier || 'Document sans nom'}
-                            <span class="document-badge">${doc.marque}</span>
-                            ${typeAscenseur ? `<span class="document-badge" style="background: #ff6b6b;">${typeAscenseur}</span>` : ''}
-                        </div>
-                        
-                        <div style="font-size: 12px; color: #6c757d;">
-                            ${doc.model ? `<span>Modèle: ${doc.model}</span> • ` : ''}
-                            <span>Ajouté le ${new Date(doc.date_upload).toLocaleDateString()}</span>
-                            ${doc.taille_fichier ? `• ${Math.round(doc.taille_fichier / 1024)} KB` : ''}
-                        </div>
-                    </div>
-                    <div>
-                        ${hasPDF ? 
-                            `<button class="download-btn" data-filename="${doc.nom_fichier}" data-pdfdata="${doc.pdf_data}">
-                                📥 Télécharger
-                            </button>` 
-                            : 
-                            '<span style="color: #6c757d; font-size: 12px;">Aucun PDF</span>'
-                        }
-                    </div>
-                </div>
-            `;
-            
-            // Ajouter l'événement de téléchargement
-            const downloadBtn = docElement.querySelector('.download-btn');
-            if (downloadBtn) {
-                downloadBtn.addEventListener('click', function() {
-                    const filename = this.getAttribute('data-filename');
-                    const pdfData = this.getAttribute('data-pdfdata');
-                    downloadPDF(filename, pdfData);
-                });
+        // Fonction pour supprimer un document
+        async function deleteDocument(id) {
+            if (!confirm('Êtes-vous sûr de vouloir supprimer ce document ? Cette action est irréversible.')) {
+                return;
             }
             
-            return docElement;
+            try {
+                showStatus('Suppression en cours...', 'loading');
+                
+                const { error } = await supabase
+                    .from('documents')
+                    .delete()
+                    .eq('id', id);
+                
+                if (error) {
+                    throw error;
+                }
+                
+                showStatus('✅ Document supprimé avec succès!', 'success');
+                
+                // Recharger le tableau
+                loadTableData();
+                
+            } catch (error) {
+                console.error('Erreur suppression:', error);
+                showStatus(`❌ Erreur lors de la suppression: ${error.message}`, 'error');
+            }
         }
         
         // Fonction pour télécharger le PDF
