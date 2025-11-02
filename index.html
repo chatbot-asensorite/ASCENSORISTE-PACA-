@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ascensoriste PACA - Upload Documents</title>
+    <title>Ascensoriste PACA - Gestion Documents</title>
     <style>
         * {
             box-sizing: border-box;
@@ -21,7 +21,7 @@
         }
         
         .container {
-            max-width: 800px;
+            max-width: 1000px;
             margin: 0 auto;
             background: white;
             border-radius: 15px;
@@ -53,8 +53,15 @@
             border: 2px dashed #dee2e6;
         }
         
-        .form-group {
+        .form-row {
+            display: flex;
+            gap: 15px;
             margin-bottom: 20px;
+        }
+        
+        .form-group {
+            flex: 1;
+            position: relative;
         }
         
         label {
@@ -64,7 +71,7 @@
             color: #2c3e50;
         }
         
-        input[type="text"] {
+        input[type="text"], select {
             width: 100%;
             padding: 12px;
             border: 2px solid #e9ecef;
@@ -73,9 +80,118 @@
             transition: border-color 0.3s;
         }
         
-        input[type="text"]:focus {
+        input[type="text"]:focus, select:focus {
             outline: none;
             border-color: #667eea;
+        }
+        
+        .select-with-actions {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+        
+        .select-with-actions select {
+            flex: 1;
+        }
+        
+        .action-btn {
+            background: #6c757d;
+            color: white;
+            border: none;
+            padding: 10px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.3s;
+        }
+        
+        .action-btn:hover {
+            background: #5a6268;
+        }
+        
+        .add-btn {
+            background: #28a745;
+        }
+        
+        .add-btn:hover {
+            background: #218838;
+        }
+        
+        .delete-btn {
+            background: #dc3545;
+        }
+        
+        .delete-btn:hover {
+            background: #c82333;
+        }
+        
+        .hidden-panel {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 10px;
+            display: none;
+        }
+        
+        .hidden-panel.active {
+            display: block;
+        }
+        
+        .panel-title {
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #495057;
+        }
+        
+        .panel-content {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .panel-content input {
+            flex: 1;
+        }
+        
+        .items-list {
+            max-height: 150px;
+            overflow-y: auto;
+        }
+        
+        .list-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 12px;
+            background: white;
+            border: 1px solid #e9ecef;
+            border-radius: 6px;
+            margin-bottom: 5px;
+        }
+        
+        .list-item:last-child {
+            margin-bottom: 0;
+        }
+        
+        .list-item-actions {
+            display: flex;
+            gap: 5px;
+        }
+        
+        .small-btn {
+            background: #6c757d;
+            color: white;
+            border: none;
+            padding: 4px 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        
+        .small-btn.delete {
+            background: #dc3545;
         }
         
         .file-input-wrapper {
@@ -164,12 +280,56 @@
             border: 1px solid #b3d7ff;
         }
         
+        .documents-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-top: 30px;
+        }
+        
+        .section {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+        }
+        
+        .section-title {
+            font-size: 1.5em;
+            margin-bottom: 20px;
+            color: #2c3e50;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+        
+        .programming-section {
+            border-left: 4px solid #28a745;
+        }
+        
+        .schemas-section {
+            border-left: 4px solid #007bff;
+        }
+        
         .document-item {
             background: white;
             border: 1px solid #e9ecef;
             border-radius: 8px;
             padding: 15px;
             margin-bottom: 15px;
+            transition: transform 0.2s;
+        }
+        
+        .document-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        
+        .document-badge {
+            background: #6c757d;
+            color: white;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 0.7em;
+            margin-left: 8px;
         }
         
         .download-btn {
@@ -187,6 +347,21 @@
         .download-btn:hover {
             background: #0056b3;
         }
+        
+        @media (max-width: 768px) {
+            .documents-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .form-row {
+                flex-direction: column;
+            }
+            
+            .select-with-actions {
+                flex-direction: column;
+                align-items: stretch;
+            }
+        }
     </style>
 </head>
 <body>
@@ -197,31 +372,72 @@
         </div>
         
         <div class="content">
+            <!-- Section Upload -->
             <div class="upload-section">
-                <h2>Ajouter un nouveau document</h2>
+                <h2>📤 Ajouter un nouveau document</h2>
                 <form id="uploadForm">
-                    <div class="form-group">
-                        <label for="programmation">Programmation :</label>
-                        <input type="text" id="programmation" name="programmation" required>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="marque">Marque *</label>
+                            <div class="select-with-actions">
+                                <select id="marque" name="marque" required>
+                                    <option value="">Sélectionnez une marque</option>
+                                    <!-- Les marques seront chargées dynamiquement -->
+                                </select>
+                                <button type="button" class="action-btn add-btn" id="manageMarquesBtn">⚙️</button>
+                            </div>
+                            <div class="hidden-panel" id="marquesPanel">
+                                <div class="panel-title">Gestion des marques</div>
+                                <div class="panel-content">
+                                    <input type="text" id="newMarque" placeholder="Nouvelle marque">
+                                    <button type="button" class="action-btn add-btn" id="addMarqueBtn">+</button>
+                                </div>
+                                <div class="items-list" id="marquesList">
+                                    <!-- Liste des marques -->
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="type_ascenseur">Type d'ascenseur *</label>
+                            <div class="select-with-actions">
+                                <select id="type_ascenseur" name="type_ascenseur" required>
+                                    <option value="">Sélectionnez un type</option>
+                                    <!-- Les types seront chargés dynamiquement -->
+                                </select>
+                                <button type="button" class="action-btn add-btn" id="manageTypesBtn">⚙️</button>
+                            </div>
+                            <div class="hidden-panel" id="typesPanel">
+                                <div class="panel-title">Gestion des types d'ascenseur</div>
+                                <div class="panel-content">
+                                    <input type="text" id="newType" placeholder="Nouveau type">
+                                    <button type="button" class="action-btn add-btn" id="addTypeBtn">+</button>
+                                </div>
+                                <div class="items-list" id="typesList">
+                                    <!-- Liste des types -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="categorie">Catégorie *</label>
+                            <select id="categorie" name="categorie" required>
+                                <option value="">Sélectionnez une catégorie</option>
+                                <option value="programmation">Programmation</option>
+                                <option value="schemas">Schémas</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="model">Modèle :</label>
+                            <input type="text" id="model" name="model" placeholder="Modèle spécifique">
+                        </div>
                     </div>
                     
                     <div class="form-group">
-                        <label for="model">Modèle :</label>
-                        <input type="text" id="model" name="model" required>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="marque">Marque :</label>
-                        <input type="text" id="marque" name="marque" required>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="schemas">Schémas :</label>
-                        <input type="text" id="schemas" name="schemas">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="pdfFile">Document PDF :</label>
+                        <label for="pdfFile">Document PDF *</label>
                         <div class="file-input-wrapper">
                             <div class="file-input-custom">
                                 📎 Choisir un fichier PDF
@@ -231,7 +447,7 @@
                         <div class="file-name" id="fileName">Aucun fichier sélectionné</div>
                     </div>
                     
-                    <button type="submit" class="btn" id="submitBtn">
+                    <button type="submit" class="btn">
                         💾 Enregistrer le document
                     </button>
                 </form>
@@ -239,10 +455,22 @@
                 <div id="statusMessage"></div>
             </div>
             
-            <div class="documents-list">
-                <h2>Documents existants</h2>
-                <div id="documentsContainer">
-                    <!-- Les documents seront chargés ici -->
+            <!-- Sections Documents -->
+            <div class="documents-grid">
+                <!-- Section Programmation -->
+                <div class="section programming-section">
+                    <h3 class="section-title">🖥️ Programmation</h3>
+                    <div id="programmationContainer">
+                        <!-- Documents de programmation -->
+                    </div>
+                </div>
+                
+                <!-- Section Schémas -->
+                <div class="section schemas-section">
+                    <h3 class="section-title">📐 Schémas</h3>
+                    <div id="schemasContainer">
+                        <!-- Documents de schémas -->
+                    </div>
                 </div>
             </div>
         </div>
@@ -260,9 +488,153 @@
         const uploadForm = document.getElementById('uploadForm');
         const pdfFileInput = document.getElementById('pdfFile');
         const fileName = document.getElementById('fileName');
-        const submitBtn = document.getElementById('submitBtn');
         const statusMessage = document.getElementById('statusMessage');
-        const documentsContainer = document.getElementById('documentsContainer');
+        const programmationContainer = document.getElementById('programmationContainer');
+        const schemasContainer = document.getElementById('schemasContainer');
+        
+        // Gestion des marques et types
+        const marqueSelect = document.getElementById('marque');
+        const typeSelect = document.getElementById('type_ascenseur');
+        const manageMarquesBtn = document.getElementById('manageMarquesBtn');
+        const manageTypesBtn = document.getElementById('manageTypesBtn');
+        const marquesPanel = document.getElementById('marquesPanel');
+        const typesPanel = document.getElementById('typesPanel');
+        const newMarqueInput = document.getElementById('newMarque');
+        const newTypeInput = document.getElementById('newType');
+        const addMarqueBtn = document.getElementById('addMarqueBtn');
+        const addTypeBtn = document.getElementById('addTypeBtn');
+        const marquesList = document.getElementById('marquesList');
+        const typesList = document.getElementById('typesList');
+        
+        // Données des marques et types (stockées dans localStorage)
+        let marques = JSON.parse(localStorage.getItem('ascenseur_marques')) || ['Otis', 'Schindler', 'Kone', 'ThyssenKrupp'];
+        let typesAscenseur = JSON.parse(localStorage.getItem('ascenseur_types')) || ['Hydraulique', 'Électrique', 'MRL', 'LVA'];
+        
+        // Initialisation
+        function initApp() {
+            updateMarquesList();
+            updateTypesList();
+            loadDocuments();
+            
+            // Gestion des panels
+            manageMarquesBtn.addEventListener('click', function() {
+                marquesPanel.classList.toggle('active');
+                typesPanel.classList.remove('active');
+            });
+            
+            manageTypesBtn.addEventListener('click', function() {
+                typesPanel.classList.toggle('active');
+                marquesPanel.classList.remove('active');
+            });
+            
+            // Fermer les panels en cliquant ailleurs
+            document.addEventListener('click', function(e) {
+                if (!e.target.closest('.form-group')) {
+                    marquesPanel.classList.remove('active');
+                    typesPanel.classList.remove('active');
+                }
+            });
+        }
+        
+        // Mettre à jour la liste des marques
+        function updateMarquesList() {
+            // Mettre à jour le select
+            marqueSelect.innerHTML = '<option value="">Sélectionnez une marque</option>';
+            marques.forEach(marque => {
+                const option = document.createElement('option');
+                option.value = marque;
+                option.textContent = marque;
+                marqueSelect.appendChild(option);
+            });
+            
+            // Mettre à jour la liste dans le panel
+            marquesList.innerHTML = '';
+            marques.forEach(marque => {
+                const listItem = document.createElement('div');
+                listItem.className = 'list-item';
+                listItem.innerHTML = `
+                    <span>${marque}</span>
+                    <div class="list-item-actions">
+                        <button class="small-btn delete" data-marque="${marque}">🗑️</button>
+                    </div>
+                `;
+                marquesList.appendChild(listItem);
+            });
+            
+            // Ajouter les événements de suppression
+            marquesList.querySelectorAll('.small-btn.delete').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const marqueToRemove = this.getAttribute('data-marque');
+                    marques = marques.filter(m => m !== marqueToRemove);
+                    updateMarquesList();
+                });
+            });
+            
+            // Sauvegarder dans localStorage
+            localStorage.setItem('ascenseur_marques', JSON.stringify(marques));
+        }
+        
+        // Mettre à jour la liste des types
+        function updateTypesList() {
+            // Mettre à jour le select
+            typeSelect.innerHTML = '<option value="">Sélectionnez un type</option>';
+            typesAscenseur.forEach(type => {
+                const option = document.createElement('option');
+                option.value = type;
+                option.textContent = type;
+                typeSelect.appendChild(option);
+            });
+            
+            // Mettre à jour la liste dans le panel
+            typesList.innerHTML = '';
+            typesAscenseur.forEach(type => {
+                const listItem = document.createElement('div');
+                listItem.className = 'list-item';
+                listItem.innerHTML = `
+                    <span>${type}</span>
+                    <div class="list-item-actions">
+                        <button class="small-btn delete" data-type="${type}">🗑️</button>
+                    </div>
+                `;
+                typesList.appendChild(listItem);
+            });
+            
+            // Ajouter les événements de suppression
+            typesList.querySelectorAll('.small-btn.delete').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const typeToRemove = this.getAttribute('data-type');
+                    typesAscenseur = typesAscenseur.filter(t => t !== typeToRemove);
+                    updateTypesList();
+                });
+            });
+            
+            // Sauvegarder dans localStorage
+            localStorage.setItem('ascenseur_types', JSON.stringify(typesAscenseur));
+        }
+        
+        // Ajouter une nouvelle marque
+        addMarqueBtn.addEventListener('click', function() {
+            const newMarque = newMarqueInput.value.trim();
+            if (newMarque && !marques.includes(newMarque)) {
+                marques.push(newMarque);
+                updateMarquesList();
+                newMarqueInput.value = '';
+                // Sélectionner la nouvelle marque
+                marqueSelect.value = newMarque;
+            }
+        });
+        
+        // Ajouter un nouveau type
+        addTypeBtn.addEventListener('click', function() {
+            const newType = newTypeInput.value.trim();
+            if (newType && !typesAscenseur.includes(newType)) {
+                typesAscenseur.push(newType);
+                updateTypesList();
+                newTypeInput.value = '';
+                // Sélectionner le nouveau type
+                typeSelect.value = newType;
+            }
+        });
         
         // Afficher le nom du fichier sélectionné
         pdfFileInput.addEventListener('change', function() {
@@ -277,10 +649,10 @@
         uploadForm.addEventListener('submit', async function(e) {
             e.preventDefault();
             
-            const programmation = document.getElementById('programmation').value;
-            const model = document.getElementById('model').value;
             const marque = document.getElementById('marque').value;
-            const schemas = document.getElementById('schemas').value;
+            const type_ascenseur = document.getElementById('type_ascenseur').value;
+            const categorie = document.getElementById('categorie').value;
+            const model = document.getElementById('model').value;
             const file = pdfFileInput.files[0];
             
             if (!file) {
@@ -294,6 +666,7 @@
             }
             
             // Désactiver le bouton pendant l'upload
+            const submitBtn = uploadForm.querySelector('.btn');
             submitBtn.disabled = true;
             submitBtn.textContent = 'Enregistrement en cours...';
             
@@ -307,15 +680,15 @@
                     try {
                         const pdfBase64 = e.target.result.split(',')[1];
                         
-                        // Préparer les données avec les VRAIS noms de colonnes
+                        // Préparer les données
                         const documentData = {
-                            programmation: programmation,  // VRAI nom : programmation
-                            model: model,                  // VRAI nom : model
-                            marque: marque,               // VRAI nom : marque
-                            schémas: schemas,             // VRAI nom : schémas
+                            marque: marque,
+                            type_ascenseur: type_ascenseur,
+                            categorie: categorie,
+                            model: model,
                             nom_fichier: file.name,
                             date_upload: new Date().toISOString(),
-                            pdf_data: pdfBase64,          // Stocker le PDF en base64
+                            pdf_data: pdfBase64,
                             taille_fichier: file.size
                         };
                         
@@ -374,72 +747,101 @@
                 const { data: documents, error } = await supabase
                     .from('documents')
                     .select('*')
-                    .order('id', { ascending: false });
+                    .order('date_upload', { ascending: false });
                 
                 if (error) {
                     throw error;
                 }
                 
-                documentsContainer.innerHTML = '';
+                // Vider les conteneurs
+                programmationContainer.innerHTML = '';
+                schemasContainer.innerHTML = '';
                 
                 if (documents.length === 0) {
-                    documentsContainer.innerHTML = '<p>Aucun document trouvé.</p>';
+                    programmationContainer.innerHTML = '<p>Aucun document de programmation trouvé.</p>';
+                    schemasContainer.innerHTML = '<p>Aucun schéma trouvé.</p>';
                     return;
                 }
                 
-                documents.forEach(doc => {
-                    const docElement = document.createElement('div');
-                    docElement.className = 'document-item';
-                    
-                    // Vérifier si le PDF est stocké en base64
-                    const hasPDF = doc.pdf_data;
-                    
-                    docElement.innerHTML = `
-                        <div style="display: flex; justify-content: space-between; align-items: center;">
-                            <div style="flex-grow: 1;">
-                                <div style="font-weight: 600; color: #2c3e50;">${doc.nom_fichier || 'Document sans nom'}</div>
-                                <div style="font-size: 14px; color: #6c757d; margin-top: 5px;">
-                                    ${doc.programmation} • ${doc.model} • ${doc.marque}
-                                    ${doc.schémas ? '• ' + doc.schémas : ''}
-                                </div>
-                                <div style="font-size: 14px; color: #6c757d; margin-top: 5px;">
-                                    Uploadé le ${new Date(doc.date_upload).toLocaleDateString()}
-                                    ${doc.taille_fichier ? '• Taille: ' + Math.round(doc.taille_fichier / 1024) + ' KB' : ''}
-                                </div>
-                            </div>
-                            <div>
-                                ${hasPDF ? 
-                                    `<button class="download-btn" data-filename="${doc.nom_fichier}" data-pdfdata="${doc.pdf_data}">
-                                        📥 Télécharger
-                                    </button>` 
-                                    : 
-                                    '<span style="color: #6c757d;">Aucun PDF</span>'
-                                }
-                            </div>
-                        </div>
-                    `;
-                    documentsContainer.appendChild(docElement);
-                });
+                // Séparer les documents par catégorie
+                const programmationDocs = documents.filter(doc => doc.categorie === 'programmation');
+                const schemasDocs = documents.filter(doc => doc.categorie === 'schemas');
                 
-                // Ajouter les événements de clic pour les boutons de téléchargement
-                document.querySelectorAll('.download-btn').forEach(btn => {
-                    btn.addEventListener('click', function() {
-                        const filename = this.getAttribute('data-filename');
-                        const pdfData = this.getAttribute('data-pdfdata');
-                        downloadPDF(filename, pdfData);
+                // Afficher les documents de programmation
+                if (programmationDocs.length === 0) {
+                    programmationContainer.innerHTML = '<p>Aucun document de programmation trouvé.</p>';
+                } else {
+                    programmationDocs.forEach(doc => {
+                        programmationContainer.appendChild(createDocumentElement(doc));
                     });
-                });
+                }
+                
+                // Afficher les documents de schémas
+                if (schemasDocs.length === 0) {
+                    schemasContainer.innerHTML = '<p>Aucun schéma trouvé.</p>';
+                } else {
+                    schemasDocs.forEach(doc => {
+                        schemasContainer.appendChild(createDocumentElement(doc));
+                    });
+                }
                 
             } catch (error) {
                 console.error('Erreur chargement documents:', error);
-                documentsContainer.innerHTML = '<p>Erreur lors du chargement des documents.</p>';
+                programmationContainer.innerHTML = '<p>Erreur lors du chargement des documents.</p>';
+                schemasContainer.innerHTML = '<p>Erreur lors du chargement des documents.</p>';
             }
+        }
+        
+        // Créer un élément document
+        function createDocumentElement(doc) {
+            const docElement = document.createElement('div');
+            docElement.className = 'document-item';
+            
+            const hasPDF = doc.pdf_data;
+            
+            docElement.innerHTML = `
+                <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                    <div style="flex-grow: 1;">
+                        <div style="font-weight: 600; color: #2c3e50; margin-bottom: 5px;">
+                            ${doc.nom_fichier || 'Document sans nom'}
+                            <span class="document-badge">${doc.marque}</span>
+                            ${doc.type_ascenseur ? `<span class="document-badge" style="background: #ff6b6b;">${doc.type_ascenseur}</span>` : ''}
+                        </div>
+                        
+                        <div style="font-size: 12px; color: #6c757d;">
+                            ${doc.model ? `<span>Modèle: ${doc.model}</span> • ` : ''}
+                            <span>Ajouté le ${new Date(doc.date_upload).toLocaleDateString()}</span>
+                            ${doc.taille_fichier ? `• ${Math.round(doc.taille_fichier / 1024)} KB` : ''}
+                        </div>
+                    </div>
+                    <div>
+                        ${hasPDF ? 
+                            `<button class="download-btn" data-filename="${doc.nom_fichier}" data-pdfdata="${doc.pdf_data}">
+                                📥 Télécharger
+                            </button>` 
+                            : 
+                            '<span style="color: #6c757d; font-size: 12px;">Aucun PDF</span>'
+                        }
+                    </div>
+                </div>
+            `;
+            
+            // Ajouter l'événement de téléchargement
+            const downloadBtn = docElement.querySelector('.download-btn');
+            if (downloadBtn) {
+                downloadBtn.addEventListener('click', function() {
+                    const filename = this.getAttribute('data-filename');
+                    const pdfData = this.getAttribute('data-pdfdata');
+                    downloadPDF(filename, pdfData);
+                });
+            }
+            
+            return docElement;
         }
         
         // Fonction pour télécharger le PDF
         function downloadPDF(filename, base64Data) {
             try {
-                // Créer un blob à partir des données base64
                 const byteCharacters = atob(base64Data);
                 const byteNumbers = new Array(byteCharacters.length);
                 for (let i = 0; i < byteCharacters.length; i++) {
@@ -448,17 +850,13 @@
                 const byteArray = new Uint8Array(byteNumbers);
                 const blob = new Blob([byteArray], { type: 'application/pdf' });
                 
-                // Créer un URL object pour le blob
                 const url = URL.createObjectURL(blob);
-                
-                // Créer un lien de téléchargement
                 const a = document.createElement('a');
                 a.href = url;
                 a.download = filename || 'document.pdf';
                 document.body.appendChild(a);
                 a.click();
                 
-                // Nettoyer
                 document.body.removeChild(a);
                 URL.revokeObjectURL(url);
                 
@@ -469,8 +867,8 @@
             }
         }
         
-        // Charger les documents au démarrage
-        loadDocuments();
+        // Initialiser l'application
+        initApp();
     </script>
 </body>
 </html>
