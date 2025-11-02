@@ -811,7 +811,12 @@
                             
                             <div class="form-group">
                                 <label for="techModel">Modèle</label>
-                                <input type="text" id="techModel" placeholder="Modèle spécifique">
+                                <select id="techModel">
+                                    <option value="">Sélectionnez un modèle</option>
+                                </select>
+                            <div style="font-size: 12px; color: #6c757d; margin-top: 5px;">
+                                    Sélectionnez d'abord une marque et un type
+                                </div>
                             </div>
                         </div>
                         <button class="btn" id="searchBtn">🔍 Rechercher</button>
@@ -923,6 +928,9 @@
         // État du tableau admin
         let isTableVisible = false;
         
+        // Liste des modèles depuis Supabase
+        let modelesDisponibles = [];
+        
         // Initialisation
         function initApp() {
             updateMarquesList();
@@ -930,6 +938,30 @@
             initAdminInterface();
             initTechnicianInterface();
             initPasswordManagement();
+            loadModelesFromSupabase();
+        }
+        
+        // Charger les modèles depuis Supabase
+        async function loadModelesFromSupabase() {
+            try {
+                const { data: documents, error } = await supabase
+                    .from('documents')
+                    .select('model, marque, programmation, schémas')
+                    .not('model', 'is', null);
+                
+                if (error) {
+                    throw error;
+                }
+                
+                // Extraire les modèles uniques
+                modelesDisponibles = [...new Set(documents.map(doc => doc.model))].filter(model => model && model.trim() !== '');
+                
+                console.log('Modèles chargés depuis Supabase:', modelesDisponibles);
+                
+            } catch (error) {
+                console.error('Erreur lors du chargement des modèles:', error);
+                modelesDisponibles = [];
+            }
         }
         
         // Mettre à jour la liste des marques
@@ -1259,6 +1291,9 @@
                             uploadForm.reset();
                             fileName.textContent = 'Aucun fichier sélectionné';
                             
+                            // Recharger les modèles depuis Supabase
+                            await loadModelesFromSupabase();
+                            
                             // Si le tableau est visible, le recharger
                             if (isTableVisible) {
                                 loadTableData();
@@ -1418,6 +1453,9 @@
                 
                 showStatus(statusMessage, '✅ Document supprimé avec succès!', 'success');
                 
+                // Recharger les modèles depuis Supabase
+                await loadModelesFromSupabase();
+                
                 // Recharger le tableau
                 loadTableData();
                 
@@ -1518,6 +1556,71 @@
                     loginBtn.click();
                 }
             });
+            
+            // Mettre à jour les modèles quand la marque ou le type change
+            techMarque.addEventListener('change', updateTechModelSelect);
+            techType.addEventListener('change', updateTechModelSelect);
+        }
+        
+        // Mettre à jour le select des modèles pour le technicien
+        async function updateTechModelSelect() {
+            const marque = techMarque.value;
+            const type = techType.value;
+            
+            techModel.innerHTML = '<option value="">Sélectionnez un modèle</option>';
+            
+            if (!marque || !type) {
+                return;
+            }
+            
+            try {
+                // Charger les modèles spécifiques à cette marque et type depuis Supabase
+                let query = supabase
+                    .from('documents')
+                    .select('model')
+                    .not('model', 'is', null);
+                
+                if (marque) {
+                    query = query.eq('marque', marque);
+                }
+                
+                if (type) {
+                    query = query.or(`programmation.eq.${type},schémas.eq.${type}`);
+                }
+                
+                const { data: documents, error } = await query;
+                
+                if (error) {
+                    throw error;
+                }
+                
+                // Extraire les modèles uniques
+                const modelesFiltres = [...new Set(documents.map(doc => doc.model))].filter(model => model && model.trim() !== '');
+                
+                // Ajouter les options au select
+                modelesFiltres.forEach(model => {
+                    const option = document.createElement('option');
+                    option.value = model;
+                    option.textContent = model;
+                    techModel.appendChild(option);
+                });
+                
+                if (modelesFiltres.length === 0) {
+                    const option = document.createElement('option');
+                    option.value = '';
+                    option.textContent = 'Aucun modèle trouvé';
+                    option.disabled = true;
+                    techModel.appendChild(option);
+                }
+                
+            } catch (error) {
+                console.error('Erreur lors du chargement des modèles:', error);
+                const option = document.createElement('option');
+                option.value = '';
+                option.textContent = 'Erreur de chargement';
+                option.disabled = true;
+                techModel.appendChild(option);
+            }
         }
         
         // Réinitialiser l'interface admin
@@ -1556,13 +1659,16 @@
                 option.textContent = type;
                 techType.appendChild(option);
             });
+            
+            // Réinitialiser le select des modèles
+            techModel.innerHTML = '<option value="">Sélectionnez un modèle</option>';
         }
         
         // Recherche de documents
         async function searchDocuments() {
             const marque = techMarque.value;
             const type = techType.value;
-            const model = techModel.value.trim();
+            const model = techModel.value;
             
             if (!marque || !type) {
                 showStatus(loginStatus, 'Veuillez sélectionner au moins une marque et un type', 'error');
@@ -1584,7 +1690,7 @@
                 }
                 
                 if (model) {
-                    query = query.ilike('model', `%${model}%`);
+                    query = query.eq('model', model);
                 }
                 
                 const { data: documents, error } = await query;
@@ -1617,6 +1723,9 @@
                                 <div style="font-weight: 600;">${doc.nom_fichier}</div>
                                 <div style="font-size: 14px; color: #6c757d;">
                                     ${doc.marque} • ${typeDoc} • ${doc.model || 'Non spécifié'}
+                                </div>
+                                <div style="font-size: 12px; color: #17a2b8; margin-top: 5px;">
+                                    ${categorie}
                                 </div>
                             </div>
                             <div>
@@ -1653,7 +1762,7 @@
         async function askAI() {
             const marque = techMarque.value;
             const type = techType.value;
-            const model = techModel.value.trim();
+            const model = techModel.value;
             
             aiSection.classList.add('active');
             aiResponse.innerHTML = '🧠 L\'IA analyse votre demande...';
