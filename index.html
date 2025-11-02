@@ -1,44 +1,24 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Test Supabase</title>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <title>Test Final</title>
 </head>
 <body>
-    <h1>Test Supabase Connection</h1>
-    <div id="result"></div>
-
     <script>
-        // URL corrigée d'après le code fonctionnel
-        const supabaseUrl = 'https://prrzsosrbrskmeozmmmu.supabase.co';
-        const supabaseKey = 'sb_publishable_2nwtPyBWSeUNNtx06wROTw_Txpyk2W3';
-        
-        const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
-        
-        async function testSupabase() {
-            const resultElement = document.getElementById('result');
-            resultElement.innerHTML = "⏳ Test en cours...";
-            
-            try {
-                const { data, error } = await supabase
-                    .from('documents')
-                    .select('*')
-                    .limit(1);
-                
-                if (error) {
-                    resultElement.innerHTML = `❌ ERREUR: ${error.message}`;
-                    resultElement.style.color = 'red';
-                } else {
-                    resultElement.innerHTML = `✅ SUCCÈS! Données: ${JSON.stringify(data)}`;
-                    resultElement.style.color = 'green';
-                }
-            } catch (err) {
-                resultElement.innerHTML = `❌ ERREUR: ${err.message}`;
-                resultElement.style.color = 'red';
+        // Test final après configuration RLS
+        fetch('https://prrzsosrbrskmeozmmmu.supabase.co/rest/v1/documents', {
+            headers: {
+                'apikey': 'sb_publishable_2nwtPyBWSeUNNtx06wROTw_Txpyk2W3',
+                'Content-Type': 'application/json'
             }
-        }
-        
-        testSupabase();
+        })
+        .then(r => r.json())
+        .then(data => {
+            document.body.innerHTML = `✅ CONNEXION RÉUSSIE! ${data.length} documents`;
+        })
+        .catch(err => {
+            document.body.innerHTML = `❌ ÉCHEC: ${err.message}`;
+        });
     </script>
 </body>
 </html>
