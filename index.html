@@ -71,6 +71,11 @@
             color: #2c3e50;
         }
         
+        .required::after {
+            content: " *";
+            color: #dc3545;
+        }
+        
         input[type="text"], select {
             width: 100%;
             padding: 12px;
@@ -83,6 +88,10 @@
         input[type="text"]:focus, select:focus {
             outline: none;
             border-color: #667eea;
+        }
+        
+        input:invalid {
+            border-color: #dc3545;
         }
         
         .select-with-actions {
@@ -445,7 +454,7 @@
                 <form id="uploadForm">
                     <div class="form-row">
                         <div class="form-group">
-                            <label for="marque">Marque *</label>
+                            <label for="marque" class="required">Marque</label>
                             <div class="select-with-actions">
                                 <select id="marque" name="marque" required>
                                     <option value="">Sélectionnez une marque</option>
@@ -466,7 +475,7 @@
                         </div>
                         
                         <div class="form-group">
-                            <label for="type_ascenseur">Type d'ascenseur *</label>
+                            <label for="type_ascenseur" class="required">Type d'ascenseur</label>
                             <div class="select-with-actions">
                                 <select id="type_ascenseur" name="type_ascenseur" required>
                                     <option value="">Sélectionnez un type</option>
@@ -489,7 +498,7 @@
                     
                     <div class="form-row">
                         <div class="form-group">
-                            <label for="categorie">Type de document *</label>
+                            <label for="categorie" class="required">Type de document</label>
                             <select id="categorie" name="categorie" required>
                                 <option value="">Sélectionnez un type</option>
                                 <option value="programmation">Programmation</option>
@@ -498,13 +507,13 @@
                         </div>
                         
                         <div class="form-group">
-                            <label for="model">Modèle :</label>
-                            <input type="text" id="model" name="model" placeholder="Modèle spécifique">
+                            <label for="model" class="required">Modèle</label>
+                            <input type="text" id="model" name="model" placeholder="Modèle spécifique" required>
                         </div>
                     </div>
                     
                     <div class="form-group">
-                        <label for="pdfFile">Document PDF *</label>
+                        <label for="pdfFile" class="required">Document PDF</label>
                         <div class="file-input-wrapper">
                             <div class="file-input-custom">
                                 📎 Choisir un fichier PDF
@@ -740,6 +749,27 @@
             const categorie = document.getElementById('categorie').value;
             const model = document.getElementById('model').value;
             const file = pdfFileInput.files[0];
+            
+            // Validation des champs obligatoires
+            if (!marque) {
+                showStatus('Veuillez sélectionner une marque', 'error');
+                return;
+            }
+            
+            if (!type_ascenseur) {
+                showStatus('Veuillez sélectionner un type d\'ascenseur', 'error');
+                return;
+            }
+            
+            if (!categorie) {
+                showStatus('Veuillez sélectionner un type de document', 'error');
+                return;
+            }
+            
+            if (!model) {
+                showStatus('Veuillez remplir le champ Modèle', 'error');
+                return;
+            }
             
             if (!file) {
                 showStatus('Veuillez sélectionner un fichier PDF', 'error');
