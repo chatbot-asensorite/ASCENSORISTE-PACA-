@@ -3,435 +3,55 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ascensoriste PACA - Upload Documents</title>
+    <title>ASCENSORISTE PACA</title>
     <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-        
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            line-height: 1.6;
-            color: #333;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            padding: 20px;
+            font-family: Arial, sans-serif;
+            margin: 40px;
+            background-color: #f5f5f5;
         }
-        
         .container {
-            max-width: 800px;
-            margin: 0 auto;
             background: white;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-            overflow: hidden;
-        }
-        
-        .header {
-            background: #2c3e50;
-            color: white;
-            padding: 30px;
-            text-align: center;
-        }
-        
-        .header h1 {
-            font-size: 2.2em;
-            margin-bottom: 10px;
-        }
-        
-        .content {
-            padding: 30px;
-        }
-        
-        .upload-section {
-            background: #f8f9fa;
+            padding: 20px;
             border-radius: 10px;
-            padding: 25px;
-            margin-bottom: 30px;
-            border: 2px dashed #dee2e6;
-        }
-        
-        .form-group {
-            margin-bottom: 20px;
-        }
-        
-        label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-            color: #2c3e50;
-        }
-        
-        input[type="text"] {
-            width: 100%;
-            padding: 12px;
-            border: 2px solid #e9ecef;
-            border-radius: 8px;
-            font-size: 16px;
-            transition: border-color 0.3s;
-        }
-        
-        input[type="text"]:focus {
-            outline: none;
-            border-color: #667eea;
-        }
-        
-        .file-input-wrapper {
-            position: relative;
-            overflow: hidden;
-            display: inline-block;
-            width: 100%;
-        }
-        
-        .file-input-wrapper input[type=file] {
-            position: absolute;
-            left: 0;
-            top: 0;
-            opacity: 0;
-            cursor: pointer;
-        }
-        
-        .file-input-custom {
-            background: #667eea;
-            color: white;
-            padding: 12px 20px;
-            border-radius: 8px;
-            text-align: center;
-            cursor: pointer;
-            transition: background 0.3s;
-        }
-        
-        .file-input-custom:hover {
-            background: #5a6fd8;
-        }
-        
-        .file-name {
-            margin-top: 8px;
-            font-size: 14px;
-            color: #6c757d;
-        }
-        
-        .btn {
-            background: #28a745;
-            color: white;
-            border: none;
-            padding: 15px 30px;
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            width: 100%;
-            transition: background 0.3s;
-        }
-        
-        .btn:hover {
-            background: #218838;
-        }
-        
-        .btn:disabled {
-            background: #6c757d;
-            cursor: not-allowed;
-        }
-        
-        .status {
-            padding: 10px;
-            border-radius: 5px;
-            margin-top: 15px;
-            text-align: center;
-            font-weight: 600;
-        }
-        
-        .status.success {
-            background: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-        }
-        
-        .status.error {
-            background: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-        }
-        
-        .status.loading {
-            background: #cce7ff;
-            color: #004085;
-            border: 1px solid #b3d7ff;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="header">
-            <h1>📄 Ascensoriste PACA</h1>
-            <p>Gestion des documents techniques</p>
-        </div>
-        
-        <div class="content">
-            <div class="upload-section">
-                <h2>Ajouter un nouveau document</h2>
-                <form id="uploadForm">
-                    <div class="form-group">
-                        <label for="programmation">Programmation :</label>
-                        <input type="text" id="programmation" name="programmation" required>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="model">Modèle :</label>
-                        <input type="text" id="model" name="model" required>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="marque">Marque :</label>
-                        <input type="text" id="marque" name="marque" required>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="schemas">Schémas :</label>
-                        <input type="text" id="schemas" name="schemas">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="pdfFile">Document PDF :</label>
-                        <div class="file-input-wrapper">
-                            <div class="file-input-custom">
-                                📎 Choisir un fichier PDF
-                            </div>
-                            <input type="file" id="pdfFile" name="pdfFile" accept=".pdf" required>
-                        </div>
-                        <div class="file-name" id="fileName">Aucun fichier sélectionné</div>
-                    </div>
-                    
-                    <button type="submit" class="btn" id="submitBtn">
-                        💾 Enregistrer le document (PDF stocké localement)
-                    </button>
-                </form>
-                
-                <div id="statusMessage"></div>
-            </div>
-            
-            <div class="documents-list">
-                <h2>Documents existants</h2>
-                <div id="documentsContainer">
-                    <!-- Les documents seront chargés ici -->
-                </div>
-            </div>
-        </div>
+        <h1>✅ Application Ascensoriste PACA</h1>
+        <p>Connexion Supabase établie avec succès</p>
+        <div id="data-result">Chargement des données...</div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
         // Configuration Supabase
         const SUPABASE_URL = 'https://prrzsosrbrskmeozmmmu.supabase.co';
         const SUPABASE_KEY = 'sb_publishable_2nwtPyBWSeUNNtx06wROTw_Txpyk2W3';
         
-        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-        
-        // Éléments DOM
-        const uploadForm = document.getElementById('uploadForm');
-        const pdfFileInput = document.getElementById('pdfFile');
-        const fileName = document.getElementById('fileName');
-        const submitBtn = document.getElementById('submitBtn');
-        const statusMessage = document.getElementById('statusMessage');
-        const documentsContainer = document.getElementById('documentsContainer');
-        
-        // Afficher le nom du fichier sélectionné
-        pdfFileInput.addEventListener('change', function() {
-            if (this.files.length > 0) {
-                fileName.textContent = this.files[0].name;
-            } else {
-                fileName.textContent = 'Aucun fichier sélectionné';
+        // Chargement des données
+        fetch(`${SUPABASE_URL}/rest/v1/documents?select=*`, {
+            headers: {
+                'apikey': SUPABASE_KEY,
+                'Authorization': `Bearer ${SUPABASE_KEY}`,
+                'Content-Type': 'application/json'
             }
+        })
+        .then(response => {
+            if (!response.ok) throw new Error(`Erreur HTTP: ${response.status}`);
+            return response.json();
+        })
+        .then(data => {
+            document.getElementById('data-result').innerHTML = 
+                `✅ ${data.length} document(s) chargé(s) avec succès`;
+            console.log('Données:', data);
+        })
+        .catch(err => {
+            document.getElementById('data-result').innerHTML = 
+                `❌ Erreur: ${err.message}`;
+            console.error('Erreur détaillée:', err);
         });
-        
-        // Gestion de l'upload
-        uploadForm.addEventListener('submit', async function(e) {
-            e.preventDefault();
-            
-            const programmation = document.getElementById('programmation').value;
-            const model = document.getElementById('model').value;
-            const marque = document.getElementById('marque').value;
-            const schemas = document.getElementById('schemas').value;
-            const file = pdfFileInput.files[0];
-            
-            if (!file) {
-                showStatus('Veuillez sélectionner un fichier PDF', 'error');
-                return;
-            }
-            
-            if (file.type !== 'application/pdf') {
-                showStatus('Veuillez sélectionner un fichier PDF valide', 'error');
-                return;
-            }
-            
-            // Désactiver le bouton pendant l'upload
-            submitBtn.disabled = true;
-            submitBtn.textContent = 'Enregistrement en cours...';
-            
-            try {
-                showStatus('Conversion du PDF en base64...', 'loading');
-                
-                // Convertir le PDF en base64 pour le stocker dans la base de données
-                const reader = new FileReader();
-                
-                reader.onload = async function(e) {
-                    try {
-                        const pdfBase64 = e.target.result.split(',')[1]; // Enlever le préfixe data:application/pdf;base64,
-                        
-                        // Enregistrer les métadonnées dans la table documents AVEC le PDF en base64
-                        const { data: dbData, error: dbError } = await supabase
-                            .from('documents')
-                            .insert([
-                                {
-                                    programmation: programmation,
-                                    model: model,
-                                    marque: marque,
-                                    schemas: schemas,
-                                    nom_fichier: file.name,
-                                    pdf_data: pdfBase64, // Stocker le PDF en base64
-                                    date_upload: new Date().toISOString(),
-                                    taille_fichier: file.size
-                                }
-                            ]);
-                        
-                        if (dbError) {
-                            throw new Error(`Erreur base de données: ${dbError.message}`);
-                        }
-                        
-                        showStatus('✅ Document enregistré avec succès!', 'success');
-                        uploadForm.reset();
-                        fileName.textContent = 'Aucun fichier sélectionné';
-                        
-                        // Recharger la liste des documents
-                        loadDocuments();
-                        
-                    } catch (error) {
-                        console.error('Erreur:', error);
-                        showStatus(`❌ Erreur: ${error.message}`, 'error');
-                    } finally {
-                        // Réactiver le bouton
-                        submitBtn.disabled = false;
-                        submitBtn.textContent = '💾 Enregistrer le document (PDF stocké localement)';
-                    }
-                };
-                
-                reader.onerror = function() {
-                    showStatus('❌ Erreur lors de la lecture du fichier', 'error');
-                    submitBtn.disabled = false;
-                    submitBtn.textContent = '💾 Enregistrer le document (PDF stocké localement)';
-                };
-                
-                // Lire le fichier comme Data URL (base64)
-                reader.readAsDataURL(file);
-                
-            } catch (error) {
-                console.error('Erreur:', error);
-                showStatus(`❌ Erreur: ${error.message}`, 'error');
-                submitBtn.disabled = false;
-                submitBtn.textContent = '💾 Enregistrer le document (PDF stocké localement)';
-            }
-        });
-        
-        // Fonction pour afficher les messages de statut
-        function showStatus(message, type) {
-            statusMessage.textContent = message;
-            statusMessage.className = 'status ' + type;
-        }
-        
-        // Charger les documents existants
-        async function loadDocuments() {
-            try {
-                const { data: documents, error } = await supabase
-                    .from('documents')
-                    .select('*')
-                    .order('id', { ascending: false });
-                
-                if (error) {
-                    throw error;
-                }
-                
-                documentsContainer.innerHTML = '';
-                
-                if (documents.length === 0) {
-                    documentsContainer.innerHTML = '<p>Aucun document trouvé.</p>';
-                    return;
-                }
-                
-                documents.forEach(doc => {
-                    const docElement = document.createElement('div');
-                    docElement.className = 'document-item';
-                    docElement.style.cssText = 'background: white; border: 1px solid #e9ecef; border-radius: 8px; padding: 15px; margin-bottom: 15px;';
-                    
-                    let downloadButton = '';
-                    if (doc.pdf_data) {
-                        downloadButton = `
-                            <button onclick='downloadPDF("${doc.nom_fichier}", "${doc.pdf_data}")' style="
-                                background: #007bff;
-                                color: white;
-                                padding: 8px 15px;
-                                border-radius: 5px;
-                                text-decoration: none;
-                                border: none;
-                                cursor: pointer;
-                                margin-left: 10px;
-                            ">📥 Télécharger</button>
-                        `;
-                    }
-                    
-                    docElement.innerHTML = `
-                        <div style="display: flex; justify-content: space-between; align-items: center;">
-                            <div>
-                                <div style="font-weight: 600; color: #2c3e50;">${doc.nom_fichier || 'Document sans nom'}</div>
-                                <div style="font-size: 14px; color: #6c757d; margin-top: 5px;">
-                                    ${doc.programmation} • ${doc.model} • ${doc.marque}
-                                    ${doc.schemas ? '• ' + doc.schemas : ''}
-                                </div>
-                                <div style="font-size: 14px; color: #6c757d; margin-top: 5px;">
-                                    Uploadé le ${new Date(doc.date_upload).toLocaleDateString()}
-                                    • Taille: ${Math.round(doc.taille_fichier / 1024)} KB
-                                </div>
-                            </div>
-                            <div>
-                                ${downloadButton}
-                            </div>
-                        </div>
-                    `;
-                    documentsContainer.appendChild(docElement);
-                });
-                
-            } catch (error) {
-                console.error('Erreur chargement documents:', error);
-                documentsContainer.innerHTML = '<p>Erreur lors du chargement des documents.</p>';
-            }
-        }
-        
-        // Fonction pour télécharger le PDF
-        function downloadPDF(filename, base64Data) {
-            try {
-                const binaryString = atob(base64Data);
-                const bytes = new Uint8Array(binaryString.length);
-                for (let i = 0; i < binaryString.length; i++) {
-                    bytes[i] = binaryString.charCodeAt(i);
-                }
-                const blob = new Blob([bytes], { type: 'application/pdf' });
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = filename;
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                URL.revokeObjectURL(url);
-            } catch (error) {
-                console.error('Erreur téléchargement:', error);
-                alert('Erreur lors du téléchargement du fichier');
-            }
-        }
-        
-        // Charger les documents au démarrage
-        loadDocuments();
     </script>
 </body>
 </html>
