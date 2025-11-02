@@ -206,8 +206,8 @@
                     </div>
                     
                     <div class="form-group">
-                        <label for="node1">Modèle :</label>
-                        <input type="text" id="node1" name="node1" required>
+                        <label for="model">Modèle :</label>
+                        <input type="text" id="model" name="model" required>
                     </div>
                     
                     <div class="form-group">
@@ -278,7 +278,7 @@
             e.preventDefault();
             
             const programstation = document.getElementById('programstation').value;
-            const node1 = document.getElementById('node1').value;
+            const model = document.getElementById('model').value;
             const marque = document.getElementById('marque').value;
             const schema = document.getElementById('schema').value;
             const file = pdfFileInput.files[0];
@@ -309,13 +309,13 @@
                         
                         // Préparer les données avec les VRAIS noms de colonnes
                         const documentData = {
-                            programstation: programstation,  // VRAI nom de colonne
-                            node1: node1,                   // VRAI nom de colonne  
+                            programstation: programstation,
+                            model: model,                   
                             marque: marque,
-                            schéma: schema,                 // VRAI nom de colonne (avec accent)
+                            schémas: schema,
                             nom_fichier: file.name,
                             date_upload: new Date().toISOString(),
-                            // On stocke le PDF en base64 dans fichier_url temporairement
+                            // Stocker le PDF en base64 dans fichier_url
                             fichier_url: `data:application/pdf;base64,${pdfBase64}`
                         };
                         
@@ -399,8 +399,8 @@
                             <div style="flex-grow: 1;">
                                 <div style="font-weight: 600; color: #2c3e50;">${doc.nom_fichier || 'Document sans nom'}</div>
                                 <div style="font-size: 14px; color: #6c757d; margin-top: 5px;">
-                                    ${doc.programstation} • ${doc.node1} • ${doc.marque}
-                                    ${doc.schéma ? '• ' + doc.schéma : ''}
+                                    ${doc.programstation} • ${doc.model} • ${doc.marque}
+                                    ${doc.schémas ? '• ' + doc.schémas : ''}
                                 </div>
                                 <div style="font-size: 14px; color: #6c757d; margin-top: 5px;">
                                     Uploadé le ${new Date(doc.date_upload).toLocaleDateString()}
