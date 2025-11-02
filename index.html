@@ -820,6 +820,106 @@
             initTechnicianInterface();
         }
         
+        // Mettre à jour la liste des marques
+        function updateMarquesList() {
+            // Mettre à jour le select admin
+            marqueSelect.innerHTML = '<option value="">Sélectionnez une marque</option>';
+            marques.forEach(marque => {
+                const option = document.createElement('option');
+                option.value = marque;
+                option.textContent = marque;
+                marqueSelect.appendChild(option);
+            });
+            
+            // Mettre à jour la liste dans le panel
+            marquesList.innerHTML = '';
+            marques.forEach(marque => {
+                const listItem = document.createElement('div');
+                listItem.className = 'list-item';
+                listItem.innerHTML = `
+                    <span>${marque}</span>
+                    <div class="list-item-actions">
+                        <button class="small-btn delete" data-marque="${marque}">🗑️</button>
+                    </div>
+                `;
+                marquesList.appendChild(listItem);
+            });
+            
+            // Ajouter les événements de suppression
+            marquesList.querySelectorAll('.small-btn.delete').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const marqueToRemove = this.getAttribute('data-marque');
+                    marques = marques.filter(m => m !== marqueToRemove);
+                    updateMarquesList();
+                });
+            });
+            
+            // Sauvegarder dans localStorage
+            localStorage.setItem('ascenseur_marques', JSON.stringify(marques));
+        }
+        
+        // Mettre à jour la liste des types
+        function updateTypesList() {
+            // Mettre à jour le select admin
+            typeSelect.innerHTML = '<option value="">Sélectionnez un type</option>';
+            typesAscenseur.forEach(type => {
+                const option = document.createElement('option');
+                option.value = type;
+                option.textContent = type;
+                typeSelect.appendChild(option);
+            });
+            
+            // Mettre à jour la liste dans le panel
+            typesList.innerHTML = '';
+            typesAscenseur.forEach(type => {
+                const listItem = document.createElement('div');
+                listItem.className = 'list-item';
+                listItem.innerHTML = `
+                    <span>${type}</span>
+                    <div class="list-item-actions">
+                        <button class="small-btn delete" data-type="${type}">🗑️</button>
+                    </div>
+                `;
+                typesList.appendChild(listItem);
+            });
+            
+            // Ajouter les événements de suppression
+            typesList.querySelectorAll('.small-btn.delete').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const typeToRemove = this.getAttribute('data-type');
+                    typesAscenseur = typesAscenseur.filter(t => t !== typeToRemove);
+                    updateTypesList();
+                });
+            });
+            
+            // Sauvegarder dans localStorage
+            localStorage.setItem('ascenseur_types', JSON.stringify(typesAscenseur));
+        }
+        
+        // Ajouter une nouvelle marque
+        addMarqueBtn.addEventListener('click', function() {
+            const newMarque = newMarqueInput.value.trim();
+            if (newMarque && !marques.includes(newMarque)) {
+                marques.push(newMarque);
+                updateMarquesList();
+                newMarqueInput.value = '';
+                // Sélectionner la nouvelle marque
+                marqueSelect.value = newMarque;
+            }
+        });
+        
+        // Ajouter un nouveau type
+        addTypeBtn.addEventListener('click', function() {
+            const newType = newTypeInput.value.trim();
+            if (newType && !typesAscenseur.includes(newType)) {
+                typesAscenseur.push(newType);
+                updateTypesList();
+                newTypeInput.value = '';
+                // Sélectionner le nouveau type
+                typeSelect.value = newType;
+            }
+        });
+        
         // Initialisation interface Admin (existante)
         function initAdminInterface() {
             // Gestion des panels
@@ -858,8 +958,302 @@
                 }
             });
             
-            // Gestion de l'upload (existante)
+            // Gestion de l'upload
             setupUploadForm();
+        }
+        
+        // Configuration du formulaire d'upload
+        function setupUploadForm() {
+            // Afficher le nom du fichier sélectionné
+            pdfFileInput.addEventListener('change', function() {
+                if (this.files.length > 0) {
+                    fileName.textContent = this.files[0].name;
+                } else {
+                    fileName.textContent = 'Aucun fichier sélectionné';
+                }
+            });
+            
+            // Gestion de l'upload
+            uploadForm.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                
+                const marque = document.getElementById('marque').value;
+                const type_ascenseur = document.getElementById('type_ascenseur').value;
+                const categorie = document.getElementById('categorie').value;
+                const model = document.getElementById('model').value;
+                const file = pdfFileInput.files[0];
+                
+                // Validation des champs obligatoires
+                if (!marque) {
+                    showStatus(statusMessage, 'Veuillez sélectionner une marque', 'error');
+                    return;
+                }
+                
+                if (!type_ascenseur) {
+                    showStatus(statusMessage, 'Veuillez sélectionner un type d\'ascenseur', 'error');
+                    return;
+                }
+                
+                if (!categorie) {
+                    showStatus(statusMessage, 'Veuillez sélectionner un type de document', 'error');
+                    return;
+                }
+                
+                if (!model) {
+                    showStatus(statusMessage, 'Veuillez remplir le champ Modèle', 'error');
+                    return;
+                }
+                
+                if (!file) {
+                    showStatus(statusMessage, 'Veuillez sélectionner un fichier PDF', 'error');
+                    return;
+                }
+                
+                if (file.type !== 'application/pdf') {
+                    showStatus(statusMessage, 'Veuillez sélectionner un fichier PDF valide', 'error');
+                    return;
+                }
+                
+                // Désactiver le bouton pendant l'upload
+                const submitBtn = uploadForm.querySelector('.btn');
+                submitBtn.disabled = true;
+                submitBtn.textContent = 'Enregistrement en cours...';
+                
+                try {
+                    showStatus(statusMessage, 'Conversion du PDF en base64...', 'loading');
+                    
+                    // Convertir le PDF en base64
+                    const reader = new FileReader();
+                    
+                    reader.onload = async function(e) {
+                        try {
+                            const pdfBase64 = e.target.result.split(',')[1];
+                            
+                            // Préparer les données avec les colonnes existantes
+                            const documentData = {
+                                marque: marque,
+                                model: model,
+                                nom_fichier: file.name,
+                                date_upload: new Date().toISOString(),
+                                pdf_data: pdfBase64,
+                                taille_fichier: file.size,
+                                programmation: categorie === 'programmation' ? type_ascenseur : null,
+                                schémas: categorie === 'schemas' ? type_ascenseur : null
+                            };
+                            
+                            // Enregistrer dans la table documents
+                            const { data: dbData, error: dbError } = await supabase
+                                .from('documents')
+                                .insert([documentData]);
+                            
+                            if (dbError) {
+                                throw new Error(`Erreur base de données: ${dbError.message}`);
+                            }
+                            
+                            showStatus(statusMessage, '✅ Document enregistré avec succès!', 'success');
+                            uploadForm.reset();
+                            fileName.textContent = 'Aucun fichier sélectionné';
+                            
+                            // Si le tableau est visible, le recharger
+                            if (isTableVisible) {
+                                loadTableData();
+                            }
+                            
+                        } catch (error) {
+                            console.error('Erreur:', error);
+                            showStatus(statusMessage, `❌ Erreur: ${error.message}`, 'error');
+                        } finally {
+                            // Réactiver le bouton
+                            submitBtn.disabled = false;
+                            submitBtn.textContent = '💾 Enregistrer le document';
+                        }
+                    };
+                    
+                    reader.onerror = function() {
+                        showStatus(statusMessage, '❌ Erreur lors de la lecture du fichier', 'error');
+                        submitBtn.disabled = false;
+                        submitBtn.textContent = '💾 Enregistrer le document';
+                    };
+                    
+                    // Lire le fichier comme Data URL (base64)
+                    reader.readAsDataURL(file);
+                    
+                } catch (error) {
+                    console.error('Erreur:', error);
+                    showStatus(statusMessage, `❌ Erreur: ${error.message}`, 'error');
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = '💾 Enregistrer le document';
+                }
+            });
+        }
+        
+        // Charger les données du tableau
+        async function loadTableData() {
+            try {
+                const { data: documents, error } = await supabase
+                    .from('documents')
+                    .select('*')
+                    .order('id', { ascending: false });
+                
+                if (error) {
+                    throw error;
+                }
+                
+                // Générer le tableau HTML
+                if (documents.length === 0) {
+                    tableContainer.innerHTML = `
+                        <div class="empty-state">
+                            <h3>📭 Aucun document trouvé</h3>
+                            <p>Ajoutez votre premier document en utilisant le formulaire ci-dessus.</p>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                let tableHTML = `
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Marque</th>
+                                <th>Type</th>
+                                <th>Catégorie</th>
+                                <th>Modèle</th>
+                                <th>Nom du fichier</th>
+                                <th>Date d'ajout</th>
+                                <th>Taille</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                `;
+                
+                documents.forEach(doc => {
+                    // Déterminer la catégorie et le type
+                    const categorie = doc.programmation ? 'Programmation' : (doc.schémas ? 'Schémas' : 'Non défini');
+                    const type = doc.programmation || doc.schémas || 'Non défini';
+                    
+                    tableHTML += `
+                        <tr>
+                            <td>${doc.id}</td>
+                            <td>${doc.marque || '-'}</td>
+                            <td>${type}</td>
+                            <td>${categorie}</td>
+                            <td>${doc.model || '-'}</td>
+                            <td>${doc.nom_fichier || '-'}</td>
+                            <td>${new Date(doc.date_upload).toLocaleDateString()}</td>
+                            <td>${doc.taille_fichier ? Math.round(doc.taille_fichier / 1024) + ' KB' : '-'}</td>
+                            <td class="action-cell">
+                                ${doc.pdf_data ? 
+                                    `<button class="table-btn view-btn" data-id="${doc.id}" data-filename="${doc.nom_fichier}" data-pdfdata="${doc.pdf_data}">
+                                        👁️ Voir
+                                    </button>` 
+                                    : 
+                                    '<span style="color: #6c757d; font-size: 12px;">Aucun PDF</span>'
+                                }
+                                <button class="table-btn delete-table-btn" data-id="${doc.id}">
+                                    🗑️ Supprimer
+                                </button>
+                            </td>
+                        </tr>
+                    `;
+                });
+                
+                tableHTML += `
+                        </tbody>
+                    </table>
+                `;
+                
+                tableContainer.innerHTML = tableHTML;
+                
+                // Ajouter les événements pour les boutons
+                document.querySelectorAll('.view-btn').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const filename = this.getAttribute('data-filename');
+                        const pdfData = this.getAttribute('data-pdfdata');
+                        downloadPDF(filename, pdfData);
+                    });
+                });
+                
+                document.querySelectorAll('.delete-table-btn').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const id = this.getAttribute('data-id');
+                        deleteDocument(id);
+                    });
+                });
+                
+            } catch (error) {
+                console.error('Erreur chargement tableau:', error);
+                tableContainer.innerHTML = `
+                    <div class="empty-state">
+                        <h3>❌ Erreur lors du chargement des données</h3>
+                        <p>${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+        
+        // Fonction pour supprimer un document
+        async function deleteDocument(id) {
+            if (!confirm('Êtes-vous sûr de vouloir supprimer ce document ? Cette action est irréversible.')) {
+                return;
+            }
+            
+            try {
+                showStatus(statusMessage, 'Suppression en cours...', 'loading');
+                
+                const { error } = await supabase
+                    .from('documents')
+                    .delete()
+                    .eq('id', id);
+                
+                if (error) {
+                    throw error;
+                }
+                
+                showStatus(statusMessage, '✅ Document supprimé avec succès!', 'success');
+                
+                // Recharger le tableau
+                loadTableData();
+                
+            } catch (error) {
+                console.error('Erreur suppression:', error);
+                showStatus(statusMessage, `❌ Erreur lors de la suppression: ${error.message}`, 'error');
+            }
+        }
+        
+        // Fonction pour télécharger le PDF
+        function downloadPDF(filename, base64Data) {
+            try {
+                const byteCharacters = atob(base64Data);
+                const byteNumbers = new Array(byteCharacters.length);
+                for (let i = 0; i < byteCharacters.length; i++) {
+                    byteNumbers[i] = byteCharacters.charCodeAt(i);
+                }
+                const byteArray = new Uint8Array(byteNumbers);
+                const blob = new Blob([byteArray], { type: 'application/pdf' });
+                
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = filename || 'document.pdf';
+                document.body.appendChild(a);
+                a.click();
+                
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                
+                showStatus(statusMessage, '✅ Téléchargement démarré!', 'success');
+            } catch (error) {
+                console.error('Erreur téléchargement:', error);
+                showStatus(statusMessage, '❌ Erreur lors du téléchargement', 'error');
+            }
+        }
+        
+        // Fonction pour afficher les messages de statut
+        function showStatus(element, message, type) {
+            element.textContent = message;
+            element.className = 'status ' + type;
         }
         
         // Initialisation interface Technicien
@@ -1059,10 +1453,6 @@
                 aiResponse.innerHTML = '❌ Erreur lors de la consultation de l\'IA';
             }
         }
-        
-        // [RESTE DU CODE ADMIN EXISTANT...]
-        // Les fonctions updateMarquesList, updateTypesList, setupUploadForm, loadTableData, etc.
-        // restent identiques à celles de l'étape précédente
         
         // Initialiser l'application
         initApp();
