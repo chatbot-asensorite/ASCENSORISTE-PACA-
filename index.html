@@ -201,13 +201,13 @@
                 <h2>Ajouter un nouveau document</h2>
                 <form id="uploadForm">
                     <div class="form-group">
-                        <label for="programmation">Programmation :</label>
-                        <input type="text" id="programmation" name="programmation" required>
+                        <label for="programstation">Programmation :</label>
+                        <input type="text" id="programstation" name="programstation" required>
                     </div>
                     
                     <div class="form-group">
-                        <label for="model">Modèle :</label>
-                        <input type="text" id="model" name="model" required>
+                        <label for="node1">Modèle :</label>
+                        <input type="text" id="node1" name="node1" required>
                     </div>
                     
                     <div class="form-group">
@@ -216,8 +216,8 @@
                     </div>
                     
                     <div class="form-group">
-                        <label for="schemas">Schémas :</label>
-                        <input type="text" id="schemas" name="schemas">
+                        <label for="schema">Schémas :</label>
+                        <input type="text" id="schema" name="schema">
                     </div>
                     
                     <div class="form-group">
@@ -277,10 +277,10 @@
         uploadForm.addEventListener('submit', async function(e) {
             e.preventDefault();
             
-            const programmation = document.getElementById('programmation').value;
-            const model = document.getElementById('model').value;
+            const programstation = document.getElementById('programstation').value;
+            const node1 = document.getElementById('node1').value;
             const marque = document.getElementById('marque').value;
-            const schemas = document.getElementById('schemas').value;
+            const schema = document.getElementById('schema').value;
             const file = pdfFileInput.files[0];
             
             if (!file) {
@@ -300,29 +300,26 @@
             try {
                 showStatus('Conversion du PDF en base64...', 'loading');
                 
-                // Convertir le PDF en base64 pour le stocker dans la base de données
+                // Convertir le PDF en base64
                 const reader = new FileReader();
                 
                 reader.onload = async function(e) {
                     try {
                         const pdfBase64 = e.target.result.split(',')[1];
                         
-                        // Préparer les données à insérer
+                        // Préparer les données avec les VRAIS noms de colonnes
                         const documentData = {
-                            programmation: programmation,
-                            model: model,
+                            programstation: programstation,  // VRAI nom de colonne
+                            node1: node1,                   // VRAI nom de colonne  
                             marque: marque,
-                            schemas: schemas,
+                            schéma: schema,                 // VRAI nom de colonne (avec accent)
                             nom_fichier: file.name,
                             date_upload: new Date().toISOString(),
-                            taille_fichier: file.size
+                            // On stocke le PDF en base64 dans fichier_url temporairement
+                            fichier_url: `data:application/pdf;base64,${pdfBase64}`
                         };
                         
-                        // Ajouter pdf_data seulement si la colonne existe
-                        // Pour l'instant, on va tester sans pdf_data
-                        // documentData.pdf_data = pdfBase64;
-                        
-                        // Enregistrer les métadonnées dans la table documents
+                        // Enregistrer dans la table documents
                         const { data: dbData, error: dbError } = await supabase
                             .from('documents')
                             .insert([documentData]);
@@ -331,7 +328,7 @@
                             throw new Error(`Erreur base de données: ${dbError.message}`);
                         }
                         
-                        showStatus('✅ Document enregistré avec succès! (PDF stocké temporairement)', 'success');
+                        showStatus('✅ Document enregistré avec succès!', 'success');
                         uploadForm.reset();
                         fileName.textContent = 'Aucun fichier sélectionné';
                         
@@ -394,32 +391,86 @@
                     const docElement = document.createElement('div');
                     docElement.className = 'document-item';
                     
+                    // Vérifier si c'est un PDF base64
+                    const isBase64PDF = doc.fichier_url && doc.fichier_url.startsWith('data:application/pdf;base64,');
+                    
                     docElement.innerHTML = `
                         <div style="display: flex; justify-content: space-between; align-items: center;">
                             <div style="flex-grow: 1;">
                                 <div style="font-weight: 600; color: #2c3e50;">${doc.nom_fichier || 'Document sans nom'}</div>
                                 <div style="font-size: 14px; color: #6c757d; margin-top: 5px;">
-                                    ${doc.programmation} • ${doc.model} • ${doc.marque}
-                                    ${doc.schemas ? '• ' + doc.schemas : ''}
+                                    ${doc.programstation} • ${doc.node1} • ${doc.marque}
+                                    ${doc.schéma ? '• ' + doc.schéma : ''}
                                 </div>
                                 <div style="font-size: 14px; color: #6c757d; margin-top: 5px;">
                                     Uploadé le ${new Date(doc.date_upload).toLocaleDateString()}
-                                    ${doc.taille_fichier ? '• Taille: ' + Math.round(doc.taille_fichier / 1024) + ' KB' : ''}
                                 </div>
                             </div>
                             <div>
-                                <span style="color: #6c757d; font-size: 14px;">
-                                    Métadonnées enregistrées
-                                </span>
+                                ${isBase64PDF ? 
+                                    `<button class="download-btn" data-filename="${doc.nom_fichier}" data-pdfdata="${doc.fichier_url.split(',')[1]}">
+                                        📥 Télécharger
+                                    </button>` 
+                                    : 
+                                    (doc.fichier_url ? 
+                                        `<a href="${doc.fichier_url}" target="_blank" class="download-btn">👁️ Voir</a>` 
+                                        : 
+                                        '<span style="color: #6c757d;">Aucun fichier</span>'
+                                    )
+                                }
                             </div>
                         </div>
                     `;
                     documentsContainer.appendChild(docElement);
                 });
                 
+                // Ajouter les événements de clic pour les boutons de téléchargement
+                document.querySelectorAll('.download-btn').forEach(btn => {
+                    if (!btn.hasAttribute('href')) {
+                        btn.addEventListener('click', function() {
+                            const filename = this.getAttribute('data-filename');
+                            const pdfData = this.getAttribute('data-pdfdata');
+                            downloadPDF(filename, pdfData);
+                        });
+                    }
+                });
+                
             } catch (error) {
                 console.error('Erreur chargement documents:', error);
                 documentsContainer.innerHTML = '<p>Erreur lors du chargement des documents.</p>';
+            }
+        }
+        
+        // Fonction pour télécharger le PDF
+        function downloadPDF(filename, base64Data) {
+            try {
+                // Créer un blob à partir des données base64
+                const byteCharacters = atob(base64Data);
+                const byteNumbers = new Array(byteCharacters.length);
+                for (let i = 0; i < byteCharacters.length; i++) {
+                    byteNumbers[i] = byteCharacters.charCodeAt(i);
+                }
+                const byteArray = new Uint8Array(byteNumbers);
+                const blob = new Blob([byteArray], { type: 'application/pdf' });
+                
+                // Créer un URL object pour le blob
+                const url = URL.createObjectURL(blob);
+                
+                // Créer un lien de téléchargement
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = filename || 'document.pdf';
+                document.body.appendChild(a);
+                a.click();
+                
+                // Nettoyer
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                
+                showStatus('✅ Téléchargement démarré!', 'success');
+            } catch (error) {
+                console.error('Erreur téléchargement:', error);
+                showStatus('❌ Erreur lors du téléchargement', 'error');
             }
         }
         
