@@ -73,7 +73,19 @@
         }
         
         /* Styles pour l'interface Admin (existante) */
+        .admin-login-section {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 30px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        
         .admin-section {
+            display: none;
+        }
+        
+        .admin-section.active {
             display: block;
         }
         
@@ -545,6 +557,23 @@
             border: 1px solid #dee2e6;
         }
         
+        /* Styles pour la gestion des techniciens */
+        .technician-management {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 25px;
+            margin-top: 30px;
+            border: 2px dashed #dee2e6;
+        }
+        
+        .password-management {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+            border: 1px solid #e9ecef;
+        }
+        
         @media (max-width: 768px) {
             .form-row {
                 flex-direction: column;
@@ -586,8 +615,23 @@
         </div>
         
         <div class="content">
-            <!-- Interface Admin (existante) -->
+            <!-- Connexion Admin -->
+            <div class="admin-login-section" id="adminLoginSection">
+                <h2>🔐 Connexion Administrateur</h2>
+                <p>Veuillez entrer le mot de passe administrateur pour accéder à cette section</p>
+                <div class="form-group" style="max-width: 300px; margin: 20px auto;">
+                    <input type="password" id="adminPassword" placeholder="Mot de passe administrateur" style="text-align: center;">
+                    <button class="btn" id="adminLoginBtn" style="margin-top: 15px;">Se connecter</button>
+                </div>
+                <div id="adminLoginStatus"></div>
+            </div>
+            
+            <!-- Interface Admin (après connexion) -->
             <div class="admin-section" id="adminSection">
+                <div style="text-align: right; margin-bottom: 20px;">
+                    <button class="action-btn" id="adminLogoutBtn" style="background: #dc3545;">🚪 Déconnexion</button>
+                </div>
+                
                 <!-- Section Upload -->
                 <div class="upload-section">
                     <h2>📤 Ajouter un nouveau document</h2>
@@ -665,6 +709,51 @@
                     <div id="statusMessage"></div>
                 </div>
                 
+                <!-- Gestion des techniciens -->
+                <div class="technician-management">
+                    <h2>👨‍🔧 Gestion des Techniciens</h2>
+                    
+                    <div class="password-management">
+                        <h3>🔑 Changer le mot de passe technicien</h3>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="newTechnicianPassword">Nouveau mot de passe technicien</label>
+                                <input type="password" id="newTechnicianPassword" placeholder="Nouveau mot de passe">
+                            </div>
+                            <div class="form-group">
+                                <label for="confirmTechnicianPassword">Confirmer le mot de passe</label>
+                                <input type="password" id="confirmTechnicianPassword" placeholder="Confirmer le mot de passe">
+                            </div>
+                        </div>
+                        <button class="btn" id="updateTechnicianPasswordBtn" style="background: #17a2b8;">
+                            🔄 Mettre à jour le mot de passe
+                        </button>
+                        <div id="passwordStatus"></div>
+                    </div>
+                    
+                    <div class="password-management">
+                        <h3>🔑 Changer le mot de passe administrateur</h3>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="currentAdminPassword">Mot de passe actuel</label>
+                                <input type="password" id="currentAdminPassword" placeholder="Mot de passe actuel">
+                            </div>
+                            <div class="form-group">
+                                <label for="newAdminPassword">Nouveau mot de passe</label>
+                                <input type="password" id="newAdminPassword" placeholder="Nouveau mot de passe">
+                            </div>
+                            <div class="form-group">
+                                <label for="confirmAdminPassword">Confirmer le nouveau mot de passe</label>
+                                <input type="password" id="confirmAdminPassword" placeholder="Confirmer le mot de passe">
+                            </div>
+                        </div>
+                        <button class="btn" id="updateAdminPasswordBtn" style="background: #6f42c1;">
+                            🔄 Mettre à jour le mot de passe admin
+                        </button>
+                        <div id="adminPasswordStatus"></div>
+                    </div>
+                </div>
+                
                 <!-- Bouton pour afficher/masquer le tableau -->
                 <button id="toggleTableBtn" class="toggle-table-btn">
                     📊 Afficher le tableau Supabase
@@ -696,6 +785,10 @@
                 
                 <!-- Interface Technicien (après connexion) -->
                 <div class="technician-interface" id="technicianInterface">
+                    <div style="text-align: right; margin-bottom: 20px;">
+                        <button class="action-btn" id="technicianLogoutBtn" style="background: #dc3545;">🚪 Déconnexion</button>
+                    </div>
+                    
                     <h2>👨‍🔧 Interface Technicien</h2>
                     
                     <!-- Recherche de documents -->
@@ -784,6 +877,7 @@
         // Éléments DOM pour le technicien (nouveaux)
         const adminBtn = document.getElementById('adminBtn');
         const technicianBtn = document.getElementById('technicianBtn');
+        const adminLoginSection = document.getElementById('adminLoginSection');
         const adminSection = document.getElementById('adminSection');
         const technicianSection = document.getElementById('technicianSection');
         const loginSection = document.getElementById('loginSection');
@@ -802,15 +896,32 @@
         const aiSection = document.getElementById('aiSection');
         const aiResponse = document.getElementById('aiResponse');
         
+        // Nouveaux éléments pour la gestion des mots de passe
+        const adminPassword = document.getElementById('adminPassword');
+        const adminLoginBtn = document.getElementById('adminLoginBtn');
+        const adminLoginStatus = document.getElementById('adminLoginStatus');
+        const adminLogoutBtn = document.getElementById('adminLogoutBtn');
+        const technicianLogoutBtn = document.getElementById('technicianLogoutBtn');
+        const newTechnicianPassword = document.getElementById('newTechnicianPassword');
+        const confirmTechnicianPassword = document.getElementById('confirmTechnicianPassword');
+        const updateTechnicianPasswordBtn = document.getElementById('updateTechnicianPasswordBtn');
+        const passwordStatus = document.getElementById('passwordStatus');
+        const currentAdminPassword = document.getElementById('currentAdminPassword');
+        const newAdminPassword = document.getElementById('newAdminPassword');
+        const confirmAdminPassword = document.getElementById('confirmAdminPassword');
+        const updateAdminPasswordBtn = document.getElementById('updateAdminPasswordBtn');
+        const adminPasswordStatus = document.getElementById('adminPasswordStatus');
+        
         // Données des marques et types (stockées dans localStorage)
         let marques = JSON.parse(localStorage.getItem('ascenseur_marques')) || ['Otis', 'Schindler', 'Kone', 'ThyssenKrupp'];
         let typesAscenseur = JSON.parse(localStorage.getItem('ascenseur_types')) || ['Hydraulique', 'Électrique', 'MRL', 'LVA'];
         
+        // Mots de passe (stockés dans localStorage)
+        let adminPass = localStorage.getItem('admin_password') || "admin123";
+        let technicianPass = localStorage.getItem('technician_password') || "tech123";
+        
         // État du tableau admin
         let isTableVisible = false;
-        
-        // Mot de passe technicien (à changer en production)
-        const TECHNICIAN_PASSWORD = "tech123";
         
         // Initialisation
         function initApp() {
@@ -818,6 +929,7 @@
             updateTypesList();
             initAdminInterface();
             initTechnicianInterface();
+            initPasswordManagement();
         }
         
         // Mettre à jour la liste des marques
@@ -960,6 +1072,99 @@
             
             // Gestion de l'upload
             setupUploadForm();
+            
+            // Connexion admin
+            adminLoginBtn.addEventListener('click', function() {
+                const password = adminPassword.value;
+                if (password === adminPass) {
+                    adminLoginSection.style.display = 'none';
+                    adminSection.classList.add('active');
+                    showStatus(adminLoginStatus, '✅ Connexion réussie!', 'success');
+                } else {
+                    showStatus(adminLoginStatus, '❌ Mot de passe incorrect', 'error');
+                }
+            });
+            
+            // Déconnexion admin
+            adminLogoutBtn.addEventListener('click', function() {
+                adminSection.classList.remove('active');
+                adminLoginSection.style.display = 'block';
+                adminPassword.value = '';
+                adminLoginStatus.innerHTML = '';
+            });
+            
+            // Entrée pour la connexion admin
+            adminPassword.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    adminLoginBtn.click();
+                }
+            });
+        }
+        
+        // Initialisation de la gestion des mots de passe
+        function initPasswordManagement() {
+            // Mettre à jour le mot de passe technicien
+            updateTechnicianPasswordBtn.addEventListener('click', function() {
+                const newPassword = newTechnicianPassword.value;
+                const confirmPassword = confirmTechnicianPassword.value;
+                
+                if (!newPassword) {
+                    showStatus(passwordStatus, '❌ Veuillez entrer un nouveau mot de passe', 'error');
+                    return;
+                }
+                
+                if (newPassword !== confirmPassword) {
+                    showStatus(passwordStatus, '❌ Les mots de passe ne correspondent pas', 'error');
+                    return;
+                }
+                
+                if (newPassword.length < 4) {
+                    showStatus(passwordStatus, '❌ Le mot de passe doit contenir au moins 4 caractères', 'error');
+                    return;
+                }
+                
+                technicianPass = newPassword;
+                localStorage.setItem('technician_password', newPassword);
+                
+                showStatus(passwordStatus, '✅ Mot de passe technicien mis à jour avec succès!', 'success');
+                newTechnicianPassword.value = '';
+                confirmTechnicianPassword.value = '';
+            });
+            
+            // Mettre à jour le mot de passe admin
+            updateAdminPasswordBtn.addEventListener('click', function() {
+                const currentPassword = currentAdminPassword.value;
+                const newPassword = newAdminPassword.value;
+                const confirmPassword = confirmAdminPassword.value;
+                
+                if (currentPassword !== adminPass) {
+                    showStatus(adminPasswordStatus, '❌ Mot de passe actuel incorrect', 'error');
+                    return;
+                }
+                
+                if (!newPassword) {
+                    showStatus(adminPasswordStatus, '❌ Veuillez entrer un nouveau mot de passe', 'error');
+                    return;
+                }
+                
+                if (newPassword !== confirmPassword) {
+                    showStatus(adminPasswordStatus, '❌ Les mots de passe ne correspondent pas', 'error');
+                    return;
+                }
+                
+                if (newPassword.length < 4) {
+                    showStatus(adminPasswordStatus, '❌ Le mot de passe doit contenir au moins 4 caractères', 'error');
+                    return;
+                }
+                
+                adminPass = newPassword;
+                localStorage.setItem('admin_password', newPassword);
+                
+                showStatus(adminPasswordStatus, '✅ Mot de passe administrateur mis à jour avec succès!', 'success');
+                currentAdminPassword.value = '';
+                newAdminPassword.value = '';
+                confirmAdminPassword.value = '';
+            });
         }
         
         // Configuration du formulaire d'upload
@@ -1262,14 +1467,17 @@
             adminBtn.addEventListener('click', function() {
                 adminBtn.classList.add('active');
                 technicianBtn.classList.remove('active');
-                adminSection.style.display = 'block';
+                adminLoginSection.style.display = 'block';
+                adminSection.classList.remove('active');
                 technicianSection.style.display = 'none';
+                resetAdminInterface();
             });
             
             technicianBtn.addEventListener('click', function() {
                 technicianBtn.classList.add('active');
                 adminBtn.classList.remove('active');
-                adminSection.style.display = 'none';
+                adminLoginSection.style.display = 'none';
+                adminSection.classList.remove('active');
                 technicianSection.style.display = 'block';
                 resetTechnicianInterface();
             });
@@ -1277,7 +1485,7 @@
             // Connexion technicien
             loginBtn.addEventListener('click', function() {
                 const password = technicianPassword.value;
-                if (password === TECHNICIAN_PASSWORD) {
+                if (password === technicianPass) {
                     loginSection.style.display = 'none';
                     technicianInterface.classList.add('active');
                     updateTechnicianSelects();
@@ -1285,6 +1493,17 @@
                 } else {
                     showStatus(loginStatus, '❌ Mot de passe incorrect', 'error');
                 }
+            });
+            
+            // Déconnexion technicien
+            technicianLogoutBtn.addEventListener('click', function() {
+                technicianInterface.classList.remove('active');
+                loginSection.style.display = 'block';
+                technicianPassword.value = '';
+                loginStatus.innerHTML = '';
+                notFoundSection.classList.remove('active');
+                documentsFound.classList.remove('active');
+                aiSection.classList.remove('active');
             });
             
             // Recherche de documents
@@ -1299,6 +1518,14 @@
                     loginBtn.click();
                 }
             });
+        }
+        
+        // Réinitialiser l'interface admin
+        function resetAdminInterface() {
+            adminLoginSection.style.display = 'block';
+            adminSection.classList.remove('active');
+            adminPassword.value = '';
+            adminLoginStatus.innerHTML = '';
         }
         
         // Réinitialiser l'interface technicien
