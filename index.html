@@ -13,26 +13,25 @@
         }
         
         body {
-            font-family: 'Roboto', sans-serif; /* Police plus lisible */
+            font-family: 'Roboto', sans-serif;
             line-height: 1.6;
             color: #333;
-            background: #f4f7f6; /* Fond plus neutre pour mobile */
+            background: #f4f7f6;
             min-height: 100vh;
-            padding: 0; /* Supprimer le padding global pour un usage plein écran mobile */
+            padding: 0;
         }
         
         .container {
-            max-width: 600px; /* Max-width ajustée pour un look mobile */
+            max-width: 600px;
             margin: 0 auto;
             background: white;
-            /* Pas de bordure/ombre sur mobile, ou très subtil */
-            box-shadow: none; 
+            box-shadow: none;
             overflow: hidden;
-            min-height: 100vh; /* Pleine hauteur sur mobile */
+            min-height: 100vh;
         }
         
         .header {
-            background: #007bff; /* Couleur plus professionnelle/moderne */
+            background: #007bff;
             color: white;
             padding: 20px 15px;
             text-align: center;
@@ -40,14 +39,14 @@
         }
         
         .header h1 {
-            font-size: 1.5em; /* Taille réduite pour mobile */
+            font-size: 1.5em;
             margin-bottom: 5px;
         }
         
         .role-selector {
             display: flex;
             justify-content: space-around;
-            background: #0056b3; /* Fond pour les boutons de rôle */
+            background: #0056b3;
             padding: 5px;
         }
         
@@ -77,24 +76,23 @@
         }
         
         .content {
-            padding: 15px; /* Padding ajusté pour mobile */
+            padding: 15px;
         }
         
-        /* --- Styles du formulaire (ajustés pour mobile) --- */
         .form-row {
             display: flex;
-            flex-direction: column; /* Toujours en colonne sur mobile pour la lisibilité */
+            flex-direction: column;
             gap: 15px;
             margin-bottom: 0;
         }
         
         .form-group {
-            flex: none; /* Désactiver la flexbox */
-            margin-bottom: 15px; /* Ajout d'une marge pour séparer les groupes */
+            flex: none;
+            margin-bottom: 15px;
         }
         
         label {
-            margin-bottom: 5px; /* Marge réduite */
+            margin-bottom: 5px;
             font-size: 0.9em;
             display: block;
         }
@@ -106,14 +104,14 @@
         
         input[type="text"], select, input[type="password"] {
             width: 100%;
-            padding: 10px; /* Padding réduit */
-            border: 1px solid #ced4da; /* Bordure plus standard */
-            border-radius: 5px; /* Rayon réduit */
-            font-size: 16px; /* Taille pour éviter le zoom iOS */
+            padding: 10px;
+            border: 1px solid #ced4da;
+            border-radius: 5px;
+            font-size: 16px;
         }
         
         .btn {
-            padding: 12px 20px; /* Padding ajusté */
+            padding: 12px 20px;
             border-radius: 5px;
             font-size: 16px;
             background: #007bff;
@@ -128,7 +126,6 @@
             opacity: 0.9;
         }
 
-        /* Styles supplémentaires manquants */
         .select-with-actions {
             display: flex;
             gap: 5px;
@@ -265,11 +262,9 @@
             font-weight: bold;
         }
 
-        /* --- Interface Technicien Spécifique (Mobile First) --- */
-        
         .technician-section {
             display: none;
-            padding: 0; /* Pas de padding pour un usage plein écran */
+            padding: 0;
         }
         
         .login-section {
@@ -279,16 +274,16 @@
         }
 
         .technician-interface {
-            background: white; /* Fond blanc sur l'interface technicien */
+            background: white;
             padding: 0;
             display: none;
         }
 
         .search-section {
-            background: #f8f9fa; /* Fond clair pour la section recherche */
+            background: #f8f9fa;
             padding: 15px;
             margin-bottom: 15px;
-            border: none; /* Suppression de la bordure */
+            border: none;
             border-bottom: 1px solid #e9ecef;
         }
         
@@ -298,7 +293,6 @@
             color: #007bff;
         }
 
-        /* Amélioration de l'aspect des boutons de recherche/déconnexion */
         #technicianLogoutBtn {
             background: #dc3545;
             color: white;
@@ -311,15 +305,13 @@
 
         #searchBtn {
             margin-top: 10px;
-            background: #28a745; /* Bouton vert pour l'action principale */
+            background: #28a745;
         }
-
-        /* --- Résultats et IA --- */
 
         .documents-found, .not-found-section, .ai-section {
             padding: 15px;
             margin-top: 0;
-            border-radius: 0; /* Plein écran */
+            border-radius: 0;
             display: none;
         }
 
@@ -330,7 +322,7 @@
 
         .document-card {
             padding: 10px;
-            border-left: 5px solid #007bff; /* Barre colorée pour l'accent */
+            border-left: 5px solid #007bff;
             box-shadow: 0 1px 3px rgba(0,0,0,0.05);
             margin-bottom: 10px;
             background: #f8f9fa;
@@ -353,7 +345,7 @@
         }
 
         .ai-response {
-            white-space: pre-wrap; /* Maintient les sauts de ligne de la simulation IA */
+            white-space: pre-wrap;
             font-size: 0.95em;
             padding: 15px;
             background: #e9ecef;
@@ -361,8 +353,6 @@
             border-radius: 5px;
             margin-top: 10px;
         }
-
-        /* --- Styles Admin (pour rester cohérent sur mobile) --- */
 
         .admin-login-section, .upload-section, .technician-management, .password-management {
             padding: 15px;
@@ -392,7 +382,6 @@
             border: 1px solid #f5c6cb;
         }
 
-        /* Ajout d'une media query pour les grands écrans (tablette/desktop) pour restaurer un look plus large si nécessaire, bien que le focus soit mobile ici */
         @media (min-width: 601px) {
             body {
                 padding: 20px;
@@ -645,7 +634,7 @@
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
-        // Configuration Supabase
+        // Configuration Supabase - AVEC LA BONNE CLÉ
         const SUPABASE_URL = 'https://prrzsosrbrskmeozmmmu.supabase.co';
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBycnpzb3NyYnJza21lb3ptbW11Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzQxNzkxNDUsImV4cCI6MjA0OTc1NTE0NX0.9RZ_1wR3kCg8Q6aMESX3VPwD8NtoK-Q8rZJ4xJjWUVQ';
         
@@ -931,7 +920,6 @@
         async function handleUpload(event) {
             event.preventDefault();
             
-            const formData = new FormData(event.target);
             const marque = document.getElementById('marque').value;
             const type_ascenseur = document.getElementById('type_ascenseur').value;
             const categorie = document.getElementById('categorie').value;
@@ -958,16 +946,16 @@
                     try {
                         const pdfBase64 = e.target.result.split(',')[1];
                         
-                        // Préparer les données avec les colonnes existantes
+                        // Préparer les données avec la structure ORIGINALE de votre table Supabase
                         const documentData = {
                             marque: marque,
+                            type_ascenseur: type_ascenseur,
+                            categorie: categorie,
                             model: model,
                             nom_fichier: pdfFile.name,
                             date_upload: new Date().toISOString(),
                             pdf_data: pdfBase64,
-                            taille_fichier: pdfFile.size,
-                            programmation: categorie === 'programmation' ? type_ascenseur : null,
-                            schémas: categorie === 'schemas' ? type_ascenseur : null
+                            taille_fichier: pdfFile.size
                         };
                         
                         // Enregistrer dans la table documents
@@ -986,7 +974,7 @@
                         
                     } catch (error) {
                         console.error('Erreur upload:', error);
-                        showStatus(document.getElementById('statusMessage'), 'Erreur lors de l\'upload', 'error');
+                        showStatus(document.getElementById('statusMessage'), 'Erreur lors de l\'upload: ' + error.message, 'error');
                     } finally {
                         // Réactiver le bouton
                         submitBtn.disabled = false;
@@ -1022,6 +1010,7 @@
                 updateTable();
             } catch (error) {
                 console.error('Erreur chargement documents:', error);
+                showStatus(document.getElementById('statusMessage'), 'Erreur lors du chargement des documents: ' + error.message, 'error');
             }
         }
 
@@ -1044,30 +1033,55 @@
                             <th>Catégorie</th>
                             <th>Fichier</th>
                             <th>Date</th>
+                            <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody>
             `;
 
             documents.forEach(doc => {
-                const categorie = doc.programmation ? 'Programmation' : (doc.schémas ? 'Schémas' : 'Non défini');
-                const type = doc.programmation || doc.schémas || 'Non défini';
-                
                 html += `
                     <tr>
                         <td>${doc.id}</td>
                         <td>${doc.marque || 'N/A'}</td>
-                        <td>${type}</td>
+                        <td>${doc.type_ascenseur || 'N/A'}</td>
                         <td>${doc.model || 'N/A'}</td>
-                        <td>${categorie}</td>
+                        <td>${doc.categorie || 'N/A'}</td>
                         <td>${doc.nom_fichier || 'N/A'}</td>
                         <td>${new Date(doc.date_upload).toLocaleDateString()}</td>
+                        <td>
+                            ${doc.pdf_data ? 
+                                `<button class="view-btn" onclick="viewDocument('${doc.nom_fichier}', '${doc.pdf_data}')" style="padding: 5px 10px; background: #007bff; color: white; border: none; border-radius: 3px; cursor: pointer;">Voir</button>` 
+                                : 
+                                '<span style="color: #6c757d;">Aucun PDF</span>'
+                            }
+                            <button class="delete-btn" onclick="deleteDocument(${doc.id})" style="padding: 5px 10px; background: #dc3545; color: white; border: none; border-radius: 3px; cursor: pointer; margin-left: 5px;">Supprimer</button>
+                        </td>
                     </tr>
                 `;
             });
 
             html += '</tbody></table>';
             tableContainer.innerHTML = html;
+        }
+
+        async function deleteDocument(id) {
+            if (!confirm('Êtes-vous sûr de vouloir supprimer ce document ?')) return;
+
+            try {
+                const { error } = await supabase
+                    .from('documents')
+                    .delete()
+                    .eq('id', id);
+
+                if (error) throw error;
+
+                showStatus(document.getElementById('statusMessage'), 'Document supprimé avec succès', 'success');
+                loadDocuments();
+            } catch (error) {
+                console.error('Erreur suppression:', error);
+                showStatus(document.getElementById('statusMessage'), 'Erreur lors de la suppression', 'error');
+            }
         }
 
         function toggleTable() {
@@ -1128,7 +1142,7 @@
                     .select('*');
 
                 if (marque) query = query.eq('marque', marque);
-                if (type) query = query.or(`programmation.eq.${type},schémas.eq.${type}`);
+                if (type) query = query.eq('type_ascenseur', type);
                 if (model) query = query.ilike('model', `%${model}%`);
 
                 const { data, error } = await query;
@@ -1142,7 +1156,7 @@
                 }
             } catch (error) {
                 console.error('Erreur recherche:', error);
-                alert('Erreur lors de la recherche');
+                alert('Erreur lors de la recherche: ' + error.message);
             }
         }
 
@@ -1151,15 +1165,12 @@
             documentList.innerHTML = '';
 
             docs.forEach(doc => {
-                const categorie = doc.programmation ? 'Programmation' : 'Schémas';
-                const typeDoc = doc.programmation || doc.schémas;
-                
                 const docCard = document.createElement('div');
                 docCard.className = 'document-card';
                 docCard.innerHTML = `
-                    <h4>${doc.marque || 'N/A'} - ${typeDoc}</h4>
+                    <h4>${doc.marque || 'N/A'} - ${doc.type_ascenseur || 'N/A'}</h4>
                     <p><strong>Modèle:</strong> ${doc.model || 'N/A'}</p>
-                    <p><strong>Type:</strong> ${categorie}</p>
+                    <p><strong>Type:</strong> ${doc.categorie || 'N/A'}</p>
                     <p><strong>Fichier:</strong> ${doc.nom_fichier || 'N/A'}</p>
                     <button class="view-btn" onclick="viewDocument('${doc.nom_fichier}', '${doc.pdf_data}')">
                         👁️ Voir le document
@@ -1288,6 +1299,7 @@
         window.deleteMarque = deleteMarque;
         window.deleteType = deleteType;
         window.viewDocument = viewDocument;
+        window.deleteDocument = deleteDocument;
     </script>
 </body>
 </html>
