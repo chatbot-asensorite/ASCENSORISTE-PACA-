@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ascensoriste PACA - Interface Technicien</title>
     <style>
+        /* Styles généraux */
         * {
             box-sizing: border-box;
             margin: 0;
@@ -12,592 +13,400 @@
         }
         
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Roboto', sans-serif;
             line-height: 1.6;
             color: #333;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: #f4f7f6;
             min-height: 100vh;
-            padding: 20px;
+            padding: 0;
         }
         
         .container {
-            max-width: 1400px;
+            max-width: 600px;
             margin: 0 auto;
             background: white;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            box-shadow: none;
             overflow: hidden;
+            min-height: 100vh;
         }
         
         .header {
-            background: #2c3e50;
+            background: #007bff;
             color: white;
-            padding: 30px;
+            padding: 20px 15px;
             text-align: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
         
         .header h1 {
-            font-size: 2.2em;
-            margin-bottom: 10px;
+            font-size: 1.5em;
+            margin-bottom: 5px;
         }
         
         .role-selector {
             display: flex;
-            justify-content: center;
-            gap: 20px;
-            margin-top: 20px;
+            justify-content: space-around;
+            background: #0056b3;
+            padding: 5px;
         }
         
         .role-btn {
-            background: #17a2b8;
+            background: none;
             color: white;
-            border: none;
-            padding: 12px 25px;
-            border-radius: 8px;
+            border: 1px solid transparent;
+            padding: 10px 15px;
+            border-radius: 5px;
             cursor: pointer;
-            font-size: 16px;
+            font-size: 14px;
             font-weight: 600;
-            transition: background 0.3s;
+            flex-grow: 1;
+            margin: 0 5px;
+            transition: all 0.3s;
         }
         
         .role-btn.active {
-            background: #28a745;
+            background: white;
+            color: #007bff;
+            border: 1px solid white;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
         }
         
         .role-btn:hover {
-            background: #138496;
+            background: rgba(255, 255, 255, 0.1);
         }
         
         .content {
-            padding: 30px;
+            padding: 15px;
         }
         
-        /* Styles pour l'interface Admin (existante) */
-        .admin-login-section {
-            background: #f8f9fa;
-            border-radius: 10px;
-            padding: 30px;
-            margin-bottom: 30px;
-            text-align: center;
-        }
-        
-        .admin-section {
-            display: none;
-        }
-        
-        .admin-section.active {
-            display: block;
-        }
-        
-        .technician-section {
-            display: none;
-        }
-        
-        .upload-section {
-            background: #f8f9fa;
-            border-radius: 10px;
-            padding: 25px;
-            margin-bottom: 30px;
-            border: 2px dashed #dee2e6;
-        }
-        
+        /* Styles du formulaire */
         .form-row {
             display: flex;
+            flex-direction: column;
             gap: 15px;
-            margin-bottom: 20px;
+            margin-bottom: 0;
         }
         
         .form-group {
-            flex: 1;
-            position: relative;
+            flex: none;
+            margin-bottom: 15px;
         }
         
         label {
+            margin-bottom: 5px;
+            font-size: 0.9em;
             display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-            color: #2c3e50;
         }
         
         .required::after {
             content: " *";
-            color: #dc3545;
+            color: red;
         }
         
         input[type="text"], select, input[type="password"] {
             width: 100%;
-            padding: 12px;
-            border: 2px solid #e9ecef;
-            border-radius: 8px;
+            padding: 10px;
+            border: 1px solid #ced4da;
+            border-radius: 5px;
             font-size: 16px;
-            transition: border-color 0.3s;
-        }
-        
-        input[type="text"]:focus, select:focus, input[type="password"]:focus {
-            outline: none;
-            border-color: #667eea;
-        }
-        
-        input:invalid {
-            border-color: #dc3545;
-        }
-        
-        .select-with-actions {
-            display: flex;
-            gap: 8px;
-            align-items: center;
-        }
-        
-        .select-with-actions select {
-            flex: 1;
-        }
-        
-        .action-btn {
-            background: #6c757d;
-            color: white;
-            border: none;
-            padding: 10px 12px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 14px;
-            transition: background 0.3s;
-        }
-        
-        .action-btn:hover {
-            background: #5a6268;
-        }
-        
-        .add-btn {
-            background: #28a745;
-        }
-        
-        .add-btn:hover {
-            background: #218838;
-        }
-        
-        .delete-btn {
-            background: #dc3545;
-        }
-        
-        .delete-btn:hover {
-            background: #c82333;
-        }
-        
-        .hidden-panel {
-            background: #f8f9fa;
-            border: 1px solid #dee2e6;
-            border-radius: 8px;
-            padding: 15px;
-            margin-top: 10px;
-            display: none;
-        }
-        
-        .hidden-panel.active {
-            display: block;
-        }
-        
-        .panel-title {
-            font-weight: 600;
-            margin-bottom: 10px;
-            color: #495057;
-        }
-        
-        .panel-content {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 15px;
-        }
-        
-        .panel-content input {
-            flex: 1;
-        }
-        
-        .items-list {
-            max-height: 150px;
-            overflow-y: auto;
-        }
-        
-        .list-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 8px 12px;
-            background: white;
-            border: 1px solid #e9ecef;
-            border-radius: 6px;
-            margin-bottom: 5px;
-        }
-        
-        .list-item:last-child {
-            margin-bottom: 0;
-        }
-        
-        .list-item-actions {
-            display: flex;
-            gap: 5px;
-        }
-        
-        .small-btn {
-            background: #6c757d;
-            color: white;
-            border: none;
-            padding: 4px 8px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 12px;
-        }
-        
-        .small-btn.delete {
-            background: #dc3545;
-        }
-        
-        .file-input-wrapper {
-            position: relative;
-            overflow: hidden;
-            display: inline-block;
-            width: 100%;
-        }
-        
-        .file-input-wrapper input[type=file] {
-            position: absolute;
-            left: 0;
-            top: 0;
-            opacity: 0;
-            width: 100%;
-            height: 100%;
-            cursor: pointer;
-        }
-        
-        .file-input-custom {
-            background: #667eea;
-            color: white;
-            padding: 12px 20px;
-            border-radius: 8px;
-            text-align: center;
-            cursor: pointer;
-            transition: background 0.3s;
-            display: block;
-        }
-        
-        .file-input-custom:hover {
-            background: #5a6fd8;
-        }
-        
-        .file-name {
-            margin-top: 8px;
-            font-size: 14px;
-            color: #6c757d;
         }
         
         .btn {
-            background: #28a745;
+            padding: 12px 20px;
+            border-radius: 5px;
+            font-size: 16px;
+            background: #007bff;
             color: white;
             border: none;
-            padding: 15px 30px;
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: 600;
             cursor: pointer;
             width: 100%;
-            transition: background 0.3s;
+            margin-top: 10px;
         }
         
         .btn:hover {
-            background: #218838;
+            opacity: 0.9;
         }
-        
-        .btn:disabled {
-            background: #6c757d;
-            cursor: not-allowed;
-        }
-        
-        .toggle-table-btn {
-            background: #17a2b8;
-            color: white;
-            border: none;
-            padding: 12px 25px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 16px;
-            font-weight: 600;
-            margin: 20px 0;
+
+        /* Styles supplémentaires manquants */
+        .select-with-actions {
             display: flex;
+            gap: 5px;
             align-items: center;
-            gap: 10px;
-            transition: background 0.3s;
         }
-        
-        .toggle-table-btn:hover {
-            background: #138496;
-        }
-        
-        .status {
-            padding: 10px;
-            border-radius: 5px;
-            margin-top: 15px;
-            text-align: center;
-            font-weight: 600;
-        }
-        
-        .status.success {
-            background: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-        }
-        
-        .status.error {
-            background: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-        }
-        
-        .status.loading {
-            background: #cce7ff;
-            color: #004085;
-            border: 1px solid #b3d7ff;
-        }
-        
-        /* Styles pour le tableau Supabase */
-        .table-section {
-            background: #f8f9fa;
-            border-radius: 10px;
-            padding: 25px;
-            margin-top: 20px;
+
+        .hidden-panel {
             display: none;
+            background: #f8f9fa;
+            padding: 10px;
+            margin-top: 5px;
+            border-radius: 5px;
+            border: 1px solid #dee2e6;
         }
-        
-        .table-section.active {
-            display: block;
+
+        .panel-title {
+            font-weight: bold;
+            margin-bottom: 8px;
+            color: #495057;
         }
-        
+
+        .panel-content {
+            display: flex;
+            gap: 5px;
+            margin-bottom: 10px;
+        }
+
+        .items-list {
+            margin-top: 10px;
+        }
+
+        .item-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 5px 0;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .file-input-wrapper {
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 5px;
+        }
+
+        .file-input-custom {
+            padding: 10px;
+            background: #007bff;
+            color: white;
+            border-radius: 5px;
+            text-align: center;
+            cursor: pointer;
+        }
+
+        .file-input-wrapper input[type="file"] {
+            position: absolute;
+            left: -9999px;
+        }
+
+        .file-name {
+            font-size: 0.9em;
+            color: #6c757d;
+            margin-top: 5px;
+        }
+
+        .action-btn {
+            padding: 8px 12px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .add-btn {
+            background: #28a745;
+            color: white;
+        }
+
+        .delete-btn {
+            background: #dc3545;
+            color: white;
+            padding: 4px 8px;
+            font-size: 10px;
+        }
+
+        .toggle-table-btn {
+            background: #6c757d;
+            color: white;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 10px 0;
+        }
+
+        .table-section {
+            display: none;
+            margin-top: 20px;
+        }
+
         .table-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
         }
-        
-        .table-title {
-            font-size: 1.5em;
-            color: #2c3e50;
-            margin: 0;
-        }
-        
+
         .refresh-btn {
             background: #17a2b8;
             color: white;
             border: none;
-            padding: 10px 20px;
-            border-radius: 8px;
+            padding: 8px 12px;
+            border-radius: 5px;
             cursor: pointer;
-            font-size: 14px;
         }
-        
-        .refresh-btn:hover {
-            background: #138496;
-        }
-        
+
         .data-table {
             width: 100%;
             border-collapse: collapse;
-            background: white;
-            border-radius: 8px;
-            overflow: hidden;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            margin-top: 10px;
         }
-        
-        .data-table th {
-            background: #2c3e50;
-            color: white;
-            padding: 12px 15px;
-            text-align: left;
-            font-weight: 600;
-        }
-        
+
+        .data-table th,
         .data-table td {
-            padding: 12px 15px;
+            border: 1px solid #dee2e6;
+            padding: 8px;
+            text-align: left;
+            font-size: 0.8em;
+        }
+
+        .data-table th {
+            background: #f8f9fa;
+            font-weight: bold;
+        }
+
+        /* Interface Technicien */
+        .technician-section {
+            display: none;
+            padding: 0;
+        }
+        
+        .login-section {
+            padding: 20px;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .technician-interface {
+            background: white;
+            padding: 0;
+            display: none;
+        }
+
+        .search-section {
+            background: #f8f9fa;
+            padding: 15px;
+            margin-bottom: 15px;
             border-bottom: 1px solid #e9ecef;
         }
         
-        .data-table tr:hover {
-            background: #f8f9fa;
+        .search-section h3 {
+            margin-bottom: 15px;
+            font-size: 1.2em;
+            color: #007bff;
         }
-        
-        .data-table tr:last-child td {
-            border-bottom: none;
-        }
-        
-        .action-cell {
-            display: flex;
-            gap: 8px;
-        }
-        
-        .table-btn {
-            padding: 6px 12px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 12px;
-            transition: background 0.3s;
-        }
-        
-        .view-btn {
-            background: #17a2b8;
-            color: white;
-        }
-        
-        .view-btn:hover {
-            background: #138496;
-        }
-        
-        .delete-table-btn {
+
+        #technicianLogoutBtn {
             background: #dc3545;
             color: white;
+            padding: 8px 15px;
+            border-radius: 5px;
+            font-size: 14px;
+            margin-top: 10px;
+            width: auto;
         }
-        
-        .delete-table-btn:hover {
-            background: #c82333;
+
+        #searchBtn {
+            margin-top: 10px;
+            background: #28a745;
         }
-        
-        .empty-state {
-            text-align: center;
-            padding: 40px;
-            color: #6c757d;
-        }
-        
-        /* Styles pour l'interface Technicien */
-        .login-section {
-            background: #f8f9fa;
-            border-radius: 10px;
-            padding: 30px;
-            margin-bottom: 30px;
-            text-align: center;
-        }
-        
-        .technician-interface {
-            background: #f8f9fa;
-            border-radius: 10px;
-            padding: 25px;
+
+        /* Résultats et IA */
+        .documents-found, .not-found-section, .ai-section {
+            padding: 15px;
+            margin-top: 0;
+            border-radius: 0;
             display: none;
         }
-        
-        .technician-interface.active {
-            display: block;
-        }
-        
-        .search-section {
-            background: white;
-            border-radius: 10px;
-            padding: 20px;
-            margin-bottom: 20px;
-            border: 2px solid #e9ecef;
-        }
-        
-        .not-found-section {
-            background: #fff3cd;
-            border: 1px solid #ffeaa7;
-            border-radius: 10px;
-            padding: 20px;
-            margin-top: 20px;
-            display: none;
-            text-align: center;
-        }
-        
-        .not-found-section.active {
-            display: block;
-        }
-        
-        .documents-found {
-            background: #d4edda;
-            border: 1px solid #c3e6cb;
-            border-radius: 10px;
-            padding: 20px;
-            margin-top: 20px;
-            display: none;
-        }
-        
-        .documents-found.active {
-            display: block;
-        }
-        
+
         .document-list {
-            display: grid;
-            gap: 15px;
-            margin-top: 15px;
+            gap: 10px;
+            margin-top: 10px;
         }
-        
+
         .document-card {
-            background: white;
-            border: 1px solid #e9ecef;
-            border-radius: 8px;
-            padding: 15px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+            padding: 10px;
+            border-left: 5px solid #007bff;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            margin-bottom: 10px;
+            background: #f8f9fa;
         }
-        
-        .ai-section {
+
+        .document-card .view-btn {
+            background: #007bff;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 5px;
+            font-size: 14px;
+            border: none;
+            cursor: pointer;
+            margin-top: 5px;
+        }
+
+        #askAIBtn {
+            margin-top: 15px;
+            background: #6f42c1;
+        }
+
+        .ai-response {
+            white-space: pre-wrap;
+            font-size: 0.95em;
+            padding: 15px;
             background: #e9ecef;
-            border-radius: 10px;
-            padding: 20px;
-            margin-top: 20px;
+            border: none;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+
+        /* Sections Admin */
+        .admin-login-section, .upload-section, .technician-management, .password-management {
+            padding: 15px;
+        }
+
+        .admin-section {
+            padding-top: 15px;
             display: none;
         }
-        
-        .ai-section.active {
-            display: block;
+
+        .status-message {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            display: none;
         }
-        
-        .ai-response {
-            background: white;
-            border-radius: 8px;
-            padding: 15px;
-            margin-top: 15px;
-            min-height: 100px;
-            border: 1px solid #dee2e6;
+
+        .status-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
         }
-        
-        /* Styles pour la gestion des techniciens */
-        .technician-management {
-            background: #f8f9fa;
-            border-radius: 10px;
-            padding: 25px;
-            margin-top: 30px;
-            border: 2px dashed #dee2e6;
+
+        .status-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
         }
-        
-        .password-management {
-            background: white;
-            border-radius: 10px;
-            padding: 20px;
-            margin-top: 20px;
-            border: 1px solid #e9ecef;
-        }
-        
-        @media (max-width: 768px) {
+
+        /* Media query pour desktop */
+        @media (min-width: 601px) {
+            body {
+                padding: 20px;
+            }
+            .container {
+                max-width: 1000px;
+                border-radius: 15px;
+                box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+                min-height: initial;
+            }
+            .content {
+                padding: 30px;
+            }
             .form-row {
-                flex-direction: column;
+                flex-direction: row;
             }
-            
-            .select-with-actions {
-                flex-direction: column;
-                align-items: stretch;
+            .btn {
+                width: auto;
             }
-            
-            .data-table {
-                display: block;
-                overflow-x: auto;
-            }
-            
-            .table-header {
-                flex-direction: column;
-                gap: 15px;
-                align-items: flex-start;
-            }
-            
-            .role-selector {
-                flex-direction: column;
-                align-items: center;
+            #technicianLogoutBtn {
+                width: auto;
             }
         }
     </style>
@@ -609,16 +418,16 @@
             <p>Gestion des documents techniques</p>
             
             <div class="role-selector">
-                <button class="role-btn active" id="adminBtn">🔧 Administration</button>
-                <button class="role-btn" id="technicianBtn">👨‍🔧 Interface Technicien</button>
+                <button class="role-btn active" id="adminBtn">🔧 Admin</button>
+                <button class="role-btn" id="technicianBtn">👨‍🔧 Technicien</button>
             </div>
         </div>
         
         <div class="content">
-            <!-- Connexion Admin -->
+            <!-- Section Admin -->
             <div class="admin-login-section" id="adminLoginSection">
                 <h2>🔐 Connexion Administrateur</h2>
-                <p>Veuillez entrer le mot de passe administrateur pour accéder à cette section</p>
+                <p>Mot de passe requis</p>
                 <div class="form-group" style="max-width: 300px; margin: 20px auto;">
                     <input type="password" id="adminPassword" placeholder="Mot de passe administrateur" style="text-align: center;">
                     <button class="btn" id="adminLoginBtn" style="margin-top: 15px;">Se connecter</button>
@@ -626,17 +435,15 @@
                 <div id="adminLoginStatus"></div>
             </div>
             
-            <!-- Interface Admin (après connexion) -->
             <div class="admin-section" id="adminSection">
-                <div style="text-align: right; margin-bottom: 20px;">
+                <div style="text-align: right; margin-bottom: 15px;">
                     <button class="action-btn" id="adminLogoutBtn" style="background: #dc3545;">🚪 Déconnexion</button>
                 </div>
                 
-                <!-- Section Upload -->
                 <div class="upload-section">
-                    <h2>📤 Ajouter un nouveau document</h2>
+                    <h2>📤 Ajouter un document</h2>
                     <form id="uploadForm">
-                        <div class="form-row">
+                        <div class="form-row"> 
                             <div class="form-group">
                                 <label for="marque" class="required">Marque</label>
                                 <div class="select-with-actions">
@@ -709,60 +516,57 @@
                     <div id="statusMessage"></div>
                 </div>
                 
-                <!-- Gestion des techniciens -->
                 <div class="technician-management">
                     <h2>👨‍🔧 Gestion des Techniciens</h2>
                     
                     <div class="password-management">
-                        <h3>🔑 Changer le mot de passe technicien</h3>
+                        <h3>🔑 M.d.P Technicien</h3>
                         <div class="form-row">
                             <div class="form-group">
                                 <label for="newTechnicianPassword">Nouveau mot de passe technicien</label>
                                 <input type="password" id="newTechnicianPassword" placeholder="Nouveau mot de passe">
                             </div>
                             <div class="form-group">
-                                <label for="confirmTechnicianPassword">Confirmer le mot de passe</label>
+                                <label for="confirmTechnicianPassword">Confirmer</label>
                                 <input type="password" id="confirmTechnicianPassword" placeholder="Confirmer le mot de passe">
                             </div>
                         </div>
                         <button class="btn" id="updateTechnicianPasswordBtn" style="background: #17a2b8;">
-                            🔄 Mettre à jour le mot de passe
+                            🔄 Mettre à jour
                         </button>
                         <div id="passwordStatus"></div>
                     </div>
                     
                     <div class="password-management">
-                        <h3>🔑 Changer le mot de passe administrateur</h3>
+                        <h3>🔑 M.d.P Administrateur</h3>
                         <div class="form-row">
                             <div class="form-group">
-                                <label for="currentAdminPassword">Mot de passe actuel</label>
+                                <label for="currentAdminPassword">Actuel</label>
                                 <input type="password" id="currentAdminPassword" placeholder="Mot de passe actuel">
                             </div>
                             <div class="form-group">
-                                <label for="newAdminPassword">Nouveau mot de passe</label>
+                                <label for="newAdminPassword">Nouveau</label>
                                 <input type="password" id="newAdminPassword" placeholder="Nouveau mot de passe">
                             </div>
                             <div class="form-group">
-                                <label for="confirmAdminPassword">Confirmer le nouveau mot de passe</label>
+                                <label for="confirmAdminPassword">Confirmer</label>
                                 <input type="password" id="confirmAdminPassword" placeholder="Confirmer le mot de passe">
                             </div>
                         </div>
                         <button class="btn" id="updateAdminPasswordBtn" style="background: #6f42c1;">
-                            🔄 Mettre à jour le mot de passe admin
+                            🔄 Mettre à jour admin
                         </button>
                         <div id="adminPasswordStatus"></div>
                     </div>
                 </div>
                 
-                <!-- Bouton pour afficher/masquer le tableau -->
-                <button id="toggleTableBtn" class="toggle-table-btn">
+                <button id="toggleTableBtn" class="toggle-table-btn" style="width: 100%;">
                     📊 Afficher le tableau Supabase
                 </button>
                 
-                <!-- Tableau Supabase (caché par défaut) -->
                 <div class="table-section" id="tableSection">
                     <div class="table-header">
-                        <h3 class="table-title">📊 Tableau Supabase - Tous les documents</h3>
+                        <h3 class="table-title">📊 Documents</h3>
                         <button class="refresh-btn" id="refreshTable">🔄 Actualiser</button>
                     </div>
                     
@@ -770,30 +574,25 @@
                 </div>
             </div>
             
-            <!-- Interface Technicien -->
+            <!-- Section Technicien -->
             <div class="technician-section" id="technicianSection">
-                <!-- Connexion Technicien -->
                 <div class="login-section" id="loginSection">
-                    <h2>🔐 Connexion Technicien</h2>
-                    <p>Veuillez entrer le mot de passe pour accéder à l'interface technicien</p>
+                    <h2>🔐 Accès Technicien</h2>
+                    <p>Entrez le mot de passe</p>
                     <div class="form-group" style="max-width: 300px; margin: 20px auto;">
                         <input type="password" id="technicianPassword" placeholder="Mot de passe technicien" style="text-align: center;">
-                        <button class="btn" id="loginBtn" style="margin-top: 15px;">Se connecter</button>
+                        <button class="btn" id="loginBtn" style="margin-top: 15px; background: #007bff;">Se connecter</button>
                     </div>
                     <div id="loginStatus"></div>
                 </div>
                 
-                <!-- Interface Technicien (après connexion) -->
                 <div class="technician-interface" id="technicianInterface">
-                    <div style="text-align: right; margin-bottom: 20px;">
-                        <button class="action-btn" id="technicianLogoutBtn" style="background: #dc3545;">🚪 Déconnexion</button>
+                    <div style="text-align: right; padding: 15px 15px 0 15px;">
+                        <button class="action-btn" id="technicianLogoutBtn">🚪 Déconnexion</button>
                     </div>
                     
-                    <h2>👨‍🔧 Interface Technicien</h2>
-                    
-                    <!-- Recherche de documents -->
                     <div class="search-section">
-                        <h3>🔍 Rechercher une documentation</h3>
+                        <h3>🔍 Recherche de documentation</h3>
                         <div class="form-row">
                             <div class="form-group">
                                 <label for="techMarque">Marque</label>
@@ -810,32 +609,24 @@
                             </div>
                             
                             <div class="form-group">
-                                <label for="techModel">Modèle</label>
-                                <select id="techModel">
-                                    <option value="">Sélectionnez un modèle</option>
-                                </select>
-                            <div style="font-size: 12px; color: #6c757d; margin-top: 5px;">
-                                    Sélectionnez d'abord une marque et un type
-                                </div>
+                                <label for="techModel">Modèle (Facultatif)</label>
+                                <input type="text" id="techModel" placeholder="Modèle spécifique">
                             </div>
                         </div>
-                        <button class="btn" id="searchBtn">🔍 Rechercher</button>
+                        <button class="btn" id="searchBtn">🚀 Lancer la Recherche</button>
                     </div>
                     
-                    <!-- Section "Document non trouvé" -->
-                    <div class="not-found-section" id="notFoundSection">
-                        <h3>❌ Documentation non trouvée</h3>
-                        <p>La documentation que vous recherchez n'est pas encore disponible dans notre base de données.</p>
-                        <button class="btn" id="askAIBtn" style="background: #6f42c1;">🤖 Demander à l'IA</button>
-                    </div>
-                    
-                    <!-- Section Documents trouvés -->
                     <div class="documents-found" id="documentsFound">
                         <h3>✅ Documents trouvés</h3>
                         <div class="document-list" id="documentList"></div>
                     </div>
+
+                    <div class="not-found-section" id="notFoundSection">
+                        <h3>❌ Doc. non disponible</h3>
+                        <p>La documentation n'est pas encore dans la base.</p>
+                        <button class="btn" id="askAIBtn" style="background: #6f42c1;">🤖 Demander à l'IA</button>
+                    </div>
                     
-                    <!-- Section IA -->
                     <div class="ai-section" id="aiSection">
                         <h3>🤖 Assistant IA Groq</h3>
                         <div class="ai-response" id="aiResponse">
@@ -851,947 +642,693 @@
     <script>
         // Configuration Supabase
         const SUPABASE_URL = 'https://prrzsosrbrskmeozmmmu.supabase.co';
-        const SUPABASE_KEY = 'sb_publishable_2nwtPyBWSeUNNtx06wROTw_Txpyk2W3';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBycnpzb3NyYnJza21lb3ptbW11Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzQxNzkxNDUsImV4cCI6MjA0OTc1NTE0NX0.9RZ_1wR3kCg8Q6aMESX3VPwD8NtoK-Q8rZJ4xJjWUVQ';
         
         const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
         
-        // Éléments DOM pour l'admin (existants)
-        const uploadForm = document.getElementById('uploadForm');
-        const pdfFileInput = document.getElementById('pdfFile');
-        const fileName = document.getElementById('fileName');
-        const statusMessage = document.getElementById('statusMessage');
-        const tableContainer = document.getElementById('tableContainer');
-        const refreshTableBtn = document.getElementById('refreshTable');
-        const toggleTableBtn = document.getElementById('toggleTableBtn');
-        const tableSection = document.getElementById('tableSection');
-        
-        // Gestion des marques et types (existante)
-        const marqueSelect = document.getElementById('marque');
-        const typeSelect = document.getElementById('type_ascenseur');
-        const manageMarquesBtn = document.getElementById('manageMarquesBtn');
-        const manageTypesBtn = document.getElementById('manageTypesBtn');
-        const marquesPanel = document.getElementById('marquesPanel');
-        const typesPanel = document.getElementById('typesPanel');
-        const newMarqueInput = document.getElementById('newMarque');
-        const newTypeInput = document.getElementById('newType');
-        const addMarqueBtn = document.getElementById('addMarqueBtn');
-        const addTypeBtn = document.getElementById('addTypeBtn');
-        const marquesList = document.getElementById('marquesList');
-        const typesList = document.getElementById('typesList');
-        
-        // Éléments DOM pour le technicien (nouveaux)
-        const adminBtn = document.getElementById('adminBtn');
-        const technicianBtn = document.getElementById('technicianBtn');
-        const adminLoginSection = document.getElementById('adminLoginSection');
-        const adminSection = document.getElementById('adminSection');
-        const technicianSection = document.getElementById('technicianSection');
-        const loginSection = document.getElementById('loginSection');
-        const technicianInterface = document.getElementById('technicianInterface');
-        const technicianPassword = document.getElementById('technicianPassword');
-        const loginBtn = document.getElementById('loginBtn');
-        const loginStatus = document.getElementById('loginStatus');
-        const techMarque = document.getElementById('techMarque');
-        const techType = document.getElementById('techType');
-        const techModel = document.getElementById('techModel');
-        const searchBtn = document.getElementById('searchBtn');
-        const notFoundSection = document.getElementById('notFoundSection');
-        const documentsFound = document.getElementById('documentsFound');
-        const documentList = document.getElementById('documentList');
-        const askAIBtn = document.getElementById('askAIBtn');
-        const aiSection = document.getElementById('aiSection');
-        const aiResponse = document.getElementById('aiResponse');
-        
-        // Nouveaux éléments pour la gestion des mots de passe
-        const adminPassword = document.getElementById('adminPassword');
-        const adminLoginBtn = document.getElementById('adminLoginBtn');
-        const adminLoginStatus = document.getElementById('adminLoginStatus');
-        const adminLogoutBtn = document.getElementById('adminLogoutBtn');
-        const technicianLogoutBtn = document.getElementById('technicianLogoutBtn');
-        const newTechnicianPassword = document.getElementById('newTechnicianPassword');
-        const confirmTechnicianPassword = document.getElementById('confirmTechnicianPassword');
-        const updateTechnicianPasswordBtn = document.getElementById('updateTechnicianPasswordBtn');
-        const passwordStatus = document.getElementById('passwordStatus');
-        const currentAdminPassword = document.getElementById('currentAdminPassword');
-        const newAdminPassword = document.getElementById('newAdminPassword');
-        const confirmAdminPassword = document.getElementById('confirmAdminPassword');
-        const updateAdminPasswordBtn = document.getElementById('updateAdminPasswordBtn');
-        const adminPasswordStatus = document.getElementById('adminPasswordStatus');
-        
-        // Données des marques et types (stockées dans localStorage)
-        let marques = JSON.parse(localStorage.getItem('ascenseur_marques')) || ['Otis', 'Schindler', 'Kone', 'ThyssenKrupp'];
-        let typesAscenseur = JSON.parse(localStorage.getItem('ascenseur_types')) || ['Hydraulique', 'Électrique', 'MRL', 'LVA'];
-        
-        // Mots de passe (stockés dans localStorage)
-        let adminPass = localStorage.getItem('admin_password') || "admin123";
-        let technicianPass = localStorage.getItem('technician_password') || "tech123";
-        
-        // État du tableau admin
-        let isTableVisible = false;
-        
-        // Liste des modèles depuis Supabase
-        let modelesDisponibles = [];
-        
+        // État de l'application
+        let currentUser = null;
+        let documents = [];
+        let marques = [];
+        let types = [];
+
         // Initialisation
-        function initApp() {
-            updateMarquesList();
-            updateTypesList();
-            initAdminInterface();
-            initTechnicianInterface();
-            initPasswordManagement();
-            loadModelesFromSupabase();
-        }
-        
-        // Charger les modèles depuis Supabase
-        async function loadModelesFromSupabase() {
-            try {
-                const { data: documents, error } = await supabase
-                    .from('documents')
-                    .select('model, marque, programmation, schémas')
-                    .not('model', 'is', null);
-                
-                if (error) {
-                    throw error;
-                }
-                
-                // Extraire les modèles uniques
-                modelesDisponibles = [...new Set(documents.map(doc => doc.model))].filter(model => model && model.trim() !== '');
-                
-                console.log('Modèles chargés depuis Supabase:', modelesDisponibles);
-                
-            } catch (error) {
-                console.error('Erreur lors du chargement des modèles:', error);
-                modelesDisponibles = [];
-            }
-        }
-        
-        // Mettre à jour la liste des marques
-        function updateMarquesList() {
-            // Mettre à jour le select admin
-            marqueSelect.innerHTML = '<option value="">Sélectionnez une marque</option>';
-            marques.forEach(marque => {
-                const option = document.createElement('option');
-                option.value = marque;
-                option.textContent = marque;
-                marqueSelect.appendChild(option);
-            });
-            
-            // Mettre à jour la liste dans le panel
-            marquesList.innerHTML = '';
-            marques.forEach(marque => {
-                const listItem = document.createElement('div');
-                listItem.className = 'list-item';
-                listItem.innerHTML = `
-                    <span>${marque}</span>
-                    <div class="list-item-actions">
-                        <button class="small-btn delete" data-marque="${marque}">🗑️</button>
-                    </div>
-                `;
-                marquesList.appendChild(listItem);
-            });
-            
-            // Ajouter les événements de suppression
-            marquesList.querySelectorAll('.small-btn.delete').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const marqueToRemove = this.getAttribute('data-marque');
-                    marques = marques.filter(m => m !== marqueToRemove);
-                    updateMarquesList();
-                });
-            });
-            
-            // Sauvegarder dans localStorage
-            localStorage.setItem('ascenseur_marques', JSON.stringify(marques));
-        }
-        
-        // Mettre à jour la liste des types
-        function updateTypesList() {
-            // Mettre à jour le select admin
-            typeSelect.innerHTML = '<option value="">Sélectionnez un type</option>';
-            typesAscenseur.forEach(type => {
-                const option = document.createElement('option');
-                option.value = type;
-                option.textContent = type;
-                typeSelect.appendChild(option);
-            });
-            
-            // Mettre à jour la liste dans le panel
-            typesList.innerHTML = '';
-            typesAscenseur.forEach(type => {
-                const listItem = document.createElement('div');
-                listItem.className = 'list-item';
-                listItem.innerHTML = `
-                    <span>${type}</span>
-                    <div class="list-item-actions">
-                        <button class="small-btn delete" data-type="${type}">🗑️</button>
-                    </div>
-                `;
-                typesList.appendChild(listItem);
-            });
-            
-            // Ajouter les événements de suppression
-            typesList.querySelectorAll('.small-btn.delete').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const typeToRemove = this.getAttribute('data-type');
-                    typesAscenseur = typesAscenseur.filter(t => t !== typeToRemove);
-                    updateTypesList();
-                });
-            });
-            
-            // Sauvegarder dans localStorage
-            localStorage.setItem('ascenseur_types', JSON.stringify(typesAscenseur));
-        }
-        
-        // Ajouter une nouvelle marque
-        addMarqueBtn.addEventListener('click', function() {
-            const newMarque = newMarqueInput.value.trim();
-            if (newMarque && !marques.includes(newMarque)) {
-                marques.push(newMarque);
-                updateMarquesList();
-                newMarqueInput.value = '';
-                // Sélectionner la nouvelle marque
-                marqueSelect.value = newMarque;
-            }
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeApp();
+            setupEventListeners();
+            loadMarquesAndTypes();
         });
-        
-        // Ajouter un nouveau type
-        addTypeBtn.addEventListener('click', function() {
-            const newType = newTypeInput.value.trim();
-            if (newType && !typesAscenseur.includes(newType)) {
-                typesAscenseur.push(newType);
-                updateTypesList();
-                newTypeInput.value = '';
-                // Sélectionner le nouveau type
-                typeSelect.value = newType;
-            }
-        });
-        
-        // Initialisation interface Admin (existante)
-        function initAdminInterface() {
-            // Gestion des panels
-            manageMarquesBtn.addEventListener('click', function() {
-                marquesPanel.classList.toggle('active');
-                typesPanel.classList.remove('active');
-            });
+
+        function initializeApp() {
+            // Cacher toutes les sections au démarrage
+            document.getElementById('adminSection').style.display = 'none';
+            document.getElementById('technicianSection').style.display = 'none';
+            document.getElementById('technicianInterface').style.display = 'none';
             
-            manageTypesBtn.addEventListener('click', function() {
-                typesPanel.classList.toggle('active');
-                marquesPanel.classList.remove('active');
-            });
-            
-            // Fermer les panels en cliquant ailleurs
-            document.addEventListener('click', function(e) {
-                if (!e.target.closest('.form-group')) {
-                    marquesPanel.classList.remove('active');
-                    typesPanel.classList.remove('active');
-                }
-            });
-            
-            // Actualiser le tableau
-            refreshTableBtn.addEventListener('click', loadTableData);
-            
-            // Afficher/masquer le tableau
-            toggleTableBtn.addEventListener('click', function() {
-                isTableVisible = !isTableVisible;
-                
-                if (isTableVisible) {
-                    tableSection.classList.add('active');
-                    toggleTableBtn.innerHTML = '📊 Masquer le tableau Supabase';
-                    loadTableData();
-                } else {
-                    tableSection.classList.remove('active');
-                    toggleTableBtn.innerHTML = '📊 Afficher le tableau Supabase';
-                }
-            });
-            
-            // Gestion de l'upload
-            setupUploadForm();
-            
-            // Connexion admin
-            adminLoginBtn.addEventListener('click', function() {
-                const password = adminPassword.value;
-                if (password === adminPass) {
-                    adminLoginSection.style.display = 'none';
-                    adminSection.classList.add('active');
-                    showStatus(adminLoginStatus, '✅ Connexion réussie!', 'success');
-                } else {
-                    showStatus(adminLoginStatus, '❌ Mot de passe incorrect', 'error');
-                }
-            });
-            
-            // Déconnexion admin
-            adminLogoutBtn.addEventListener('click', function() {
-                adminSection.classList.remove('active');
-                adminLoginSection.style.display = 'block';
-                adminPassword.value = '';
-                adminLoginStatus.innerHTML = '';
-            });
-            
-            // Entrée pour la connexion admin
-            adminPassword.addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') {
-                    adminLoginBtn.click();
-                }
-            });
+            // Afficher seulement la connexion admin
+            document.getElementById('adminLoginSection').style.display = 'block';
         }
-        
-        // Initialisation de la gestion des mots de passe
-        function initPasswordManagement() {
-            // Mettre à jour le mot de passe technicien
-            updateTechnicianPasswordBtn.addEventListener('click', function() {
-                const newPassword = newTechnicianPassword.value;
-                const confirmPassword = confirmTechnicianPassword.value;
-                
-                if (!newPassword) {
-                    showStatus(passwordStatus, '❌ Veuillez entrer un nouveau mot de passe', 'error');
-                    return;
-                }
-                
-                if (newPassword !== confirmPassword) {
-                    showStatus(passwordStatus, '❌ Les mots de passe ne correspondent pas', 'error');
-                    return;
-                }
-                
-                if (newPassword.length < 4) {
-                    showStatus(passwordStatus, '❌ Le mot de passe doit contenir au moins 4 caractères', 'error');
-                    return;
-                }
-                
-                technicianPass = newPassword;
-                localStorage.setItem('technician_password', newPassword);
-                
-                showStatus(passwordStatus, '✅ Mot de passe technicien mis à jour avec succès!', 'success');
-                newTechnicianPassword.value = '';
-                confirmTechnicianPassword.value = '';
-            });
-            
-            // Mettre à jour le mot de passe admin
-            updateAdminPasswordBtn.addEventListener('click', function() {
-                const currentPassword = currentAdminPassword.value;
-                const newPassword = newAdminPassword.value;
-                const confirmPassword = confirmAdminPassword.value;
-                
-                if (currentPassword !== adminPass) {
-                    showStatus(adminPasswordStatus, '❌ Mot de passe actuel incorrect', 'error');
-                    return;
-                }
-                
-                if (!newPassword) {
-                    showStatus(adminPasswordStatus, '❌ Veuillez entrer un nouveau mot de passe', 'error');
-                    return;
-                }
-                
-                if (newPassword !== confirmPassword) {
-                    showStatus(adminPasswordStatus, '❌ Les mots de passe ne correspondent pas', 'error');
-                    return;
-                }
-                
-                if (newPassword.length < 4) {
-                    showStatus(adminPasswordStatus, '❌ Le mot de passe doit contenir au moins 4 caractères', 'error');
-                    return;
-                }
-                
-                adminPass = newPassword;
-                localStorage.setItem('admin_password', newPassword);
-                
-                showStatus(adminPasswordStatus, '✅ Mot de passe administrateur mis à jour avec succès!', 'success');
-                currentAdminPassword.value = '';
-                newAdminPassword.value = '';
-                confirmAdminPassword.value = '';
-            });
+
+        function setupEventListeners() {
+            // Navigation entre les rôles
+            document.getElementById('adminBtn').addEventListener('click', () => switchRole('admin'));
+            document.getElementById('technicianBtn').addEventListener('click', () => switchRole('technician'));
+
+            // Connexion
+            document.getElementById('adminLoginBtn').addEventListener('click', adminLogin);
+            document.getElementById('loginBtn').addEventListener('click', technicianLogin);
+
+            // Déconnexion
+            document.getElementById('adminLogoutBtn').addEventListener('click', logout);
+            document.getElementById('technicianLogoutBtn').addEventListener('click', logout);
+
+            // Gestion des documents
+            document.getElementById('uploadForm').addEventListener('submit', handleUpload);
+            document.getElementById('pdfFile').addEventListener('change', handleFileSelect);
+
+            // Gestion des marques et types
+            document.getElementById('manageMarquesBtn').addEventListener('click', () => togglePanel('marquesPanel'));
+            document.getElementById('manageTypesBtn').addEventListener('click', () => togglePanel('typesPanel'));
+            document.getElementById('addMarqueBtn').addEventListener('click', addMarque);
+            document.getElementById('addTypeBtn').addEventListener('click', addType);
+
+            // Mots de passe
+            document.getElementById('updateTechnicianPasswordBtn').addEventListener('click', updateTechnicianPassword);
+            document.getElementById('updateAdminPasswordBtn').addEventListener('click', updateAdminPassword);
+
+            // Tableau
+            document.getElementById('toggleTableBtn').addEventListener('click', toggleTable);
+            document.getElementById('refreshTable').addEventListener('click', loadDocuments);
+
+            // Recherche technicien
+            document.getElementById('searchBtn').addEventListener('click', searchDocuments);
+            document.getElementById('askAIBtn').addEventListener('click', askAI);
         }
-        
-        // Configuration du formulaire d'upload
-        function setupUploadForm() {
-            // Afficher le nom du fichier sélectionné
-            pdfFileInput.addEventListener('change', function() {
-                if (this.files.length > 0) {
-                    fileName.textContent = this.files[0].name;
-                } else {
-                    fileName.textContent = 'Aucun fichier sélectionné';
-                }
-            });
+
+        function switchRole(role) {
+            const adminBtn = document.getElementById('adminBtn');
+            const technicianBtn = document.getElementById('technicianBtn');
             
-            // Gestion de l'upload
-            uploadForm.addEventListener('submit', async function(e) {
-                e.preventDefault();
-                
-                const marque = document.getElementById('marque').value;
-                const type_ascenseur = document.getElementById('type_ascenseur').value;
-                const categorie = document.getElementById('categorie').value;
-                const model = document.getElementById('model').value;
-                const file = pdfFileInput.files[0];
-                
-                // Validation des champs obligatoires
-                if (!marque) {
-                    showStatus(statusMessage, 'Veuillez sélectionner une marque', 'error');
-                    return;
-                }
-                
-                if (!type_ascenseur) {
-                    showStatus(statusMessage, 'Veuillez sélectionner un type d\'ascenseur', 'error');
-                    return;
-                }
-                
-                if (!categorie) {
-                    showStatus(statusMessage, 'Veuillez sélectionner un type de document', 'error');
-                    return;
-                }
-                
-                if (!model) {
-                    showStatus(statusMessage, 'Veuillez remplir le champ Modèle', 'error');
-                    return;
-                }
-                
-                if (!file) {
-                    showStatus(statusMessage, 'Veuillez sélectionner un fichier PDF', 'error');
-                    return;
-                }
-                
-                if (file.type !== 'application/pdf') {
-                    showStatus(statusMessage, 'Veuillez sélectionner un fichier PDF valide', 'error');
-                    return;
-                }
-                
-                // Désactiver le bouton pendant l'upload
-                const submitBtn = uploadForm.querySelector('.btn');
-                submitBtn.disabled = true;
-                submitBtn.textContent = 'Enregistrement en cours...';
-                
-                try {
-                    showStatus(statusMessage, 'Conversion du PDF en base64...', 'loading');
-                    
-                    // Convertir le PDF en base64
-                    const reader = new FileReader();
-                    
-                    reader.onload = async function(e) {
-                        try {
-                            const pdfBase64 = e.target.result.split(',')[1];
-                            
-                            // Préparer les données avec les colonnes existantes
-                            const documentData = {
-                                marque: marque,
-                                model: model,
-                                nom_fichier: file.name,
-                                date_upload: new Date().toISOString(),
-                                pdf_data: pdfBase64,
-                                taille_fichier: file.size,
-                                programmation: categorie === 'programmation' ? type_ascenseur : null,
-                                schémas: categorie === 'schemas' ? type_ascenseur : null
-                            };
-                            
-                            // Enregistrer dans la table documents
-                            const { data: dbData, error: dbError } = await supabase
-                                .from('documents')
-                                .insert([documentData]);
-                            
-                            if (dbError) {
-                                throw new Error(`Erreur base de données: ${dbError.message}`);
-                            }
-                            
-                            showStatus(statusMessage, '✅ Document enregistré avec succès!', 'success');
-                            uploadForm.reset();
-                            fileName.textContent = 'Aucun fichier sélectionné';
-                            
-                            // Recharger les modèles depuis Supabase
-                            await loadModelesFromSupabase();
-                            
-                            // Si le tableau est visible, le recharger
-                            if (isTableVisible) {
-                                loadTableData();
-                            }
-                            
-                        } catch (error) {
-                            console.error('Erreur:', error);
-                            showStatus(statusMessage, `❌ Erreur: ${error.message}`, 'error');
-                        } finally {
-                            // Réactiver le bouton
-                            submitBtn.disabled = false;
-                            submitBtn.textContent = '💾 Enregistrer le document';
-                        }
-                    };
-                    
-                    reader.onerror = function() {
-                        showStatus(statusMessage, '❌ Erreur lors de la lecture du fichier', 'error');
-                        submitBtn.disabled = false;
-                        submitBtn.textContent = '💾 Enregistrer le document';
-                    };
-                    
-                    // Lire le fichier comme Data URL (base64)
-                    reader.readAsDataURL(file);
-                    
-                } catch (error) {
-                    console.error('Erreur:', error);
-                    showStatus(statusMessage, `❌ Erreur: ${error.message}`, 'error');
-                    submitBtn.disabled = false;
-                    submitBtn.textContent = '💾 Enregistrer le document';
-                }
-            });
-        }
-        
-        // Charger les données du tableau
-        async function loadTableData() {
-            try {
-                const { data: documents, error } = await supabase
-                    .from('documents')
-                    .select('*')
-                    .order('id', { ascending: false });
-                
-                if (error) {
-                    throw error;
-                }
-                
-                // Générer le tableau HTML
-                if (documents.length === 0) {
-                    tableContainer.innerHTML = `
-                        <div class="empty-state">
-                            <h3>📭 Aucun document trouvé</h3>
-                            <p>Ajoutez votre premier document en utilisant le formulaire ci-dessus.</p>
-                        </div>
-                    `;
-                    return;
-                }
-                
-                let tableHTML = `
-                    <table class="data-table">
-                        <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>Marque</th>
-                                <th>Type</th>
-                                <th>Catégorie</th>
-                                <th>Modèle</th>
-                                <th>Nom du fichier</th>
-                                <th>Date d'ajout</th>
-                                <th>Taille</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                `;
-                
-                documents.forEach(doc => {
-                    // Déterminer la catégorie et le type
-                    const categorie = doc.programmation ? 'Programmation' : (doc.schémas ? 'Schémas' : 'Non défini');
-                    const type = doc.programmation || doc.schémas || 'Non défini';
-                    
-                    tableHTML += `
-                        <tr>
-                            <td>${doc.id}</td>
-                            <td>${doc.marque || '-'}</td>
-                            <td>${type}</td>
-                            <td>${categorie}</td>
-                            <td>${doc.model || '-'}</td>
-                            <td>${doc.nom_fichier || '-'}</td>
-                            <td>${new Date(doc.date_upload).toLocaleDateString()}</td>
-                            <td>${doc.taille_fichier ? Math.round(doc.taille_fichier / 1024) + ' KB' : '-'}</td>
-                            <td class="action-cell">
-                                ${doc.pdf_data ? 
-                                    `<button class="table-btn view-btn" data-id="${doc.id}" data-filename="${doc.nom_fichier}" data-pdfdata="${doc.pdf_data}">
-                                        👁️ Voir
-                                    </button>` 
-                                    : 
-                                    '<span style="color: #6c757d; font-size: 12px;">Aucun PDF</span>'
-                                }
-                                <button class="table-btn delete-table-btn" data-id="${doc.id}">
-                                    🗑️ Supprimer
-                                </button>
-                            </td>
-                        </tr>
-                    `;
-                });
-                
-                tableHTML += `
-                        </tbody>
-                    </table>
-                `;
-                
-                tableContainer.innerHTML = tableHTML;
-                
-                // Ajouter les événements pour les boutons
-                document.querySelectorAll('.view-btn').forEach(btn => {
-                    btn.addEventListener('click', function() {
-                        const filename = this.getAttribute('data-filename');
-                        const pdfData = this.getAttribute('data-pdfdata');
-                        downloadPDF(filename, pdfData);
-                    });
-                });
-                
-                document.querySelectorAll('.delete-table-btn').forEach(btn => {
-                    btn.addEventListener('click', function() {
-                        const id = this.getAttribute('data-id');
-                        deleteDocument(id);
-                    });
-                });
-                
-            } catch (error) {
-                console.error('Erreur chargement tableau:', error);
-                tableContainer.innerHTML = `
-                    <div class="empty-state">
-                        <h3>❌ Erreur lors du chargement des données</h3>
-                        <p>${error.message}</p>
-                    </div>
-                `;
+            adminBtn.classList.toggle('active', role === 'admin');
+            technicianBtn.classList.toggle('active', role === 'technician');
+
+            if (role === 'admin') {
+                document.getElementById('technicianSection').style.display = 'none';
+                document.getElementById('adminLoginSection').style.display = 'block';
+            } else {
+                document.getElementById('adminLoginSection').style.display = 'none';
+                document.getElementById('adminSection').style.display = 'none';
+                document.getElementById('technicianSection').style.display = 'block';
             }
         }
-        
-        // Fonction pour supprimer un document
-        async function deleteDocument(id) {
-            if (!confirm('Êtes-vous sûr de vouloir supprimer ce document ? Cette action est irréversible.')) {
+
+        async function adminLogin() {
+            const password = document.getElementById('adminPassword').value;
+            const statusDiv = document.getElementById('adminLoginStatus');
+            
+            if (!password) {
+                showStatus(statusDiv, 'Veuillez entrer un mot de passe', 'error');
                 return;
             }
-            
+
             try {
-                showStatus(statusMessage, 'Suppression en cours...', 'loading');
-                
+                // Vérifier le mot de passe admin (dans un vrai projet, cela serait sécurisé)
+                const { data, error } = await supabase
+                    .from('passwords')
+                    .select('*')
+                    .eq('role', 'admin')
+                    .single();
+
+                if (error) throw error;
+
+                if (data && data.password === password) {
+                    currentUser = { role: 'admin' };
+                    document.getElementById('adminLoginSection').style.display = 'none';
+                    document.getElementById('adminSection').style.display = 'block';
+                    showStatus(statusDiv, 'Connexion réussie!', 'success');
+                    loadDocuments();
+                } else {
+                    showStatus(statusDiv, 'Mot de passe incorrect', 'error');
+                }
+            } catch (error) {
+                console.error('Erreur de connexion:', error);
+                showStatus(statusDiv, 'Erreur de connexion', 'error');
+            }
+        }
+
+        async function technicianLogin() {
+            const password = document.getElementById('technicianPassword').value;
+            const statusDiv = document.getElementById('loginStatus');
+            
+            if (!password) {
+                showStatus(statusDiv, 'Veuillez entrer un mot de passe', 'error');
+                return;
+            }
+
+            try {
+                const { data, error } = await supabase
+                    .from('passwords')
+                    .select('*')
+                    .eq('role', 'technician')
+                    .single();
+
+                if (error) throw error;
+
+                if (data && data.password === password) {
+                    currentUser = { role: 'technician' };
+                    document.getElementById('loginSection').style.display = 'none';
+                    document.getElementById('technicianInterface').style.display = 'block';
+                    showStatus(statusDiv, 'Connexion réussie!', 'success');
+                    loadMarquesAndTypesForTechnician();
+                } else {
+                    showStatus(statusDiv, 'Mot de passe incorrect', 'error');
+                }
+            } catch (error) {
+                console.error('Erreur de connexion:', error);
+                showStatus(statusDiv, 'Erreur de connexion', 'error');
+            }
+        }
+
+        function logout() {
+            currentUser = null;
+            document.getElementById('adminPassword').value = '';
+            document.getElementById('technicianPassword').value = '';
+            
+            document.getElementById('adminSection').style.display = 'none';
+            document.getElementById('technicianInterface').style.display = 'none';
+            document.getElementById('tableSection').style.display = 'none';
+            
+            document.getElementById('adminLoginSection').style.display = 'block';
+            document.getElementById('loginSection').style.display = 'block';
+        }
+
+        async function loadMarquesAndTypes() {
+            try {
+                // Charger les marques
+                const { data: marquesData, error: marquesError } = await supabase
+                    .from('marques')
+                    .select('*')
+                    .order('name');
+
+                if (marquesError) throw marquesError;
+                marques = marquesData || [];
+
+                // Charger les types
+                const { data: typesData, error: typesError } = await supabase
+                    .from('types_ascenseur')
+                    .select('*')
+                    .order('name');
+
+                if (typesError) throw typesError;
+                types = typesData || [];
+
+                updateMarquesAndTypesSelects();
+                updateMarquesAndTypesLists();
+            } catch (error) {
+                console.error('Erreur chargement marques/types:', error);
+            }
+        }
+
+        function updateMarquesAndTypesSelects() {
+            const marqueSelect = document.getElementById('marque');
+            const techMarqueSelect = document.getElementById('techMarque');
+            const typeSelect = document.getElementById('type_ascenseur');
+            const techTypeSelect = document.getElementById('techType');
+
+            // Mettre à jour les selects admin
+            marqueSelect.innerHTML = '<option value="">Sélectionnez une marque</option>';
+            typeSelect.innerHTML = '<option value="">Sélectionnez un type</option>';
+
+            // Mettre à jour les selects technicien
+            techMarqueSelect.innerHTML = '<option value="">Sélectionnez une marque</option>';
+            techTypeSelect.innerHTML = '<option value="">Sélectionnez un type</option>';
+
+            marques.forEach(marque => {
+                const option = new Option(marque.name, marque.id);
+                marqueSelect.add(option);
+                techMarqueSelect.add(option.cloneNode(true));
+            });
+
+            types.forEach(type => {
+                const option = new Option(type.name, type.id);
+                typeSelect.add(option);
+                techTypeSelect.add(option.cloneNode(true));
+            });
+        }
+
+        function updateMarquesAndTypesLists() {
+            const marquesList = document.getElementById('marquesList');
+            const typesList = document.getElementById('typesList');
+
+            marquesList.innerHTML = '';
+            typesList.innerHTML = '';
+
+            marques.forEach(marque => {
+                const div = document.createElement('div');
+                div.className = 'item-row';
+                div.innerHTML = `
+                    <span>${marque.name}</span>
+                    <button class="delete-btn" onclick="deleteMarque(${marque.id})">🗑️</button>
+                `;
+                marquesList.appendChild(div);
+            });
+
+            types.forEach(type => {
+                const div = document.createElement('div');
+                div.className = 'item-row';
+                div.innerHTML = `
+                    <span>${type.name}</span>
+                    <button class="delete-btn" onclick="deleteType(${type.id})">🗑️</button>
+                `;
+                typesList.appendChild(div);
+            });
+        }
+
+        async function addMarque() {
+            const newMarqueInput = document.getElementById('newMarque');
+            const name = newMarqueInput.value.trim();
+
+            if (!name) {
+                alert('Veuillez entrer un nom de marque');
+                return;
+            }
+
+            try {
+                const { data, error } = await supabase
+                    .from('marques')
+                    .insert([{ name }])
+                    .select();
+
+                if (error) throw error;
+
+                newMarqueInput.value = '';
+                await loadMarquesAndTypes();
+                showStatus(document.getElementById('statusMessage'), 'Marque ajoutée avec succès', 'success');
+            } catch (error) {
+                console.error('Erreur ajout marque:', error);
+                showStatus(document.getElementById('statusMessage'), 'Erreur lors de l\'ajout', 'error');
+            }
+        }
+
+        async function addType() {
+            const newTypeInput = document.getElementById('newType');
+            const name = newTypeInput.value.trim();
+
+            if (!name) {
+                alert('Veuillez entrer un nom de type');
+                return;
+            }
+
+            try {
+                const { data, error } = await supabase
+                    .from('types_ascenseur')
+                    .insert([{ name }])
+                    .select();
+
+                if (error) throw error;
+
+                newTypeInput.value = '';
+                await loadMarquesAndTypes();
+                showStatus(document.getElementById('statusMessage'), 'Type ajouté avec succès', 'success');
+            } catch (error) {
+                console.error('Erreur ajout type:', error);
+                showStatus(document.getElementById('statusMessage'), 'Erreur lors de l\'ajout', 'error');
+            }
+        }
+
+        async function deleteMarque(id) {
+            if (!confirm('Êtes-vous sûr de vouloir supprimer cette marque ?')) return;
+
+            try {
                 const { error } = await supabase
-                    .from('documents')
+                    .from('marques')
                     .delete()
                     .eq('id', id);
-                
-                if (error) {
-                    throw error;
-                }
-                
-                showStatus(statusMessage, '✅ Document supprimé avec succès!', 'success');
-                
-                // Recharger les modèles depuis Supabase
-                await loadModelesFromSupabase();
-                
-                // Recharger le tableau
-                loadTableData();
-                
+
+                if (error) throw error;
+
+                await loadMarquesAndTypes();
+                showStatus(document.getElementById('statusMessage'), 'Marque supprimée avec succès', 'success');
             } catch (error) {
-                console.error('Erreur suppression:', error);
-                showStatus(statusMessage, `❌ Erreur lors de la suppression: ${error.message}`, 'error');
+                console.error('Erreur suppression marque:', error);
+                showStatus(document.getElementById('statusMessage'), 'Erreur lors de la suppression', 'error');
             }
         }
-        
-        // Fonction pour télécharger le PDF
-        function downloadPDF(filename, base64Data) {
+
+        async function deleteType(id) {
+            if (!confirm('Êtes-vous sûr de vouloir supprimer ce type ?')) return;
+
             try {
-                const byteCharacters = atob(base64Data);
-                const byteNumbers = new Array(byteCharacters.length);
-                for (let i = 0; i < byteCharacters.length; i++) {
-                    byteNumbers[i] = byteCharacters.charCodeAt(i);
-                }
-                const byteArray = new Uint8Array(byteNumbers);
-                const blob = new Blob([byteArray], { type: 'application/pdf' });
-                
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = filename || 'document.pdf';
-                document.body.appendChild(a);
-                a.click();
-                
-                document.body.removeChild(a);
-                URL.revokeObjectURL(url);
-                
-                showStatus(statusMessage, '✅ Téléchargement démarré!', 'success');
+                const { error } = await supabase
+                    .from('types_ascenseur')
+                    .delete()
+                    .eq('id', id);
+
+                if (error) throw error;
+
+                await loadMarquesAndTypes();
+                showStatus(document.getElementById('statusMessage'), 'Type supprimé avec succès', 'success');
             } catch (error) {
-                console.error('Erreur téléchargement:', error);
-                showStatus(statusMessage, '❌ Erreur lors du téléchargement', 'error');
+                console.error('Erreur suppression type:', error);
+                showStatus(document.getElementById('statusMessage'), 'Erreur lors de la suppression', 'error');
             }
         }
-        
-        // Fonction pour afficher les messages de statut
-        function showStatus(element, message, type) {
-            element.textContent = message;
-            element.className = 'status ' + type;
+
+        function handleFileSelect(event) {
+            const file = event.target.files[0];
+            const fileNameDiv = document.getElementById('fileName');
+            
+            if (file) {
+                fileNameDiv.textContent = `Fichier sélectionné: ${file.name}`;
+            } else {
+                fileNameDiv.textContent = 'Aucun fichier sélectionné';
+            }
         }
-        
-        // Initialisation interface Technicien
-        function initTechnicianInterface() {
-            // Sélection du rôle
-            adminBtn.addEventListener('click', function() {
-                adminBtn.classList.add('active');
-                technicianBtn.classList.remove('active');
-                adminLoginSection.style.display = 'block';
-                adminSection.classList.remove('active');
-                technicianSection.style.display = 'none';
-                resetAdminInterface();
-            });
+
+        async function handleUpload(event) {
+            event.preventDefault();
             
-            technicianBtn.addEventListener('click', function() {
-                technicianBtn.classList.add('active');
-                adminBtn.classList.remove('active');
-                adminLoginSection.style.display = 'none';
-                adminSection.classList.remove('active');
-                technicianSection.style.display = 'block';
-                resetTechnicianInterface();
-            });
-            
-            // Connexion technicien
-            loginBtn.addEventListener('click', function() {
-                const password = technicianPassword.value;
-                if (password === technicianPass) {
-                    loginSection.style.display = 'none';
-                    technicianInterface.classList.add('active');
-                    updateTechnicianSelects();
-                    showStatus(loginStatus, '✅ Connexion réussie!', 'success');
-                } else {
-                    showStatus(loginStatus, '❌ Mot de passe incorrect', 'error');
-                }
-            });
-            
-            // Déconnexion technicien
-            technicianLogoutBtn.addEventListener('click', function() {
-                technicianInterface.classList.remove('active');
-                loginSection.style.display = 'block';
-                technicianPassword.value = '';
-                loginStatus.innerHTML = '';
-                notFoundSection.classList.remove('active');
-                documentsFound.classList.remove('active');
-                aiSection.classList.remove('active');
-            });
-            
-            // Recherche de documents
-            searchBtn.addEventListener('click', searchDocuments);
-            
-            // Demander à l'IA
-            askAIBtn.addEventListener('click', askAI);
-            
-            // Entrée pour la connexion
-            technicianPassword.addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') {
-                    loginBtn.click();
-                }
-            });
-            
-            // Mettre à jour les modèles quand la marque ou le type change
-            techMarque.addEventListener('change', updateTechModelSelect);
-            techType.addEventListener('change', updateTechModelSelect);
-        }
-        
-        // Mettre à jour le select des modèles pour le technicien
-        async function updateTechModelSelect() {
-            const marque = techMarque.value;
-            const type = techType.value;
-            
-            techModel.innerHTML = '<option value="">Sélectionnez un modèle</option>';
-            
-            if (!marque || !type) {
+            const formData = new FormData(event.target);
+            const marqueId = formData.get('marque');
+            const typeId = formData.get('type_ascenseur');
+            const categorie = formData.get('categorie');
+            const model = formData.get('model');
+            const pdfFile = document.getElementById('pdfFile').files[0];
+
+            if (!pdfFile) {
+                showStatus(document.getElementById('statusMessage'), 'Veuillez sélectionner un fichier PDF', 'error');
                 return;
             }
-            
+
             try {
-                // Charger les modèles spécifiques à cette marque et type depuis Supabase
-                let query = supabase
+                // Upload du fichier PDF
+                const fileExt = pdfFile.name.split('.').pop();
+                const fileName = `${Date.now()}.${fileExt}`;
+
+                const { data: fileData, error: uploadError } = await supabase.storage
                     .from('documents')
-                    .select('model')
-                    .not('model', 'is', null);
+                    .upload(fileName, pdfFile);
+
+                if (uploadError) throw uploadError;
+
+                // Enregistrement dans la base de données
+                const { data, error } = await supabase
+                    .from('documents')
+                    .insert([{
+                        marque_id: marqueId,
+                        type_ascenseur_id: typeId,
+                        categorie,
+                        model,
+                        file_path: fileName,
+                        file_name: pdfFile.name
+                    }])
+                    .select();
+
+                if (error) throw error;
+
+                // Réinitialiser le formulaire
+                event.target.reset();
+                document.getElementById('fileName').textContent = 'Aucun fichier sélectionné';
                 
-                if (marque) {
-                    query = query.eq('marque', marque);
-                }
-                
-                if (type) {
-                    query = query.or(`programmation.eq.${type},schémas.eq.${type}`);
-                }
-                
-                const { data: documents, error } = await query;
-                
-                if (error) {
-                    throw error;
-                }
-                
-                // Extraire les modèles uniques
-                const modelesFiltres = [...new Set(documents.map(doc => doc.model))].filter(model => model && model.trim() !== '');
-                
-                // Ajouter les options au select
-                modelesFiltres.forEach(model => {
-                    const option = document.createElement('option');
-                    option.value = model;
-                    option.textContent = model;
-                    techModel.appendChild(option);
-                });
-                
-                if (modelesFiltres.length === 0) {
-                    const option = document.createElement('option');
-                    option.value = '';
-                    option.textContent = 'Aucun modèle trouvé';
-                    option.disabled = true;
-                    techModel.appendChild(option);
-                }
-                
+                showStatus(document.getElementById('statusMessage'), 'Document uploadé avec succès!', 'success');
+                loadDocuments();
             } catch (error) {
-                console.error('Erreur lors du chargement des modèles:', error);
-                const option = document.createElement('option');
-                option.value = '';
-                option.textContent = 'Erreur de chargement';
-                option.disabled = true;
-                techModel.appendChild(option);
+                console.error('Erreur upload:', error);
+                showStatus(document.getElementById('statusMessage'), 'Erreur lors de l\'upload', 'error');
             }
         }
-        
-        // Réinitialiser l'interface admin
-        function resetAdminInterface() {
-            adminLoginSection.style.display = 'block';
-            adminSection.classList.remove('active');
-            adminPassword.value = '';
-            adminLoginStatus.innerHTML = '';
+
+        async function loadDocuments() {
+            try {
+                const { data, error } = await supabase
+                    .from('documents')
+                    .select(`
+                        *,
+                        marques(name),
+                        types_ascenseur(name)
+                    `)
+                    .order('created_at', { ascending: false });
+
+                if (error) throw error;
+
+                documents = data || [];
+                updateTable();
+            } catch (error) {
+                console.error('Erreur chargement documents:', error);
+            }
         }
-        
-        // Réinitialiser l'interface technicien
-        function resetTechnicianInterface() {
-            loginSection.style.display = 'block';
-            technicianInterface.classList.remove('active');
-            notFoundSection.classList.remove('active');
-            documentsFound.classList.remove('active');
-            aiSection.classList.remove('active');
-            technicianPassword.value = '';
-            loginStatus.innerHTML = '';
-        }
-        
-        // Mettre à jour les sélecteurs technicien
-        function updateTechnicianSelects() {
-            techMarque.innerHTML = '<option value="">Sélectionnez une marque</option>';
-            marques.forEach(marque => {
-                const option = document.createElement('option');
-                option.value = marque;
-                option.textContent = marque;
-                techMarque.appendChild(option);
-            });
+
+        function updateTable() {
+            const tableContainer = document.getElementById('tableContainer');
             
-            techType.innerHTML = '<option value="">Sélectionnez un type</option>';
-            typesAscenseur.forEach(type => {
-                const option = document.createElement('option');
-                option.value = type;
-                option.textContent = type;
-                techType.appendChild(option);
+            if (documents.length === 0) {
+                tableContainer.innerHTML = '<p>Aucun document trouvé</p>';
+                return;
+            }
+
+            let html = `
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Marque</th>
+                            <th>Type</th>
+                            <th>Modèle</th>
+                            <th>Catégorie</th>
+                            <th>Fichier</th>
+                            <th>Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            documents.forEach(doc => {
+                html += `
+                    <tr>
+                        <td>${doc.marques?.name || 'N/A'}</td>
+                        <td>${doc.types_ascenseur?.name || 'N/A'}</td>
+                        <td>${doc.model}</td>
+                        <td>${doc.categorie}</td>
+                        <td>${doc.file_name}</td>
+                        <td>${new Date(doc.created_at).toLocaleDateString()}</td>
+                    </tr>
+                `;
             });
-            
-            // Réinitialiser le select des modèles
-            techModel.innerHTML = '<option value="">Sélectionnez un modèle</option>';
+
+            html += '</tbody></table>';
+            tableContainer.innerHTML = html;
         }
-        
-        // Recherche de documents
+
+        function toggleTable() {
+            const tableSection = document.getElementById('tableSection');
+            const toggleBtn = document.getElementById('toggleTableBtn');
+            
+            if (tableSection.style.display === 'none' || !tableSection.style.display) {
+                tableSection.style.display = 'block';
+                toggleBtn.textContent = '📊 Masquer le tableau Supabase';
+                loadDocuments();
+            } else {
+                tableSection.style.display = 'none';
+                toggleBtn.textContent = '📊 Afficher le tableau Supabase';
+            }
+        }
+
+        function togglePanel(panelId) {
+            const panel = document.getElementById(panelId);
+            panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+        }
+
+        async function loadMarquesAndTypesForTechnician() {
+            // Recharger les données pour le technicien
+            await loadMarquesAndTypes();
+        }
+
         async function searchDocuments() {
-            const marque = techMarque.value;
-            const type = techType.value;
-            const model = techModel.value;
-            
-            if (!marque || !type) {
-                showStatus(loginStatus, 'Veuillez sélectionner au moins une marque et un type', 'error');
+            const marqueId = document.getElementById('techMarque').value;
+            const typeId = document.getElementById('techType').value;
+            const model = document.getElementById('techModel').value.trim();
+
+            // Cacher toutes les sections de résultats
+            document.getElementById('documentsFound').style.display = 'none';
+            document.getElementById('notFoundSection').style.display = 'none';
+            document.getElementById('aiSection').style.display = 'none';
+
+            if (!marqueId && !typeId && !model) {
+                alert('Veuillez remplir au moins un critère de recherche');
                 return;
             }
-            
+
             try {
                 let query = supabase
                     .from('documents')
-                    .select('*');
-                
-                // Appliquer les filtres
-                if (marque) {
-                    query = query.eq('marque', marque);
-                }
-                
-                if (type) {
-                    query = query.or(`programmation.eq.${type},schémas.eq.${type}`);
-                }
-                
-                if (model) {
-                    query = query.eq('model', model);
-                }
-                
-                const { data: documents, error } = await query;
-                
-                if (error) {
-                    throw error;
-                }
-                
-                // Afficher les résultats
-                if (documents.length === 0) {
-                    notFoundSection.classList.add('active');
-                    documentsFound.classList.remove('active');
-                    aiSection.classList.remove('active');
+                    .select(`
+                        *,
+                        marques(name),
+                        types_ascenseur(name)
+                    `);
+
+                if (marqueId) query = query.eq('marque_id', marqueId);
+                if (typeId) query = query.eq('type_ascenseur_id', typeId);
+                if (model) query = query.ilike('model', `%${model}%`);
+
+                const { data, error } = await query;
+
+                if (error) throw error;
+
+                if (data && data.length > 0) {
+                    displayFoundDocuments(data);
                 } else {
-                    notFoundSection.classList.remove('active');
-                    documentsFound.classList.add('active');
-                    aiSection.classList.remove('active');
-                    
-                    // Afficher les documents trouvés
-                    documentList.innerHTML = '';
-                    documents.forEach(doc => {
-                        const docElement = document.createElement('div');
-                        docElement.className = 'document-card';
-                        
-                        const categorie = doc.programmation ? 'Programmation' : 'Schémas';
-                        const typeDoc = doc.programmation || doc.schémas;
-                        
-                        docElement.innerHTML = `
-                            <div>
-                                <div style="font-weight: 600;">${doc.nom_fichier}</div>
-                                <div style="font-size: 14px; color: #6c757d;">
-                                    ${doc.marque} • ${typeDoc} • ${doc.model || 'Non spécifié'}
-                                </div>
-                                <div style="font-size: 12px; color: #17a2b8; margin-top: 5px;">
-                                    ${categorie}
-                                </div>
-                            </div>
-                            <div>
-                                ${doc.pdf_data ? 
-                                    `<button class="view-btn" data-filename="${doc.nom_fichier}" data-pdfdata="${doc.pdf_data}">
-                                        📥 Télécharger
-                                    </button>` 
-                                    : 
-                                    '<span style="color: #6c757d;">Aucun PDF</span>'
-                                }
-                            </div>
-                        `;
-                        
-                        documentList.appendChild(docElement);
-                    });
-                    
-                    // Ajouter les événements de téléchargement
-                    documentList.querySelectorAll('.view-btn').forEach(btn => {
-                        btn.addEventListener('click', function() {
-                            const filename = this.getAttribute('data-filename');
-                            const pdfData = this.getAttribute('data-pdfdata');
-                            downloadPDF(filename, pdfData);
-                        });
-                    });
+                    document.getElementById('notFoundSection').style.display = 'block';
                 }
-                
             } catch (error) {
                 console.error('Erreur recherche:', error);
-                showStatus(loginStatus, `❌ Erreur lors de la recherche: ${error.message}`, 'error');
+                alert('Erreur lors de la recherche');
             }
         }
-        
-        // Demander à l'IA
-        async function askAI() {
-            const marque = techMarque.value;
-            const type = techType.value;
-            const model = techModel.value;
-            
-            aiSection.classList.add('active');
-            aiResponse.innerHTML = '🧠 L\'IA analyse votre demande...';
-            
+
+        function displayFoundDocuments(docs) {
+            const documentList = document.getElementById('documentList');
+            documentList.innerHTML = '';
+
+            docs.forEach(doc => {
+                const docCard = document.createElement('div');
+                docCard.className = 'document-card';
+                docCard.innerHTML = `
+                    <h4>${doc.marques?.name || 'N/A'} - ${doc.types_ascenseur?.name || 'N/A'}</h4>
+                    <p><strong>Modèle:</strong> ${doc.model}</p>
+                    <p><strong>Type:</strong> ${doc.categorie}</p>
+                    <p><strong>Fichier:</strong> ${doc.file_name}</p>
+                    <button class="view-btn" onclick="viewDocument('${doc.file_path}', '${doc.file_name}')">
+                        👁️ Voir le document
+                    </button>
+                `;
+                documentList.appendChild(docCard);
+            });
+
+            document.getElementById('documentsFound').style.display = 'block';
+        }
+
+        async function viewDocument(filePath, fileName) {
             try {
-                // Simulation de réponse IA (à remplacer par l'API Groq réelle)
-                setTimeout(() => {
-                    let response = `Pour l'ascenseur ${marque} de type ${type}`;
-                    if (model) {
-                        response += ` modèle ${model}`;
-                    }
-                    response += `, voici quelques conseils techniques généraux :\n\n`;
-                    response += `• Vérifiez les paramètres de base de la programmation\n`;
-                    response += `• Contrôlez l'alignement des capteurs de sécurité\n`;
-                    response += `• Inspectez les contacts du tableau de commande\n`;
-                    response += `• Testez les séquences d'ouverture/fermeture des portes\n\n`;
-                    response += `Ces informations sont génériques. Pour des instructions spécifiques, consultez la documentation technique officielle.`;
-                    
-                    aiResponse.innerHTML = response.replace(/\n/g, '<br>');
-                }, 2000);
-                
+                const { data, error } = await supabase.storage
+                    .from('documents')
+                    .createSignedUrl(filePath, 3600); // Lien valide 1 heure
+
+                if (error) throw error;
+
+                if (data) {
+                    window.open(data.signedUrl, '_blank');
+                }
             } catch (error) {
-                console.error('Erreur IA:', error);
-                aiResponse.innerHTML = '❌ Erreur lors de la consultation de l\'IA';
+                console.error('Erreur visualisation document:', error);
+                alert('Erreur lors de l\'ouverture du document');
             }
         }
-        
-        // Initialiser l'application
-        initApp();
+
+        async function askAI() {
+            const marqueId = document.getElementById('techMarque').value;
+            const typeId = document.getElementById('techType').value;
+            const model = document.getElementById('techModel').value.trim();
+
+            const marqueSelect = document.getElementById('techMarque');
+            const typeSelect = document.getElementById('techType');
+            
+            const marqueName = marqueSelect.options[marqueSelect.selectedIndex]?.text || '';
+            const typeName = typeSelect.options[typeSelect.selectedIndex]?.text || '';
+
+            const aiResponse = document.getElementById('aiResponse');
+            aiResponse.textContent = 'Analyse en cours...';
+            document.getElementById('aiSection').style.display = 'block';
+
+            // Simulation de réponse IA (dans un vrai projet, intégration avec une API IA)
+            setTimeout(() => {
+                const responses = [
+                    `Pour l'ascenseur ${marqueName} ${typeName} modèle ${model || 'non spécifié'}, je recommande de vérifier d'abord le module de commande principal. Les documents techniques spécifiques ne sont pas encore disponibles dans notre base, mais la procédure standard pour ce type d'appareil est de...`,
+
+                    `Concernant ${marqueName} ${typeName}, voici quelques conseils techniques généraux : 1. Vérifiez l'alimentation électrique 2. Contrôlez les capteurs de sécurité 3. Inspectez le système de freinage. La documentation détaillée sera bientôt disponible.`,
+
+                    `L'ascenseur ${marqueName} de type ${typeName} utilise généralement un système de contrôle standard. En attendant la documentation spécifique, voici les étapes de dépannage de base...`
+                ];
+
+                const randomResponse = responses[Math.floor(Math.random() * responses.length)];
+                aiResponse.textContent = randomResponse;
+            }, 2000);
+        }
+
+        async function updateTechnicianPassword() {
+            const newPassword = document.getElementById('newTechnicianPassword').value;
+            const confirmPassword = document.getElementById('confirmTechnicianPassword').value;
+            const statusDiv = document.getElementById('passwordStatus');
+
+            if (!newPassword || !confirmPassword) {
+                showStatus(statusDiv, 'Veuillez remplir tous les champs', 'error');
+                return;
+            }
+
+            if (newPassword !== confirmPassword) {
+                showStatus(statusDiv, 'Les mots de passe ne correspondent pas', 'error');
+                return;
+            }
+
+            try {
+                const { error } = await supabase
+                    .from('passwords')
+                    .update({ password: newPassword })
+                    .eq('role', 'technician');
+
+                if (error) throw error;
+
+                document.getElementById('newTechnicianPassword').value = '';
+                document.getElementById('confirmTechnicianPassword').value = '';
+                showStatus(statusDiv, 'Mot de passe technicien mis à jour avec succès', 'success');
+            } catch (error) {
+                console.error('Erreur mise à jour mot de passe:', error);
+                showStatus(statusDiv, 'Erreur lors de la mise à jour', 'error');
+            }
+        }
+
+        async function updateAdminPassword() {
+            const currentPassword = document.getElementById('currentAdminPassword').value;
+            const newPassword = document.getElementById('newAdminPassword').value;
+            const confirmPassword = document.getElementById('confirmAdminPassword').value;
+            const statusDiv = document.getElementById('adminPasswordStatus');
+
+            if (!currentPassword || !newPassword || !confirmPassword) {
+                showStatus(statusDiv, 'Veuillez remplir tous les champs', 'error');
+                return;
+            }
+
+            if (newPassword !== confirmPassword) {
+                showStatus(statusDiv, 'Les nouveaux mots de passe ne correspondent pas', 'error');
+                return;
+            }
+
+            try {
+                // Vérifier le mot de passe actuel
+                const { data, error: checkError } = await supabase
+                    .from('passwords')
+                    .select('*')
+                    .eq('role', 'admin')
+                    .single();
+
+                if (checkError) throw checkError;
+
+                if (!data || data.password !== currentPassword) {
+                    showStatus(statusDiv, 'Mot de passe actuel incorrect', 'error');
+                    return;
+                }
+
+                // Mettre à jour le mot de passe
+                const { error } = await supabase
+                    .from('passwords')
+                    .update({ password: newPassword })
+                    .eq('role', 'admin');
+
+                if (error) throw error;
+
+                document.getElementById('currentAdminPassword').value = '';
+                document.getElementById('newAdminPassword').value = '';
+                document.getElementById('confirmAdminPassword').value = '';
+                showStatus(statusDiv, 'Mot de passe admin mis à jour avec succès', 'success');
+            } catch (error) {
+                console.error('Erreur mise à jour mot de passe admin:', error);
+                showStatus(statusDiv, 'Erreur lors de la mise à jour', 'error');
+            }
+        }
+
+        function showStatus(element, message, type) {
+            element.textContent = message;
+            element.className = `status-message status-${type}`;
+            element.style.display = 'block';
+
+            setTimeout(() => {
+                element.style.display = 'none';
+            }, 5000);
+        }
+
+        // Fonctions globales pour les boutons de suppression
+        window.deleteMarque = deleteMarque;
+        window.deleteType = deleteType;
+        window.viewDocument = viewDocument;
     </script>
 </body>
 </html>
