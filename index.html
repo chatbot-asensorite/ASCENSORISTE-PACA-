@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ascensoriste PACA - Interface Technicien</title>
     <style>
-        /* Styles généraux */
+        /* Styles généraux (conservés et légèrement ajustés) */
         * {
             box-sizing: border-box;
             margin: 0;
@@ -13,25 +13,26 @@
         }
         
         body {
-            font-family: 'Roboto', sans-serif;
+            font-family: 'Roboto', sans-serif; /* Police plus lisible */
             line-height: 1.6;
             color: #333;
-            background: #f4f7f6;
+            background: #f4f7f6; /* Fond plus neutre pour mobile */
             min-height: 100vh;
-            padding: 0;
+            padding: 0; /* Supprimer le padding global pour un usage plein écran mobile */
         }
         
         .container {
-            max-width: 600px;
+            max-width: 600px; /* Max-width ajustée pour un look mobile */
             margin: 0 auto;
             background: white;
-            box-shadow: none;
+            /* Pas de bordure/ombre sur mobile, ou très subtil */
+            box-shadow: none; 
             overflow: hidden;
-            min-height: 100vh;
+            min-height: 100vh; /* Pleine hauteur sur mobile */
         }
         
         .header {
-            background: #007bff;
+            background: #007bff; /* Couleur plus professionnelle/moderne */
             color: white;
             padding: 20px 15px;
             text-align: center;
@@ -39,14 +40,14 @@
         }
         
         .header h1 {
-            font-size: 1.5em;
+            font-size: 1.5em; /* Taille réduite pour mobile */
             margin-bottom: 5px;
         }
         
         .role-selector {
             display: flex;
             justify-content: space-around;
-            background: #0056b3;
+            background: #0056b3; /* Fond pour les boutons de rôle */
             padding: 5px;
         }
         
@@ -76,24 +77,24 @@
         }
         
         .content {
-            padding: 15px;
+            padding: 15px; /* Padding ajusté pour mobile */
         }
         
-        /* Styles du formulaire */
+        /* --- Styles du formulaire (ajustés pour mobile) --- */
         .form-row {
             display: flex;
-            flex-direction: column;
+            flex-direction: column; /* Toujours en colonne sur mobile pour la lisibilité */
             gap: 15px;
             margin-bottom: 0;
         }
         
         .form-group {
-            flex: none;
-            margin-bottom: 15px;
+            flex: none; /* Désactiver la flexbox */
+            margin-bottom: 15px; /* Ajout d'une marge pour séparer les groupes */
         }
         
         label {
-            margin-bottom: 5px;
+            margin-bottom: 5px; /* Marge réduite */
             font-size: 0.9em;
             display: block;
         }
@@ -105,14 +106,14 @@
         
         input[type="text"], select, input[type="password"] {
             width: 100%;
-            padding: 10px;
-            border: 1px solid #ced4da;
-            border-radius: 5px;
-            font-size: 16px;
+            padding: 10px; /* Padding réduit */
+            border: 1px solid #ced4da; /* Bordure plus standard */
+            border-radius: 5px; /* Rayon réduit */
+            font-size: 16px; /* Taille pour éviter le zoom iOS */
         }
         
         .btn {
-            padding: 12px 20px;
+            padding: 12px 20px; /* Padding ajusté */
             border-radius: 5px;
             font-size: 16px;
             background: #007bff;
@@ -221,6 +222,7 @@
             border-radius: 5px;
             cursor: pointer;
             margin: 10px 0;
+            width: 100%;
         }
 
         .table-section {
@@ -263,10 +265,11 @@
             font-weight: bold;
         }
 
-        /* Interface Technicien */
+        /* --- Interface Technicien Spécifique (Mobile First) --- */
+        
         .technician-section {
             display: none;
-            padding: 0;
+            padding: 0; /* Pas de padding pour un usage plein écran */
         }
         
         .login-section {
@@ -276,15 +279,16 @@
         }
 
         .technician-interface {
-            background: white;
+            background: white; /* Fond blanc sur l'interface technicien */
             padding: 0;
             display: none;
         }
 
         .search-section {
-            background: #f8f9fa;
+            background: #f8f9fa; /* Fond clair pour la section recherche */
             padding: 15px;
             margin-bottom: 15px;
+            border: none; /* Suppression de la bordure */
             border-bottom: 1px solid #e9ecef;
         }
         
@@ -294,6 +298,7 @@
             color: #007bff;
         }
 
+        /* Amélioration de l'aspect des boutons de recherche/déconnexion */
         #technicianLogoutBtn {
             background: #dc3545;
             color: white;
@@ -306,14 +311,15 @@
 
         #searchBtn {
             margin-top: 10px;
-            background: #28a745;
+            background: #28a745; /* Bouton vert pour l'action principale */
         }
 
-        /* Résultats et IA */
+        /* --- Résultats et IA --- */
+
         .documents-found, .not-found-section, .ai-section {
             padding: 15px;
             margin-top: 0;
-            border-radius: 0;
+            border-radius: 0; /* Plein écran */
             display: none;
         }
 
@@ -324,7 +330,7 @@
 
         .document-card {
             padding: 10px;
-            border-left: 5px solid #007bff;
+            border-left: 5px solid #007bff; /* Barre colorée pour l'accent */
             box-shadow: 0 1px 3px rgba(0,0,0,0.05);
             margin-bottom: 10px;
             background: #f8f9fa;
@@ -347,7 +353,7 @@
         }
 
         .ai-response {
-            white-space: pre-wrap;
+            white-space: pre-wrap; /* Maintient les sauts de ligne de la simulation IA */
             font-size: 0.95em;
             padding: 15px;
             background: #e9ecef;
@@ -356,7 +362,8 @@
             margin-top: 10px;
         }
 
-        /* Sections Admin */
+        /* --- Styles Admin (pour rester cohérent sur mobile) --- */
+
         .admin-login-section, .upload-section, .technician-management, .password-management {
             padding: 15px;
         }
@@ -385,7 +392,7 @@
             border: 1px solid #f5c6cb;
         }
 
-        /* Media query pour desktop */
+        /* Ajout d'une media query pour les grands écrans (tablette/desktop) pour restaurer un look plus large si nécessaire, bien que le focus soit mobile ici */
         @media (min-width: 601px) {
             body {
                 padding: 20px;
@@ -424,7 +431,6 @@
         </div>
         
         <div class="content">
-            <!-- Section Admin -->
             <div class="admin-login-section" id="adminLoginSection">
                 <h2>🔐 Connexion Administrateur</h2>
                 <p>Mot de passe requis</p>
@@ -574,7 +580,6 @@
                 </div>
             </div>
             
-            <!-- Section Technicien -->
             <div class="technician-section" id="technicianSection">
                 <div class="login-section" id="loginSection">
                     <h2>🔐 Accès Technicien</h2>
@@ -649,14 +654,21 @@
         // État de l'application
         let currentUser = null;
         let documents = [];
-        let marques = [];
-        let types = [];
+        let marques = JSON.parse(localStorage.getItem('ascenseur_marques')) || ['Otis', 'Schindler', 'Kone', 'ThyssenKrupp'];
+        let typesAscenseur = JSON.parse(localStorage.getItem('ascenseur_types')) || ['Hydraulique', 'Électrique', 'MRL', 'LVA'];
+        
+        // Mots de passe (stockés dans localStorage)
+        let adminPass = localStorage.getItem('admin_password') || "admin123";
+        let technicianPass = localStorage.getItem('technician_password') || "tech123";
+        
+        // État du tableau admin
+        let isTableVisible = false;
 
         // Initialisation
         document.addEventListener('DOMContentLoaded', function() {
             initializeApp();
             setupEventListeners();
-            loadMarquesAndTypes();
+            updateMarquesAndTypesSelects();
         });
 
         function initializeApp() {
@@ -703,6 +715,14 @@
             // Recherche technicien
             document.getElementById('searchBtn').addEventListener('click', searchDocuments);
             document.getElementById('askAIBtn').addEventListener('click', askAI);
+
+            // Entrée pour les connexions
+            document.getElementById('adminPassword').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') adminLogin();
+            });
+            document.getElementById('technicianPassword').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') technicianLogin();
+            });
         }
 
         function switchRole(role) {
@@ -715,10 +735,13 @@
             if (role === 'admin') {
                 document.getElementById('technicianSection').style.display = 'none';
                 document.getElementById('adminLoginSection').style.display = 'block';
+                document.getElementById('adminSection').style.display = 'none';
             } else {
                 document.getElementById('adminLoginSection').style.display = 'none';
                 document.getElementById('adminSection').style.display = 'none';
                 document.getElementById('technicianSection').style.display = 'block';
+                document.getElementById('technicianInterface').style.display = 'none';
+                document.getElementById('loginSection').style.display = 'block';
             }
         }
 
@@ -731,28 +754,14 @@
                 return;
             }
 
-            try {
-                // Vérifier le mot de passe admin (dans un vrai projet, cela serait sécurisé)
-                const { data, error } = await supabase
-                    .from('passwords')
-                    .select('*')
-                    .eq('role', 'admin')
-                    .single();
-
-                if (error) throw error;
-
-                if (data && data.password === password) {
-                    currentUser = { role: 'admin' };
-                    document.getElementById('adminLoginSection').style.display = 'none';
-                    document.getElementById('adminSection').style.display = 'block';
-                    showStatus(statusDiv, 'Connexion réussie!', 'success');
-                    loadDocuments();
-                } else {
-                    showStatus(statusDiv, 'Mot de passe incorrect', 'error');
-                }
-            } catch (error) {
-                console.error('Erreur de connexion:', error);
-                showStatus(statusDiv, 'Erreur de connexion', 'error');
+            if (password === adminPass) {
+                currentUser = { role: 'admin' };
+                document.getElementById('adminLoginSection').style.display = 'none';
+                document.getElementById('adminSection').style.display = 'block';
+                showStatus(statusDiv, 'Connexion réussie!', 'success');
+                loadDocuments();
+            } else {
+                showStatus(statusDiv, 'Mot de passe incorrect', 'error');
             }
         }
 
@@ -765,27 +774,14 @@
                 return;
             }
 
-            try {
-                const { data, error } = await supabase
-                    .from('passwords')
-                    .select('*')
-                    .eq('role', 'technician')
-                    .single();
-
-                if (error) throw error;
-
-                if (data && data.password === password) {
-                    currentUser = { role: 'technician' };
-                    document.getElementById('loginSection').style.display = 'none';
-                    document.getElementById('technicianInterface').style.display = 'block';
-                    showStatus(statusDiv, 'Connexion réussie!', 'success');
-                    loadMarquesAndTypesForTechnician();
-                } else {
-                    showStatus(statusDiv, 'Mot de passe incorrect', 'error');
-                }
-            } catch (error) {
-                console.error('Erreur de connexion:', error);
-                showStatus(statusDiv, 'Erreur de connexion', 'error');
+            if (password === technicianPass) {
+                currentUser = { role: 'technician' };
+                document.getElementById('loginSection').style.display = 'none';
+                document.getElementById('technicianInterface').style.display = 'block';
+                showStatus(statusDiv, 'Connexion réussie!', 'success');
+                updateTechnicianSelects();
+            } else {
+                showStatus(statusDiv, 'Mot de passe incorrect', 'error');
             }
         }
 
@@ -800,33 +796,6 @@
             
             document.getElementById('adminLoginSection').style.display = 'block';
             document.getElementById('loginSection').style.display = 'block';
-        }
-
-        async function loadMarquesAndTypes() {
-            try {
-                // Charger les marques
-                const { data: marquesData, error: marquesError } = await supabase
-                    .from('marques')
-                    .select('*')
-                    .order('name');
-
-                if (marquesError) throw marquesError;
-                marques = marquesData || [];
-
-                // Charger les types
-                const { data: typesData, error: typesError } = await supabase
-                    .from('types_ascenseur')
-                    .select('*')
-                    .order('name');
-
-                if (typesError) throw typesError;
-                types = typesData || [];
-
-                updateMarquesAndTypesSelects();
-                updateMarquesAndTypesLists();
-            } catch (error) {
-                console.error('Erreur chargement marques/types:', error);
-            }
         }
 
         function updateMarquesAndTypesSelects() {
@@ -844,16 +813,18 @@
             techTypeSelect.innerHTML = '<option value="">Sélectionnez un type</option>';
 
             marques.forEach(marque => {
-                const option = new Option(marque.name, marque.id);
+                const option = new Option(marque, marque);
                 marqueSelect.add(option);
                 techMarqueSelect.add(option.cloneNode(true));
             });
 
-            types.forEach(type => {
-                const option = new Option(type.name, type.id);
+            typesAscenseur.forEach(type => {
+                const option = new Option(type, type);
                 typeSelect.add(option);
                 techTypeSelect.add(option.cloneNode(true));
             });
+
+            updateMarquesAndTypesLists();
         }
 
         function updateMarquesAndTypesLists() {
@@ -867,18 +838,18 @@
                 const div = document.createElement('div');
                 div.className = 'item-row';
                 div.innerHTML = `
-                    <span>${marque.name}</span>
-                    <button class="delete-btn" onclick="deleteMarque(${marque.id})">🗑️</button>
+                    <span>${marque}</span>
+                    <button class="delete-btn" onclick="deleteMarque('${marque}')">🗑️</button>
                 `;
                 marquesList.appendChild(div);
             });
 
-            types.forEach(type => {
+            typesAscenseur.forEach(type => {
                 const div = document.createElement('div');
                 div.className = 'item-row';
                 div.innerHTML = `
-                    <span>${type.name}</span>
-                    <button class="delete-btn" onclick="deleteType(${type.id})">🗑️</button>
+                    <span>${type}</span>
+                    <button class="delete-btn" onclick="deleteType('${type}')">🗑️</button>
                 `;
                 typesList.appendChild(div);
             });
@@ -893,20 +864,14 @@
                 return;
             }
 
-            try {
-                const { data, error } = await supabase
-                    .from('marques')
-                    .insert([{ name }])
-                    .select();
-
-                if (error) throw error;
-
+            if (!marques.includes(name)) {
+                marques.push(name);
+                updateMarquesAndTypesSelects();
                 newMarqueInput.value = '';
-                await loadMarquesAndTypes();
                 showStatus(document.getElementById('statusMessage'), 'Marque ajoutée avec succès', 'success');
-            } catch (error) {
-                console.error('Erreur ajout marque:', error);
-                showStatus(document.getElementById('statusMessage'), 'Erreur lors de l\'ajout', 'error');
+                
+                // Sauvegarder dans localStorage
+                localStorage.setItem('ascenseur_marques', JSON.stringify(marques));
             }
         }
 
@@ -919,59 +884,37 @@
                 return;
             }
 
-            try {
-                const { data, error } = await supabase
-                    .from('types_ascenseur')
-                    .insert([{ name }])
-                    .select();
-
-                if (error) throw error;
-
+            if (!typesAscenseur.includes(name)) {
+                typesAscenseur.push(name);
+                updateMarquesAndTypesSelects();
                 newTypeInput.value = '';
-                await loadMarquesAndTypes();
                 showStatus(document.getElementById('statusMessage'), 'Type ajouté avec succès', 'success');
-            } catch (error) {
-                console.error('Erreur ajout type:', error);
-                showStatus(document.getElementById('statusMessage'), 'Erreur lors de l\'ajout', 'error');
+                
+                // Sauvegarder dans localStorage
+                localStorage.setItem('ascenseur_types', JSON.stringify(typesAscenseur));
             }
         }
 
-        async function deleteMarque(id) {
+        async function deleteMarque(marqueToRemove) {
             if (!confirm('Êtes-vous sûr de vouloir supprimer cette marque ?')) return;
 
-            try {
-                const { error } = await supabase
-                    .from('marques')
-                    .delete()
-                    .eq('id', id);
-
-                if (error) throw error;
-
-                await loadMarquesAndTypes();
-                showStatus(document.getElementById('statusMessage'), 'Marque supprimée avec succès', 'success');
-            } catch (error) {
-                console.error('Erreur suppression marque:', error);
-                showStatus(document.getElementById('statusMessage'), 'Erreur lors de la suppression', 'error');
-            }
+            marques = marques.filter(m => m !== marqueToRemove);
+            updateMarquesAndTypesSelects();
+            showStatus(document.getElementById('statusMessage'), 'Marque supprimée avec succès', 'success');
+            
+            // Sauvegarder dans localStorage
+            localStorage.setItem('ascenseur_marques', JSON.stringify(marques));
         }
 
-        async function deleteType(id) {
+        async function deleteType(typeToRemove) {
             if (!confirm('Êtes-vous sûr de vouloir supprimer ce type ?')) return;
 
-            try {
-                const { error } = await supabase
-                    .from('types_ascenseur')
-                    .delete()
-                    .eq('id', id);
-
-                if (error) throw error;
-
-                await loadMarquesAndTypes();
-                showStatus(document.getElementById('statusMessage'), 'Type supprimé avec succès', 'success');
-            } catch (error) {
-                console.error('Erreur suppression type:', error);
-                showStatus(document.getElementById('statusMessage'), 'Erreur lors de la suppression', 'error');
-            }
+            typesAscenseur = typesAscenseur.filter(t => t !== typeToRemove);
+            updateMarquesAndTypesSelects();
+            showStatus(document.getElementById('statusMessage'), 'Type supprimé avec succès', 'success');
+            
+            // Sauvegarder dans localStorage
+            localStorage.setItem('ascenseur_types', JSON.stringify(typesAscenseur));
         }
 
         function handleFileSelect(event) {
@@ -989,10 +932,10 @@
             event.preventDefault();
             
             const formData = new FormData(event.target);
-            const marqueId = formData.get('marque');
-            const typeId = formData.get('type_ascenseur');
-            const categorie = formData.get('categorie');
-            const model = formData.get('model');
+            const marque = document.getElementById('marque').value;
+            const type_ascenseur = document.getElementById('type_ascenseur').value;
+            const categorie = document.getElementById('categorie').value;
+            const model = document.getElementById('model').value;
             const pdfFile = document.getElementById('pdfFile').files[0];
 
             if (!pdfFile) {
@@ -1001,37 +944,65 @@
             }
 
             try {
-                // Upload du fichier PDF
-                const fileExt = pdfFile.name.split('.').pop();
-                const fileName = `${Date.now()}.${fileExt}`;
+                // Désactiver le bouton pendant l'upload
+                const submitBtn = uploadForm.querySelector('.btn');
+                submitBtn.disabled = true;
+                submitBtn.textContent = 'Enregistrement en cours...';
 
-                const { data: fileData, error: uploadError } = await supabase.storage
-                    .from('documents')
-                    .upload(fileName, pdfFile);
-
-                if (uploadError) throw uploadError;
-
-                // Enregistrement dans la base de données
-                const { data, error } = await supabase
-                    .from('documents')
-                    .insert([{
-                        marque_id: marqueId,
-                        type_ascenseur_id: typeId,
-                        categorie,
-                        model,
-                        file_path: fileName,
-                        file_name: pdfFile.name
-                    }])
-                    .select();
-
-                if (error) throw error;
-
-                // Réinitialiser le formulaire
-                event.target.reset();
-                document.getElementById('fileName').textContent = 'Aucun fichier sélectionné';
+                showStatus(document.getElementById('statusMessage'), 'Conversion du PDF en base64...', 'loading');
                 
-                showStatus(document.getElementById('statusMessage'), 'Document uploadé avec succès!', 'success');
-                loadDocuments();
+                // Convertir le PDF en base64
+                const reader = new FileReader();
+                
+                reader.onload = async function(e) {
+                    try {
+                        const pdfBase64 = e.target.result.split(',')[1];
+                        
+                        // Préparer les données avec les colonnes existantes
+                        const documentData = {
+                            marque: marque,
+                            model: model,
+                            nom_fichier: pdfFile.name,
+                            date_upload: new Date().toISOString(),
+                            pdf_data: pdfBase64,
+                            taille_fichier: pdfFile.size,
+                            programmation: categorie === 'programmation' ? type_ascenseur : null,
+                            schémas: categorie === 'schemas' ? type_ascenseur : null
+                        };
+                        
+                        // Enregistrer dans la table documents
+                        const { data, error } = await supabase
+                            .from('documents')
+                            .insert([documentData]);
+                        
+                        if (error) throw error;
+
+                        // Réinitialiser le formulaire
+                        event.target.reset();
+                        document.getElementById('fileName').textContent = 'Aucun fichier sélectionné';
+                        
+                        showStatus(document.getElementById('statusMessage'), 'Document uploadé avec succès!', 'success');
+                        loadDocuments();
+                        
+                    } catch (error) {
+                        console.error('Erreur upload:', error);
+                        showStatus(document.getElementById('statusMessage'), 'Erreur lors de l\'upload', 'error');
+                    } finally {
+                        // Réactiver le bouton
+                        submitBtn.disabled = false;
+                        submitBtn.textContent = '💾 Enregistrer le document';
+                    }
+                };
+                
+                reader.onerror = function() {
+                    showStatus(document.getElementById('statusMessage'), 'Erreur lors de la lecture du fichier', 'error');
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = '💾 Enregistrer le document';
+                };
+                
+                // Lire le fichier comme Data URL (base64)
+                reader.readAsDataURL(pdfFile);
+                
             } catch (error) {
                 console.error('Erreur upload:', error);
                 showStatus(document.getElementById('statusMessage'), 'Erreur lors de l\'upload', 'error');
@@ -1042,11 +1013,7 @@
             try {
                 const { data, error } = await supabase
                     .from('documents')
-                    .select(`
-                        *,
-                        marques(name),
-                        types_ascenseur(name)
-                    `)
+                    .select('*')
                     .order('created_at', { ascending: false });
 
                 if (error) throw error;
@@ -1070,6 +1037,7 @@
                 <table class="data-table">
                     <thead>
                         <tr>
+                            <th>ID</th>
                             <th>Marque</th>
                             <th>Type</th>
                             <th>Modèle</th>
@@ -1082,14 +1050,18 @@
             `;
 
             documents.forEach(doc => {
+                const categorie = doc.programmation ? 'Programmation' : (doc.schémas ? 'Schémas' : 'Non défini');
+                const type = doc.programmation || doc.schémas || 'Non défini';
+                
                 html += `
                     <tr>
-                        <td>${doc.marques?.name || 'N/A'}</td>
-                        <td>${doc.types_ascenseur?.name || 'N/A'}</td>
-                        <td>${doc.model}</td>
-                        <td>${doc.categorie}</td>
-                        <td>${doc.file_name}</td>
-                        <td>${new Date(doc.created_at).toLocaleDateString()}</td>
+                        <td>${doc.id}</td>
+                        <td>${doc.marque || 'N/A'}</td>
+                        <td>${type}</td>
+                        <td>${doc.model || 'N/A'}</td>
+                        <td>${categorie}</td>
+                        <td>${doc.nom_fichier || 'N/A'}</td>
+                        <td>${new Date(doc.date_upload).toLocaleDateString()}</td>
                     </tr>
                 `;
             });
@@ -1117,14 +1089,27 @@
             panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
         }
 
-        async function loadMarquesAndTypesForTechnician() {
-            // Recharger les données pour le technicien
-            await loadMarquesAndTypes();
+        function updateTechnicianSelects() {
+            const techMarqueSelect = document.getElementById('techMarque');
+            const techTypeSelect = document.getElementById('techType');
+
+            techMarqueSelect.innerHTML = '<option value="">Sélectionnez une marque</option>';
+            techTypeSelect.innerHTML = '<option value="">Sélectionnez un type</option>';
+
+            marques.forEach(marque => {
+                const option = new Option(marque, marque);
+                techMarqueSelect.add(option);
+            });
+
+            typesAscenseur.forEach(type => {
+                const option = new Option(type, type);
+                techTypeSelect.add(option);
+            });
         }
 
         async function searchDocuments() {
-            const marqueId = document.getElementById('techMarque').value;
-            const typeId = document.getElementById('techType').value;
+            const marque = document.getElementById('techMarque').value;
+            const type = document.getElementById('techType').value;
             const model = document.getElementById('techModel').value.trim();
 
             // Cacher toutes les sections de résultats
@@ -1132,7 +1117,7 @@
             document.getElementById('notFoundSection').style.display = 'none';
             document.getElementById('aiSection').style.display = 'none';
 
-            if (!marqueId && !typeId && !model) {
+            if (!marque && !type && !model) {
                 alert('Veuillez remplir au moins un critère de recherche');
                 return;
             }
@@ -1140,14 +1125,10 @@
             try {
                 let query = supabase
                     .from('documents')
-                    .select(`
-                        *,
-                        marques(name),
-                        types_ascenseur(name)
-                    `);
+                    .select('*');
 
-                if (marqueId) query = query.eq('marque_id', marqueId);
-                if (typeId) query = query.eq('type_ascenseur_id', typeId);
+                if (marque) query = query.eq('marque', marque);
+                if (type) query = query.or(`programmation.eq.${type},schémas.eq.${type}`);
                 if (model) query = query.ilike('model', `%${model}%`);
 
                 const { data, error } = await query;
@@ -1170,14 +1151,17 @@
             documentList.innerHTML = '';
 
             docs.forEach(doc => {
+                const categorie = doc.programmation ? 'Programmation' : 'Schémas';
+                const typeDoc = doc.programmation || doc.schémas;
+                
                 const docCard = document.createElement('div');
                 docCard.className = 'document-card';
                 docCard.innerHTML = `
-                    <h4>${doc.marques?.name || 'N/A'} - ${doc.types_ascenseur?.name || 'N/A'}</h4>
-                    <p><strong>Modèle:</strong> ${doc.model}</p>
-                    <p><strong>Type:</strong> ${doc.categorie}</p>
-                    <p><strong>Fichier:</strong> ${doc.file_name}</p>
-                    <button class="view-btn" onclick="viewDocument('${doc.file_path}', '${doc.file_name}')">
+                    <h4>${doc.marque || 'N/A'} - ${typeDoc}</h4>
+                    <p><strong>Modèle:</strong> ${doc.model || 'N/A'}</p>
+                    <p><strong>Type:</strong> ${categorie}</p>
+                    <p><strong>Fichier:</strong> ${doc.nom_fichier || 'N/A'}</p>
+                    <button class="view-btn" onclick="viewDocument('${doc.nom_fichier}', '${doc.pdf_data}')">
                         👁️ Voir le document
                     </button>
                 `;
@@ -1187,17 +1171,26 @@
             document.getElementById('documentsFound').style.display = 'block';
         }
 
-        async function viewDocument(filePath, fileName) {
+        async function viewDocument(fileName, base64Data) {
             try {
-                const { data, error } = await supabase.storage
-                    .from('documents')
-                    .createSignedUrl(filePath, 3600); // Lien valide 1 heure
-
-                if (error) throw error;
-
-                if (data) {
-                    window.open(data.signedUrl, '_blank');
+                const byteCharacters = atob(base64Data);
+                const byteNumbers = new Array(byteCharacters.length);
+                for (let i = 0; i < byteCharacters.length; i++) {
+                    byteNumbers[i] = byteCharacters.charCodeAt(i);
                 }
+                const byteArray = new Uint8Array(byteNumbers);
+                const blob = new Blob([byteArray], { type: 'application/pdf' });
+                
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = fileName || 'document.pdf';
+                document.body.appendChild(a);
+                a.click();
+                
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                
             } catch (error) {
                 console.error('Erreur visualisation document:', error);
                 alert('Erreur lors de l\'ouverture du document');
@@ -1205,28 +1198,22 @@
         }
 
         async function askAI() {
-            const marqueId = document.getElementById('techMarque').value;
-            const typeId = document.getElementById('techType').value;
+            const marque = document.getElementById('techMarque').value;
+            const type = document.getElementById('techType').value;
             const model = document.getElementById('techModel').value.trim();
-
-            const marqueSelect = document.getElementById('techMarque');
-            const typeSelect = document.getElementById('techType');
-            
-            const marqueName = marqueSelect.options[marqueSelect.selectedIndex]?.text || '';
-            const typeName = typeSelect.options[typeSelect.selectedIndex]?.text || '';
 
             const aiResponse = document.getElementById('aiResponse');
             aiResponse.textContent = 'Analyse en cours...';
             document.getElementById('aiSection').style.display = 'block';
 
-            // Simulation de réponse IA (dans un vrai projet, intégration avec une API IA)
+            // Simulation de réponse IA
             setTimeout(() => {
                 const responses = [
-                    `Pour l'ascenseur ${marqueName} ${typeName} modèle ${model || 'non spécifié'}, je recommande de vérifier d'abord le module de commande principal. Les documents techniques spécifiques ne sont pas encore disponibles dans notre base, mais la procédure standard pour ce type d'appareil est de...`,
+                    `Pour l'ascenseur ${marque} ${type} modèle ${model || 'non spécifié'}, je recommande de vérifier d'abord le module de commande principal. Les documents techniques spécifiques ne sont pas encore disponibles dans notre base, mais la procédure standard pour ce type d'appareil est de...`,
 
-                    `Concernant ${marqueName} ${typeName}, voici quelques conseils techniques généraux : 1. Vérifiez l'alimentation électrique 2. Contrôlez les capteurs de sécurité 3. Inspectez le système de freinage. La documentation détaillée sera bientôt disponible.`,
+                    `Concernant ${marque} ${type}, voici quelques conseils techniques généraux : 1. Vérifiez l'alimentation électrique 2. Contrôlez les capteurs de sécurité 3. Inspectez le système de freinage. La documentation détaillée sera bientôt disponible.`,
 
-                    `L'ascenseur ${marqueName} de type ${typeName} utilise généralement un système de contrôle standard. En attendant la documentation spécifique, voici les étapes de dépannage de base...`
+                    `L'ascenseur ${marque} de type ${type} utilise généralement un système de contrôle standard. En attendant la documentation spécifique, voici les étapes de dépannage de base...`
                 ];
 
                 const randomResponse = responses[Math.floor(Math.random() * responses.length)];
@@ -1249,21 +1236,12 @@
                 return;
             }
 
-            try {
-                const { error } = await supabase
-                    .from('passwords')
-                    .update({ password: newPassword })
-                    .eq('role', 'technician');
+            technicianPass = newPassword;
+            localStorage.setItem('technician_password', newPassword);
 
-                if (error) throw error;
-
-                document.getElementById('newTechnicianPassword').value = '';
-                document.getElementById('confirmTechnicianPassword').value = '';
-                showStatus(statusDiv, 'Mot de passe technicien mis à jour avec succès', 'success');
-            } catch (error) {
-                console.error('Erreur mise à jour mot de passe:', error);
-                showStatus(statusDiv, 'Erreur lors de la mise à jour', 'error');
-            }
+            document.getElementById('newTechnicianPassword').value = '';
+            document.getElementById('confirmTechnicianPassword').value = '';
+            showStatus(statusDiv, 'Mot de passe technicien mis à jour avec succès', 'success');
         }
 
         async function updateAdminPassword() {
@@ -1277,42 +1255,23 @@
                 return;
             }
 
+            if (currentPassword !== adminPass) {
+                showStatus(statusDiv, 'Mot de passe actuel incorrect', 'error');
+                return;
+            }
+
             if (newPassword !== confirmPassword) {
                 showStatus(statusDiv, 'Les nouveaux mots de passe ne correspondent pas', 'error');
                 return;
             }
 
-            try {
-                // Vérifier le mot de passe actuel
-                const { data, error: checkError } = await supabase
-                    .from('passwords')
-                    .select('*')
-                    .eq('role', 'admin')
-                    .single();
+            adminPass = newPassword;
+            localStorage.setItem('admin_password', newPassword);
 
-                if (checkError) throw checkError;
-
-                if (!data || data.password !== currentPassword) {
-                    showStatus(statusDiv, 'Mot de passe actuel incorrect', 'error');
-                    return;
-                }
-
-                // Mettre à jour le mot de passe
-                const { error } = await supabase
-                    .from('passwords')
-                    .update({ password: newPassword })
-                    .eq('role', 'admin');
-
-                if (error) throw error;
-
-                document.getElementById('currentAdminPassword').value = '';
-                document.getElementById('newAdminPassword').value = '';
-                document.getElementById('confirmAdminPassword').value = '';
-                showStatus(statusDiv, 'Mot de passe admin mis à jour avec succès', 'success');
-            } catch (error) {
-                console.error('Erreur mise à jour mot de passe admin:', error);
-                showStatus(statusDiv, 'Erreur lors de la mise à jour', 'error');
-            }
+            document.getElementById('currentAdminPassword').value = '';
+            document.getElementById('newAdminPassword').value = '';
+            document.getElementById('confirmAdminPassword').value = '';
+            showStatus(statusDiv, 'Mot de passe admin mis à jour avec succès', 'success');
         }
 
         function showStatus(element, message, type) {
